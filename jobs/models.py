@@ -13,17 +13,17 @@ class Architecture(models.Model):
     def __unicode__(self):
         return self.architecture
 
-class Handler(models.Model):
+class Builder(models.Model):
     name = models.CharField(max_length=20)
-    description = models.TextField
+    description = models.TextField()
     location = models.CharField(max_length=100)
     architecture = models.ForeignKey(Architecture)
 
     def __unicode__(self):
         return self.name
 
-class HandlerAdministrator(models.Model):
-    handler = models.ForeignKey(Handler)
+class BuilderAdministrator(models.Model):
+    handler = models.ForeignKey(Builder)
     administrator = models.ForeignKey(User)
 
 class Job(models.Model):
@@ -44,18 +44,20 @@ class Job(models.Model):
     state = models.CharField(max_length=1, choices=JOB_STATES, default=u'N')
     distro = models.ForeignKey(Distribution)
 
-class JobTask(models.Model):
+class Task(models.Model):
     JOB_VCS = (
         (u'none', 'None'),
         (u'bzr', 'Bazaar'),
         (u'git', 'GIT'),
         (u'hg', 'Mercurial'),
     )
+
     job = models.ForeignKey(Job)
     debian_url = models.URLField("Package's URL", max_length=1024, verify_exists=False)
     debian_vcs = models.CharField("Package's VCS", max_length=10, choices=JOB_VCS)
     debian_tag = models.CharField("Package's Tag", max_length=50)
     orig_url = models.URLField("Original source's URL", max_length=1024)
+
 
 class JobBuilder(models.Model):
     BUILDER_STATES = (
@@ -68,8 +70,7 @@ class JobBuilder(models.Model):
         (u'F', u'Failed'),
 
     )
-
-    task = models.ForeignKey(JobTask)
+    task = models.ForeignKey(Task)
     architecture = models.ForeignKey(Architecture)
-    handler = models.ForeignKey(Handler)
+    handler = models.ForeignKey(Builder)
     state = models.CharField(max_length=1, choices=BUILDER_STATES, default=u'N')
