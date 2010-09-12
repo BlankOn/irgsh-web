@@ -1,6 +1,18 @@
 from jobs.models import * 
 from django.contrib import admin
 
+class AdministratorInline(admin.StackedInline):
+    model = BuilderAdministrator
+    max_num = 5
+
+class AdministratorAdmin(admin.ModelAdmin):
+    inlines = [AdministratorInline,] 
+
+class DistributionInline(admin.StackedInline):
+    model = DistributionArchitecture
+
+class DistributionAdmin(admin.ModelAdmin):
+    inlines = [DistributionInline,]
 
 class TaskInline(admin.StackedInline):
     model = Task
@@ -10,7 +22,6 @@ class JobAdmin(admin.ModelAdmin):
     inlines = [TaskInline,]
 
 admin.site.register(Architecture)
-admin.site.register(Builder)
+admin.site.register(Builder,AdministratorAdmin)
 admin.site.register(Job, JobAdmin)
-admin.site.register(Distribution)
-admin.site.register(HandlerAdministrator)
+admin.site.register(Distribution, DistributionAdmin)

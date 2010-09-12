@@ -1,0 +1,77 @@
+/**
+  BlankOn Style
+**/
+
+body {
+margin: 0px;
+padding: 0px;
+background: url(/site-media/images/bg.png);
+font-family: arial, sans;
+font-size: 13px;
+}
+
+div#content {
+padding: 20px 30px 20px 30px;
+margin: 0px 70px 0px 70px;
+background-color: white;
+}
+
+div#b-bar-menu {
+background-color: #73d216;
+padding: 5px;
+margin: 0px;
+color: #eeeeec;
+text-align: right;
+}
+
+a#b-a-account {
+color: #44aa00;
+text-decoration: none;
+padding: 7px 5px 7px 5px;
+}
+
+a#b-a-account:hover {
+background-color: #22241c;
+color: #e2e3db;
+}
+
+div#b-bar-closure {
+background-color: #4e9a06;padding: 0px;margin: 0px;height:3px
+}
+
+a#b-a:hover {
+background-color: #4e9a06;
+color: #e2e3db;
+}
+
+a#b-a {
+color: black;
+text-decoration: none;
+padding: 7px 5px 5px 5px;
+margin: 0x;
+}
+
+img#b {
+position: fixed;
+top: 0px;
+left: 0px;
+}
+
+a#submenu {
+color: black;
+text-decoration: none;
+text-transform: uppercase;
+padding: 3px 3px 1px 3px;
+border-style: dotted;
+border-width: 1px;
+border-color: #8e8e8e;
+}
+
+a#submenu:hover {
+background-color: #73d216;
+}
+
+div#copyright {
+color: #73d216;
+text-align: center;
+}

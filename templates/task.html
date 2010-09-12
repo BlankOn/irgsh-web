@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block content %}
+<h1>Task {{ task_id }}</h1>
+Job id: {{ job_id }}<br/>
+Debian URL: {{ debian_url }}<br/>
+Debian VCS: {{ debian_vcs }}<br/>
+{% if debian_tag %}
+Debian tag: {{ debian_tag }}<br/>
+{% endif %}
+{% if orig_url %}
+Original source code: {{ orig_url}}<br/>
+{% endif %}
+
+{% endblock content %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block content %}
+{% if job_id %}
+Your job is accepted as job: {{ job_id }}   
+{% else %}
+<form action="." method=post class="job-form">
+<fieldset class="module aligned ">
+{% for field in form %}
+    <div class="form-row">
+            <div class="field-box">
+                {{ field.errors }}
+                {{ field.label_tag }}: {{ field }}
+            </div>
+    </div>
+{% endfor %}
+</fieldset>
+
+<fieldset class="module aligned ">
+<h2>Tasks</h2>
+<table>
+     <tr>
+     {% for field in formset.forms.0 %}
+          {% if not field.is_hidden %}
+               <td>{{ field.label }}</td>
+          {% endif %}
+     {% endfor %}
+     </tr>
+     {% for f in formset.management_form %}
+          {{ f }}
+     {% endfor %}
+     {% for f in formset.forms %}
+          <tr>
+          {% for field in f %}
+               {% if not field.is_hidden %}
+                    <td>
+                    {{ field.errors }}
+                    {{ field }}
+                    </td>
+               {% else %}
+                    <td valign="bottom">{{ field }}</
+               {% endif %}
+          {% endfor %}
+          </tr>
+     {% endfor %}
+</table>
+</fieldset>
+<input type=submit name=submit>
+</form>
+{% endif %}
+
+{% endblock content %}
