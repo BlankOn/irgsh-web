@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% block title %}
+Logout
+{% endblock %}
 
 
 {% block content %}
+<div class="success">
 You've logged out from this system.
-To complete the logout process from the whole BlankOn system,<a href={{ full_logout_url }}>click here</a>.
+</div>
+To complete the logout process from the whole BlankOn system, <a href={{ full_logout_url }}>click here</a>.
 
 {% endblock content %}

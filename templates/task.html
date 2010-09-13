@@ -1,17 +1,46 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% block title %}
+Information about task #{{ task_id }}
+{% endblock %}
 
 {% block content %}
-<h1>Task {{ task_id }}</h1>
-Job id: {{ job_id }}<br/>
-Debian URL: {{ debian_url }}<br/>
-Debian VCS: {{ debian_vcs }}<br/>
-{% if debian_tag %}
-Debian tag: {{ debian_tag }}<br/>
+<h1>Task #{{ task_id }}</h1>
+Job id: {{ task.job.id }}<br/>
+Debian URL: {{ task.debian_url }}<br/>
+Debian VCS: {{ task.debian_vcs }}<br/>
+{% if task.debian_tag %}
+Debian tag: {{ task.debian_tag }}<br/>
 {% endif %}
-{% if orig_url %}
-Original source code: {{ orig_url}}<br/>
+{% if task.orig_url %}
+Original source code: {{ task.orig_url}}<br/>
+{% endif %}
+
+
+{% if assignments %}
+<fieldset>
+<legend>Builders</legend>
+{% for a in assignments %}
+<fieldset>
+<legend>{{ a.architecture }}</legend>
+Start time: {{ a.start_time }}<br/>
+Builder: {{ a.handler }}<br/>
+State: {{ a.state }}<br/>
+</fieldset>
+{% endfor %}
+</fieldset>
+{% endif %}
+
+{% if manifest %}
+{% for m in manifest %}
+<fieldset>
+<legend>Manifest</legend>
+Name: {{ m.name }}<br/>
+Architecture: {{ m.architecture }}<br/>
+Type: {{ m.type}}<br/>
+</fieldset>
+{% endfor %}
 {% endif %}
 
 {% endblock content %}

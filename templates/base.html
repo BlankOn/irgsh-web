@@ -6,6 +6,7 @@
 		<meta name="keywords" content="BlankOn Linux"/>
 		<meta name="description" content="BlankOn package factory"/>
 		<link rel="stylesheet" type="text/css" href="/site-media/css/blankon.css">
+		<link rel="stylesheet" type="text/css" href="/site-media/css/b/screen.css">
 		{% block extrahead %}{% endblock extrahead %}
     </head>
     <body>
@@ -18,7 +19,8 @@
   <div id="b-bar-closure">
   &nbsp;
   </div>
-<div id="content">
+<div class=container>
+<div class="span-20 prepend-2">
 {% if not user.is_authenticated %}
 <a id=submenu href=/o/login?next=/>{% trans "Login" %}</a>
 {% else %}
@@ -27,14 +29,14 @@
 <a id=submenu href=/logout>{% trans "Logout" %}</a>
 Logged in as: {{ user }}
 {% endif %}
-<p>
+        </div>
+<div class="span-20 prepend-2">
         {% block content %}
         {% endblock content %}
-
-<div id="copyright">
+        </div>
+<hr class="space">
+<div class="span-12 prepend-6" id=copyright>
 (c) 2010, Yayasan Penggerak Linux Indonesia, Tim Pengembang BlankOn
-  </div>
-
 </div>
     </body>
 </html>

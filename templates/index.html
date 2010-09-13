@@ -1,6 +1,25 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% block title %}
+irgsh: Package Builder
+{% endblock %}
 
 {% block content %}
+<div class="span-8 prepend-3">
+<table>
+<tr>
+<th>Job</th>
+<th>Submitter</th>
+<th>Status</th>
+</tr>
+{% for t in tasks %}
+<tr>
+<td><a href=/task/{{ t.id }}>{{ t.id }}</a></td>
+<td>{{ t.job.submitter }}</td>
+<td>{{ t.state }}</td>
+</tr>
+{% endfor %}
+</table>
+</div>
 {% endblock content %}

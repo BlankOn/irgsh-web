@@ -30,7 +30,7 @@ class DistributionArchitecture(models.Model):
         unique_together = (("name", "architecture"),)
 
 class Builder(models.Model):
-    name = models.CharField(max_length=20, primary_key=True)
+    name = models.CharField(max_length=20, unique=True)
     description = models.TextField()
     location = models.CharField(max_length=100)
     architecture = models.ForeignKey(Architecture, limit_choices_to={'logical': False})
@@ -58,11 +58,11 @@ class Job(models.Model):
     )
 
     submitter = models.ForeignKey(User, editable=False)
-    carbon_copy = models.TextField("Cc:", blank=True)
     submission_time = models.DateTimeField(default=datetime.now,editable=False)
     completion_time = models.DateTimeField(default=datetime.now,editable=False)
     state = models.CharField(max_length=1, choices=JOB_STATES, default=u'N', editable=False)
     distro = models.ForeignKey(Distribution)
+    carbon_copy = models.TextField("Cc:", blank=True)
 
     def __unicode__(self):
         return "%d: %s (%s): %s" % (self.id, self.submitter, self.distro, self.state)
@@ -132,4 +132,4 @@ class TaskAssignment(models.Model):
     state = models.CharField(max_length=1, choices=BUILDER_STATES, default=u'N')
 
     class Meta:
-        unique_together = (("task", "architecture","handler"),)
+        unique_together = (("task", "architecture"),)

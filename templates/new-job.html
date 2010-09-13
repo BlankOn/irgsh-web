@@ -1,49 +1,60 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% block title %}
+Submit a new job
+{% endblock %}
 
 
 {% block content %}
 {% if job_id %}
+<div class="success">Success</div>
 Your job is accepted as job: {{ job_id }}   
 {% else %}
+<h1>New job</h1>
+<p>
+Please fill in the data below to submit a new job.
+The newly entered job will be put into a queue which then 
+taken by the builders.
+Please enter correct data in this page as you will not
+be able to edit them later. You can either end up with a 
+failed job or you can cancel the job.
+You can submit up to four tasks within the same job. A failure
+in a task will make the whole tasks in the job fail.
+</p>
 <form action="." method=post class="job-form">
 <fieldset class="module aligned ">
+<legend>Job description</legend>
+<p>Fill in here the email address(es) of people you want to give update about the job, separated by comma. Make sure you are putting the people you know and relevant to this job. Then choose the Distribution that you are targetting.</p>
 {% for field in form %}
     <div class="form-row">
             <div class="field-box">
-                {{ field.errors }}
-                {{ field.label_tag }}: {{ field }}
+                {% if field.errors %}
+                <div class="error">{{ field.errors }}</div>
+                {% endif %}
+                <label for="{{ field.name }}">{{ field.label_tag }}</label><br/> {{ field }}
             </div>
     </div>
 {% endfor %}
 </fieldset>
 
 <fieldset class="module aligned ">
-<h2>Tasks</h2>
-<table>
-     <tr>
-     {% for field in formset.forms.0 %}
-          {% if not field.is_hidden %}
-               <td>{{ field.label }}</td>
-          {% endif %}
-     {% endfor %}
-     </tr>
-     {% for f in formset.management_form %}
-          {{ f }}
-     {% endfor %}
+<legend>Tasks</legend>
+<p>Put here the information about the task.</p>
+{% for f in formset.management_form %}
+{{ f }}
+{% endfor %}
      {% for f in formset.forms %}
-          <tr>
+          <fieldset class="">
           {% for field in f %}
                {% if not field.is_hidden %}
-                    <td>
-                    {{ field.errors }}
-                    {{ field }}
-                    </td>
-               {% else %}
-                    <td valign="bottom">{{ field }}</
+               <br/><label for="{{ field.name }}">{{ field.label }}</label><br/>
                {% endif %}
+               {% if field.errors %}
+                    <div class=error>{{ field.errors }}</div>
+               {% endif %}
+                    {{ field }}
           {% endfor %}
-          </tr>
+          </fieldset>
      {% endfor %}
 </table>
 </fieldset>

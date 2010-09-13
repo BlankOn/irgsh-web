@@ -19,14 +19,26 @@ def site_logout(request):
     )
 
 def site_index(request):
+    tasks_query = Task.objects.all().order_by('id')[:5]
+
     return render_to_response("index.html", 
+        {
+            "tasks": tasks_query, 
+        },
         context_instance=RequestContext(request),
     )
 
 
 def task(request, task_id):
+
+    task_query = Task.objects.get(id=task_id)
+    assignments_query = TaskAssignment.objects.filter(task=task_query)
     return render_to_response("task.html", 
-        { "task_id": task_id} ,
+        { 
+            "task_id": task_id,
+            "task": task_query,
+            "assignments": assignments_query,
+        } ,
         context_instance=RequestContext(request),
     )
     
