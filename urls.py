@@ -22,6 +22,7 @@ urlpatterns = patterns('',
     (r'^logout/', site_logout),
     ('^new-job/', new_job),
     ('^task/(?P<task_id>.*)$', task),
+    (r'xmlrpc/$', 'django_xmlrpc.views.handle_xmlrpc',),
     ('^$', site_index),
 )
 

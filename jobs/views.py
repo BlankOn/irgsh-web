@@ -74,3 +74,79 @@ def new_job(request):
         },
         context_instance=RequestContext(request),
     )
+
+def get_new_tasks():
+    retval = []
+    tasks = Task.objects.filter(state='N')
+    for task in tasks:
+        retval.append(task.id)
+    return retval 
+
+def get_task_info(task):
+    task = Task.objects.get(id=task)
+    
+    retval = {
+        'debian_url': task.debian_url,
+        'debian_vcs': task.debian_vcs,
+        'debian_tag': task.debian_tag,
+        'orig_url': task.orig_url,
+        'state': task.state,
+        'debian_copy': task.debian_copy,
+        'orig_copy': task.orig_copy,
+    }
+
+    return retval
+
+def populate_debian_info(task_id, info):
+    try:
+        task = Task.objects.get(id=task_id)
+
+        task.package = info["source"]
+        task.version = info["version"]
+        task.changelog = info["changelog"]
+
+        for package in info["packages"]:
+            m = TaskManifest()
+            m.task = task
+            m.name = package["package"]
+            m.architecture = package["architecture"]
+            if m.architecture == "source":
+                m.type = 'S'
+            else:
+                m.type = 'B'
+            m.save()
+
+        task.save()
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+
+def set_debian_copy(task_id, url):
+    try:
+        task = Task.objects.get(id=task_id)
+        task.debian_copy = url
+        task.save()
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+
+def set_orig_copy(task_id, url):
+    try:
+        task = Task.objects.get(id=task_id)
+        task.debian_copy = url
+        task.save()
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+def start_downloading(task_id):
+    try:
+        task = Task.objects.get(id=task_id)
+        task.start_downloading()
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+

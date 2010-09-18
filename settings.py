@@ -79,6 +79,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django_openid_auth',
+    'django_xmlrpc',
     'jobs',
 )
 
@@ -95,4 +96,12 @@ OPENID_SSO_SERVER_URL = "http://82.181.46.34:8081/o/"
 FULL_LOGOUT_URL = "http://82.181.46.34:8081/logout"
 OPENID_USE_AS_ADMIN_LOGIN = True
 
-
+XMLRPC_METHODS = (
+    ('jobs.views.get_new_tasks', 'get_new_tasks'),
+    ('jobs.views.get_task_info', 'get_task_info'),
+    ('jobs.views.populate_debian_info', 'populate_debian_info'),
+    ('jobs.views.set_debian_copy', 'set_debian_copy'),
+    ('jobs.views.set_orig_copy', 'set_orig_copy'),
+    ('jobs.views.start_downloading', 'start_downloading'),
+    ('jobs.views.set_orig_copy', 'set_orig_copy'),
+)

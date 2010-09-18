@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext as _
 from django.db import models
 from datetime import datetime
 
@@ -49,12 +50,12 @@ class BuilderAdministrator(models.Model):
 class Job(models.Model):
 
     JOB_STATES = (
-        (u'N', u'New'),
-        (u'S', u'Running'),
-        (u'F', u'Failed'),
-        (u'R', u'Restarted'),
-        (u'C', u'Completed'),
-        (u'X', u'Canceled'),
+        ('N', _(u'New')),
+        ('S', _(u'Running')),
+        ('F', _(u'Failed')),
+        ('R', _(u'Restarted')),
+        ('C', _(u'Completed')),
+        ('X', _(u'Canceled')),
     )
 
     submitter = models.ForeignKey(User, editable=False)
@@ -69,47 +70,63 @@ class Job(models.Model):
 
 class Task(models.Model):
     TASK_STATES = (
-        (u'N', u'New'),
-        (u'D', u'Downloading'),
-        (u'R', u'Running'),
-        (u'F', u'Failed'),
-        (u'C', u'Completed'),
-        (u'X', u'Canceled'),
+        ('N', _(u'New')),
+        ('D', _(u'Downloading')),
+        ('R', _(u'Running')),
+        ('F', _(u'Failed')),
+        ('C', _(u'Completed')),
+        ('X', _(u'Canceled')),
     )
 
     JOB_VCS = (
-        (u'none', 'None (tarball)'),
-        (u'bzr', 'Bazaar'),
-        (u'git', 'GIT'),
-        (u'hg', 'Mercurial'),
+        ('tarball', _('None (tarball)')),
+        ('bzr', _('Bazaar')),
+        ('git', _('GIT')),
+        ('hg', _('Mercurial')),
     )
 
     job = models.ForeignKey(Job)
     state = models.CharField(max_length=1, choices=TASK_STATES, default=u'N', editable=False)
-    debian_url = models.URLField("Package's URL", max_length=1024, verify_exists=False)
+    debian_url = models.CharField("Package's URL", max_length=1024)
     debian_vcs = models.CharField("Package's VCS", max_length=10, choices=JOB_VCS)
     debian_tag = models.CharField("Package's Tag", max_length=50, blank=True)
-    orig_url = models.URLField("Original source's URL", max_length=1024, blank=True)
-    debian_copy = models.CharField(max_length=1024, editable=False)
-    orig_copy = models.CharField(max_length=1024, editable=False)
+    orig_url = models.CharField("Original source's URL", max_length=1024, blank=True)
+    # Copied debian/orig is always a tarball
+    debian_copy = models.URLField(max_length=1024, editable=False)
+    orig_copy = models.URLField(max_length=1024, editable=False)
     changelog = models.TextField(editable=False)
+    package = models.CharField("Package", max_length=150, editable=False, blank=True)
+    version = models.CharField("Version", max_length=150, editable=False, blank=True)
 
     class Meta:
         unique_together = (("job", "state","debian_url", "debian_vcs", "debian_tag", "orig_url"),)
 
+    def start_downloading(self):
+        self.state = 'D'
+        self.save()
+
+    def fail(self):
+        self.state = 'F'
+        self.save()
+
+    def cancel(self):
+        self.state = 'X'
+        self.save()
+
+
 class TaskManifest(models.Model):
     MANIFEST_TYPES = (
-        (u'S', u'Source'),
-        (u'B', u'Binary'),
+        ('S', u'Source'),
+        ('B', u'Binary'),
     )
     task = models.ForeignKey(Task)
     name = models.CharField(max_length=120) 
-    version = models.CharField(max_length=300)
-    architecture = models.ForeignKey(Architecture)
+    #This field is not related to Architecture model
+    architecture = models.CharField(max_length=10)
     type = models.CharField(max_length=1, choices=MANIFEST_TYPES)
 
     class Meta:
-        unique_together = (("name", "version","architecture", "type"),)
+        unique_together = (("task", "name", "architecture", "type"),)
     
 
 class TaskAssignment(models.Model):
