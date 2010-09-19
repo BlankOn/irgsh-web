@@ -7,19 +7,29 @@ irgsh: Package Builder
 
 {% block content %}
 <div class="span-8 prepend-3">
+<fieldset>
+<legend>Latest Tasks</legend>
 <table>
 <tr>
 <th>Job</th>
 <th>Submitter</th>
+<th>Package</th>
+<th>Version</th>
 <th>Status</th>
 </tr>
 {% for t in tasks %}
 <tr>
 <td><a href=/task/{{ t.id }}>{{ t.id }}</a></td>
 <td>{{ t.job.submitter }}</td>
-<td>{{ t.state }}</td>
+<td>{% if t.package %}{{ t.package }}
+{% else %}Unprocessed{% endif %}</td>
+<td>{% if t.version %}{{ t.version }}
+{% else %}Unprocessed{% endif %}</td>
+<td>{{ t.get_state_display }}</td>
 </tr>
 {% endfor %}
 </table>
+<a href=/tasks/>More...</a>
+</fieldset>
 </div>
 {% endblock content %}

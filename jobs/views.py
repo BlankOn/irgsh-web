@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.utils.translation import ugettext as _
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
@@ -25,6 +26,26 @@ def site_index(request):
     return render_to_response("index.html", 
         {
             "tasks": tasks_query, 
+        },
+        context_instance=RequestContext(request),
+    )
+
+def tasks(request):
+    tasks_query = Task.objects.all().order_by('-id')
+    paginator = Paginator(tasks_query, 30)
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        tasks = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        tasks = paginator.page(paginator.num_pages)
+
+    return render_to_response("tasks.html", 
+        {
+            "tasks": tasks, 
         },
         context_instance=RequestContext(request),
     )
@@ -153,12 +174,22 @@ def set_orig_copy(task_id, url):
         return (-1, str(e)) 
     return (0, "")
 
-def start_downloading(task_id):
+def start_running(task_id):
     try:
         task = Task.objects.get(id=task_id)
-        task.start_downloading()
+        task.start_running()
         log = TaskLog(task=task)
-        log.log(_("Starting to download"))
+        log.log(_("Starting to run"))
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+def start_assigning(task_id):
+    try:
+        task = Task.objects.get(id=task_id)
+        task.start_assigning()
+        log = TaskLog(task=task)
+        log.log(_("Starting to assign"))
     except Exception as e:
         return (-1, str(e)) 
     return (0, "")

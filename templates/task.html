@@ -2,13 +2,19 @@
 {% load i18n %}
 
 {% block title %}
-Information about task #{{ task_id }}
+Information about task #{{ task_id }} {{ task.package }} {{ task.version }}
 {% endblock %}
 
 {% block content %}
 <h1>Task #{{ task_id }}</h1>
 Job id: {{ task.job.id }}<br/>
-Task status: {{ task.state }}<br/>
+{% if task.package %}
+Package: {{ task.package }}<br/>
+{% endif %}
+{% if task.version %}
+Version: {{ task.version }}<br/>
+{% endif %}
+Task status: {{ task.get_state_display }}<br/>
 Debian URL: {{ task.debian_url }}<br/>
 Debian VCS: {{ task.debian_vcs }}<br/>
 {% if task.debian_tag %}
@@ -34,7 +40,7 @@ Original source code copy: {{ task.orig_copy}}<br/>
 <legend>{{ a.architecture }}</legend>
 Start time: {{ a.start_time }}<br/>
 Builder: {{ a.handler }}<br/>
-State: {{ a.state }}<br/>
+State: {{ a.get_state_display }}<br/>
 </fieldset>
 {% endfor %}
 </fieldset>
@@ -48,7 +54,7 @@ State: {{ a.state }}<br/>
 <legend>{{ m.name }}</legend>
 Name: {{ m.name }}<br/>
 Architecture: {{ m.architecture }}<br/>
-Type: {{ m.type}}<br/>
+Type: {{ m.get_type_display }}<br/>
 </fieldset>
 {% endfor %}
 </fieldset>
@@ -61,7 +67,7 @@ Type: {{ m.type}}<br/>
 <table>
 {% for entry in log %}
 <tr>
-<td>{{entry.time}}</td>
+<td width=25%>{{entry.time}}</td>
 <td>{{entry.text}}</td>
 </tr>
 {% endfor %}

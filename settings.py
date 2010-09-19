@@ -102,7 +102,8 @@ XMLRPC_METHODS = (
     ('jobs.views.populate_debian_info', 'populate_debian_info'),
     ('jobs.views.set_debian_copy', 'set_debian_copy'),
     ('jobs.views.set_orig_copy', 'set_orig_copy'),
-    ('jobs.views.start_downloading', 'start_downloading'),
+    ('jobs.views.start_running', 'start_running'),
+    ('jobs.views.start_assigning', 'start_assigning'),
     ('jobs.views.set_orig_copy', 'set_orig_copy'),
     ('jobs.views.task_init_failed', 'task_init_failed'),
 )

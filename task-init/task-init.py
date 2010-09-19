@@ -59,7 +59,7 @@ class TaskInit:
         try:
             self.init_and_copy_debian(info, entry, path)
             self.init_and_copy_orig(info, entry, path)
-            self.x.start_downloading(entry)
+            self.x.start_assigning(entry)
         except Exception as e:
             print "Unable to initialize task %d: %s" % (entry, e)
             self.x.task_init_failed(entry, str(e))

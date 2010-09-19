@@ -71,7 +71,7 @@ class Job(models.Model):
 class Task(models.Model):
     TASK_STATES = (
         ('N', _(u'New')),
-        ('D', _(u'Downloading')),
+        ('A', _(u'Assigning')),
         ('R', _(u'Running')),
         ('F', _(u'Failed')),
         ('C', _(u'Completed')),
@@ -101,8 +101,12 @@ class Task(models.Model):
     class Meta:
         unique_together = (("job", "state","debian_url", "debian_vcs", "debian_tag", "orig_url"),)
 
-    def start_downloading(self):
-        self.state = 'D'
+    def start_assigning(self):
+        self.state = 'A'
+        self.save()
+
+    def start_running(self):
+        self.state = 'R'
         self.save()
 
     def fail(self):
@@ -112,6 +116,7 @@ class Task(models.Model):
     def cancel(self):
         self.state = 'X'
         self.save()
+
 
 class TaskLog(models.Model):
     task = models.ForeignKey(Task)
