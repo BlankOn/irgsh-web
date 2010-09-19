@@ -62,6 +62,7 @@ class TaskInit:
             self.x.start_downloading(entry)
         except Exception as e:
             print "Unable to initialize task %d: %s" % (entry, e)
+            self.x.task_init_failed(entry, str(e))
 
     def init_and_copy_debian(self, info, entry, path):
         d = DvcsLoader(info['debian_vcs'], info['debian_url'])        

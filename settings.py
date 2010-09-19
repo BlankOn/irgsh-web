@@ -104,4 +104,5 @@ XMLRPC_METHODS = (
     ('jobs.views.set_orig_copy', 'set_orig_copy'),
     ('jobs.views.start_downloading', 'start_downloading'),
     ('jobs.views.set_orig_copy', 'set_orig_copy'),
+    ('jobs.views.task_init_failed', 'task_init_failed'),
 )

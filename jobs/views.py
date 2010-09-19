@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import ugettext as _
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
@@ -19,7 +20,7 @@ def site_logout(request):
     )
 
 def site_index(request):
-    tasks_query = Task.objects.all().order_by('id')[:5]
+    tasks_query = Task.objects.all().order_by('-id')[:5]
 
     return render_to_response("index.html", 
         {
@@ -33,11 +34,15 @@ def task(request, task_id):
 
     task_query = Task.objects.get(id=task_id)
     assignments_query = TaskAssignment.objects.filter(task=task_query)
+    manifest_query = TaskManifest.objects.filter(task=task_query)
+    log_query = TaskLog.objects.filter(task=task_query)
     return render_to_response("task.html", 
         { 
             "task_id": task_id,
             "task": task_query,
+            "manifest": manifest_query,
             "assignments": assignments_query,
+            "log": log_query,
         } ,
         context_instance=RequestContext(request),
     )
@@ -84,6 +89,7 @@ def get_new_tasks():
 
 def get_task_info(task):
     task = Task.objects.get(id=task)
+    log = TaskLog(task=task)
     
     retval = {
         'debian_url': task.debian_url,
@@ -117,6 +123,8 @@ def populate_debian_info(task_id, info):
             m.save()
 
         task.save()
+        log = TaskLog(task=task)
+        log.log(_("Populated debian information"))
     except Exception as e:
         return (-1, str(e)) 
     return (0, "")
@@ -127,6 +135,8 @@ def set_debian_copy(task_id, url):
         task = Task.objects.get(id=task_id)
         task.debian_copy = url
         task.save()
+        log = TaskLog(task=task)
+        log.log(_("Set debian copy to %s" % url))
     except Exception as e:
         return (-1, str(e)) 
     return (0, "")
@@ -135,8 +145,10 @@ def set_debian_copy(task_id, url):
 def set_orig_copy(task_id, url):
     try:
         task = Task.objects.get(id=task_id)
-        task.debian_copy = url
+        task.orig_copy = url
         task.save()
+        log = TaskLog(task=task)
+        log.log(_("Set orig copy to %s" % url))
     except Exception as e:
         return (-1, str(e)) 
     return (0, "")
@@ -145,8 +157,21 @@ def start_downloading(task_id):
     try:
         task = Task.objects.get(id=task_id)
         task.start_downloading()
+        log = TaskLog(task=task)
+        log.log(_("Starting to download"))
     except Exception as e:
         return (-1, str(e)) 
     return (0, "")
+
+def task_init_failed(task_id, message):
+    try:
+        task = Task.objects.get(id=task_id)
+        task.fail()
+        log = TaskLog(task=task)
+        log.log(_("Task initialization failed: %s" % message))
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
 
 

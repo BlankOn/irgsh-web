@@ -113,6 +113,14 @@ class Task(models.Model):
         self.state = 'X'
         self.save()
 
+class TaskLog(models.Model):
+    task = models.ForeignKey(Task)
+    time = models.DateTimeField(default=datetime.now,editable=False)
+    text = models.TextField() 
+
+    def log(self, text):
+        self.text = text
+        self.save()
 
 class TaskManifest(models.Model):
     MANIFEST_TYPES = (

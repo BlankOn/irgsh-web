@@ -8,13 +8,21 @@ Information about task #{{ task_id }}
 {% block content %}
 <h1>Task #{{ task_id }}</h1>
 Job id: {{ task.job.id }}<br/>
+Task status: {{ task.state }}<br/>
 Debian URL: {{ task.debian_url }}<br/>
 Debian VCS: {{ task.debian_vcs }}<br/>
 {% if task.debian_tag %}
 Debian tag: {{ task.debian_tag }}<br/>
 {% endif %}
+{% if task.debian_copy %}
+Debian copy: {{ task.debian_copy }}<br/>
+{% endif %}
 {% if task.orig_url %}
 Original source code: {{ task.orig_url}}<br/>
+{% endif %}
+
+{% if task.orig_copy %}
+Original source code copy: {{ task.orig_copy}}<br/>
 {% endif %}
 
 
@@ -33,14 +41,31 @@ State: {{ a.state }}<br/>
 {% endif %}
 
 {% if manifest %}
-{% for m in manifest %}
 <fieldset>
 <legend>Manifest</legend>
+{% for m in manifest %}
+<fieldset>
+<legend>{{ m.name }}</legend>
 Name: {{ m.name }}<br/>
 Architecture: {{ m.architecture }}<br/>
 Type: {{ m.type}}<br/>
 </fieldset>
 {% endfor %}
+</fieldset>
 {% endif %}
 
+
+{% if log%}
+<fieldset>
+<legend>Log</legend>
+<table>
+{% for entry in log %}
+<tr>
+<td>{{entry.time}}</td>
+<td>{{entry.text}}</td>
+</tr>
+{% endfor %}
+</table>
+</fieldset>
+{% endif %}
 {% endblock content %}
