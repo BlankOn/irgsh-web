@@ -106,17 +106,70 @@ class Task(models.Model):
         self.save()
 
     def start_running(self):
-        self.state = 'R'
-        self.save()
+        if self.state != 'A':
+            raise Exception("Incorrect state prior to run: %s" % self.state) 
+
+        retval = False
+        manifest = TaskManifest.objects.filter(task=self) 
+        archs = Architecture.objects.filter(active=True, logical=False)
+        total_archs = len(archs)
+        assignments = TaskAssignment.objects.filter(task=self)
+        total_assignments = len(assignments)
+        has_all = 0
+        has_any = 0
+        for m in manifest:
+            if m.type == 'B':
+                if m.architecture == "any":
+                    has_any = 1
+                elif m.architecture == "all":
+                    has_all = 1
+
+        can_run = 0
+        log = TaskLog(task=self)
+        if has_any or has_all:
+            if has_any:
+                # all builders for all archs has been assigned
+                if total_archs == total_assignments:
+                    can_run = 1
+            else:
+                if has_all:
+                    # at least one builder build "all" package
+                    if total_assignments == 1:
+                        can_run = 1
+        else:
+            # package doesn't contain binary packages
+            self.fail() 
+            log.log(_("Debian manifest doesn't contain any binary package, failing"))
+
+        if can_run:
+            self.state = 'R'
+            self.save()
+            log.log(_("All builders are assigned, running now"))
+            return retval
 
     def fail(self):
         self.state = 'F'
         self.save()
+        log = TaskLog(task=self)
+        log.log(_("Task is failed"))
 
     def cancel(self):
         self.state = 'X'
         self.save()
+        log = TaskLog(task=self)
+        log.log( _("Task is canceled"))
 
+    def completing(self):
+        assignments = TaskAssignment.objects.filter(task=self)
+        total_assignments = len(assignments)
+
+        completed_assignments = TaskAssignment.objects.filter(task=self, state='C')
+        total_completed_assignments = len(completed_assignments)
+        if total_assignments == total_completed_assignments:
+            self.state = 'C'
+            self.save()
+            log = TaskLog(task=self)
+            log.log(_("All builders has completed their tasks, completing"))
 
 class TaskLog(models.Model):
     task = models.ForeignKey(Task)
@@ -146,7 +199,7 @@ class TaskAssignment(models.Model):
     BUILDER_STATES = (
         (u'N', u'New'),
         (u'D', u'Downloading'),
-        (u'P', u'Preparing environment'),
+        (u'E', u'Preparing environment'),
         (u'B', u'Building'),
         (u'U', u'Uploading'),
         (u'C', u'Completed'),
@@ -159,7 +212,57 @@ class TaskAssignment(models.Model):
     completion_time = models.DateTimeField()
     architecture = models.ForeignKey(Architecture)
     handler = models.ForeignKey(Builder)
+    log_url = models.CharField(max_length=2048) 
     state = models.CharField(max_length=1, choices=BUILDER_STATES, default=u'N')
+
+    tasklog = TaskLog(task = Task(task))
 
     class Meta:
         unique_together = (("task", "architecture"),)
+
+    def set_log_url(self, url):
+        self.log_url = url
+        self.save()
+
+    def start_downloading(self):
+        self.state = 'D'
+        self.start_time = datetime.now
+        self.save()
+        self.tasklog.log(_("Builder %s is starting to download" % self.builder))
+
+    def start_environment(self):
+        self.state = 'E'
+        self.save()
+        self.tasklog.log(_("Builder %s is starting to prepare the environment" % self.builder))
+
+    def start_building(self):
+        self.state = 'B'
+        self.save()
+        self.tasklog.log(_("Builder %s is starting to build" % self.builder))
+
+    def start_uploading(self):
+        self.state = 'U'
+        self.save()
+        self.tasklog.log(_("Builder %s is starting to upload" % self.builder))
+
+    def start_completing(self):
+        self.state = 'C'
+        self.completion_time = datetime.now
+        self.save()
+        self.tasklog.log(_("Builder %s is starting to complete task" % self.builder))
+        self.task.completing()
+
+    def fail(self):
+        self.state = 'F'
+        self.completion_time = datetime.now
+        self.save()
+        self.tasklog.log(_("Builder %s fails to complete task" % self.builder))
+        self.task.fail()
+
+    def cancel(self):
+        self.state = 'X'
+        self.completion_time = datetime.now
+        self.save()
+        self.tasklog.log(_("Builder %s cancels the task" % self.builder))
+        self.task.cancel()
+

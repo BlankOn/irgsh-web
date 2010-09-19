@@ -101,6 +101,8 @@ def new_job(request):
         context_instance=RequestContext(request),
     )
 
+#### XMLRPC starts here ####
+
 def get_new_tasks():
     retval = []
     tasks = Task.objects.filter(state='N')
@@ -203,6 +205,83 @@ def task_init_failed(task_id, message):
     except Exception as e:
         return (-1, str(e)) 
     return (0, "")
+
+def assign_task(task_id, architecture, handler):
+    try:
+        task_object = Task.objects.get(id=task_id)
+        arch_object = Architecture.objects.get(architecture=architecture)
+        handler_object = Builder.objects.get(name=handler)
+
+        log = TaskLog(task=task_object)
+        log.log(_("Assigning task %d/%s to %s" % (task_id, architecture, handler)))
+        task_object.start_running()
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+def assignment_download(id):
+    try:
+        assignment = TaskAssignment(id=id)
+        assignment.start_downloading()
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+def assignment_environment(id):
+    try:
+        assignment = TaskAssignment(id=id)
+        assignment.start_environment()
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+def assignment_building(id):
+    try:
+        assignment = TaskAssignment(id=id)
+        assignment.start_building()
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+def assignment_upload(id):
+    try:
+        assignment = TaskAssignment(id=id)
+        assignment.start_uploading()
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+def assignment_complete(id):
+    try:
+        assignment = TaskAssignment(id=id)
+        assignment.start_completing()
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+def assignment_fail(id):
+    try:
+        assignment = TaskAssignment(id=id)
+        assignment.fail()
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+
+def assignment_set_log_url(id, url):
+    try:
+        assignment = TaskAssignment(id=id)
+        assignment.set_log_url(url)
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+
+#def ()
+#    try:
+#    except Exception as e:
+#        return (-1, str(e)) 
+#    return (0, "")
 
 
 

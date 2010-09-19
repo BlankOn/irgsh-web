@@ -106,4 +106,13 @@ XMLRPC_METHODS = (
     ('jobs.views.start_assigning', 'start_assigning'),
     ('jobs.views.set_orig_copy', 'set_orig_copy'),
     ('jobs.views.task_init_failed', 'task_init_failed'),
+    ('jobs.views.start_running', 'start_running'),
+    ('jobs.views.assign_task', 'assign_task'),
+    ('jobs.views.assignment_download', 'assignment_download'),
+    ('jobs.views.assignment_environment', 'assignment_environment'),
+    ('jobs.views.assignment_building', 'assignment_building'),
+    ('jobs.views.assignment_upload', 'assignment_upload'),
+    ('jobs.views.assignment_complete', 'assignment_complete'),
+    ('jobs.views.assignment_fail', 'assignment_fail'),
+    ('jobs.views.assignment_set_log_url', 'assignment_set_log_url'),
 )
