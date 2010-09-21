@@ -52,7 +52,6 @@ def tasks(request):
 
 
 def task(request, task_id):
-
     task_query = Task.objects.get(id=task_id)
     assignments_query = TaskAssignment.objects.filter(task=task_query)
     manifest_query = TaskManifest.objects.filter(task=task_query)
@@ -115,6 +114,7 @@ def get_task_info(task):
     log = TaskLog(task=task)
     
     retval = {
+        'distribution': task.job.distro.name,
         'debian_url': task.debian_url,
         'debian_vcs': task.debian_vcs,
         'debian_tag': task.debian_tag,
@@ -199,29 +199,39 @@ def start_assigning(task_id):
 def task_init_failed(task_id, message):
     try:
         task = Task.objects.get(id=task_id)
-        task.fail()
-        log = TaskLog(task=task)
-        log.log(_("Task initialization failed: %s" % message))
+        task.fail(_("Task initialization failed: %s" % message))
     except Exception as e:
         return (-1, str(e)) 
     return (0, "")
 
-def assign_task(task_id, architecture, handler):
+def assign_task(task_id, handler):
     try:
         task_object = Task.objects.get(id=task_id)
-        arch_object = Architecture.objects.get(architecture=architecture)
         handler_object = Builder.objects.get(name=handler)
-
+        architecture_object = handler_object.architecture
+        assignment = TaskAssignment(task=task_object, architecture=architecture_object, handler=handler_object)
+        assignment.save()
         log = TaskLog(task=task_object)
-        log.log(_("Assigning task %d/%s to %s" % (task_id, architecture, handler)))
+        log.log(_("Assigning task %d/%s to %s" % (task_id, str(handler_object.architecture), handler)))
         task_object.start_running()
     except Exception as e:
         return (-1, str(e)) 
-    return (0, "")
+    return (0, assignment.id)
+
+def get_assignment_from_builder_and_task(task_id, handler):
+    try:
+        task_object = Task.objects.get(id=task_id)
+        handler_object = Builder.objects.get(name=handler)
+        architecture_object = handler_object.architecture
+        assignment = TaskAssignment.objects.get(task=task_object, architecture=architecture_object, handler=handler_object)
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, assignment.id)
+        
 
 def assignment_download(id):
     try:
-        assignment = TaskAssignment(id=id)
+        assignment = TaskAssignment.objects.get(id=id)
         assignment.start_downloading()
     except Exception as e:
         return (-1, str(e)) 
@@ -229,7 +239,7 @@ def assignment_download(id):
 
 def assignment_environment(id):
     try:
-        assignment = TaskAssignment(id=id)
+        assignment = TaskAssignment.objects.get(id=id)
         assignment.start_environment()
     except Exception as e:
         return (-1, str(e)) 
@@ -237,7 +247,7 @@ def assignment_environment(id):
 
 def assignment_building(id):
     try:
-        assignment = TaskAssignment(id=id)
+        assignment = TaskAssignment.objects.get(id=id)
         assignment.start_building()
     except Exception as e:
         return (-1, str(e)) 
@@ -245,7 +255,7 @@ def assignment_building(id):
 
 def assignment_upload(id):
     try:
-        assignment = TaskAssignment(id=id)
+        assignment = TaskAssignment.objects.get(id=id)
         assignment.start_uploading()
     except Exception as e:
         return (-1, str(e)) 
@@ -253,7 +263,7 @@ def assignment_upload(id):
 
 def assignment_complete(id):
     try:
-        assignment = TaskAssignment(id=id)
+        assignment = TaskAssignment.objects.get(id=id)
         assignment.start_completing()
     except Exception as e:
         return (-1, str(e)) 
@@ -261,7 +271,7 @@ def assignment_complete(id):
 
 def assignment_fail(id):
     try:
-        assignment = TaskAssignment(id=id)
+        assignment = TaskAssignment.objects.get(id=id)
         assignment.fail()
     except Exception as e:
         return (-1, str(e)) 
@@ -270,12 +280,24 @@ def assignment_fail(id):
 
 def assignment_set_log_url(id, url):
     try:
-        assignment = TaskAssignment(id=id)
+        assignment = TaskAssignment.objects.get(id=id)
         assignment.set_log_url(url)
     except Exception as e:
         return (-1, str(e)) 
     return (0, "")
 
+
+def get_unassigned_task():
+    id = -1
+    try:
+        task = Task.objects.filter(state='A').order_by('-id')[:1]
+        if len(task) == 0:
+            return (0, -1)
+        id = task[0].id
+    except Exception as e:
+        return (-1, str(e)) 
+    
+    return (0, id)
 
 #def ()
 #    try:

@@ -71,7 +71,7 @@ class Job(models.Model):
 class Task(models.Model):
     TASK_STATES = (
         ('N', _(u'New')),
-        ('A', _(u'Assigning')),
+        ('A', _(u'Waiting for builders')),
         ('R', _(u'Running')),
         ('F', _(u'Failed')),
         ('C', _(u'Completed')),
@@ -138,8 +138,7 @@ class Task(models.Model):
                         can_run = 1
         else:
             # package doesn't contain binary packages
-            self.fail() 
-            log.log(_("Debian manifest doesn't contain any binary package, failing"))
+            self.fail(_("Debian manifest doesn't contain any binary package, failing"))
 
         if can_run:
             self.state = 'R'
@@ -147,11 +146,11 @@ class Task(models.Model):
             log.log(_("All builders are assigned, running now"))
             return retval
 
-    def fail(self):
+    def fail(self, message):
         self.state = 'F'
         self.save()
         log = TaskLog(task=self)
-        log.log(_("Task is failed"))
+        log.log(_("Task is failed: %s" % message))
 
     def cancel(self):
         self.state = 'X'
@@ -208,14 +207,15 @@ class TaskAssignment(models.Model):
     )
     task = models.ForeignKey(Task)
     assign_time = models.DateTimeField(default=datetime.now)
-    start_time = models.DateTimeField()
-    completion_time = models.DateTimeField()
+    start_time = models.DateTimeField(default=datetime.now)
+    completion_time = models.DateTimeField(default=datetime.now)
     architecture = models.ForeignKey(Architecture)
     handler = models.ForeignKey(Builder)
     log_url = models.CharField(max_length=2048) 
     state = models.CharField(max_length=1, choices=BUILDER_STATES, default=u'N')
 
     tasklog = TaskLog(task = Task(task))
+    t=Task(task)
 
     class Meta:
         unique_together = (("task", "architecture"),)
@@ -226,43 +226,42 @@ class TaskAssignment(models.Model):
 
     def start_downloading(self):
         self.state = 'D'
-        self.start_time = datetime.now
+        self.start_time = datetime.now()
         self.save()
-        self.tasklog.log(_("Builder %s is starting to download" % self.builder))
+        self.tasklog.log(_("Builder %s is starting to download" % self.handler))
 
     def start_environment(self):
         self.state = 'E'
         self.save()
-        self.tasklog.log(_("Builder %s is starting to prepare the environment" % self.builder))
+        self.tasklog.log(_("Builder %s is starting to prepare the environment" % self.handler))
 
     def start_building(self):
         self.state = 'B'
         self.save()
-        self.tasklog.log(_("Builder %s is starting to build" % self.builder))
+        self.tasklog.log(_("Builder %s is starting to build" % self.handler))
 
     def start_uploading(self):
         self.state = 'U'
         self.save()
-        self.tasklog.log(_("Builder %s is starting to upload" % self.builder))
+        self.tasklog.log(_("Builder %s is starting to upload" % self.handler))
 
     def start_completing(self):
         self.state = 'C'
-        self.completion_time = datetime.now
+        self.completion_time = datetime.now()
         self.save()
-        self.tasklog.log(_("Builder %s is starting to complete task" % self.builder))
+        self.tasklog.log(_("Builder %s is starting to complete task" % self.handler))
         self.task.completing()
 
     def fail(self):
         self.state = 'F'
-        self.completion_time = datetime.now
+        self.completion_time = datetime.now()
         self.save()
-        self.tasklog.log(_("Builder %s fails to complete task" % self.builder))
-        self.task.fail()
+        self.task.fail(_("Builder %s fails to complete task" % self.handler))
 
     def cancel(self):
         self.state = 'X'
-        self.completion_time = datetime.now
+        self.completion_time = datetime.now()
         self.save()
-        self.tasklog.log(_("Builder %s cancels the task" % self.builder))
+        self.tasklog.log(_("Builder %s cancels the task" % self.handler))
         self.task.cancel()
 

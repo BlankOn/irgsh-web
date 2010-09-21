@@ -115,4 +115,6 @@ XMLRPC_METHODS = (
     ('jobs.views.assignment_complete', 'assignment_complete'),
     ('jobs.views.assignment_fail', 'assignment_fail'),
     ('jobs.views.assignment_set_log_url', 'assignment_set_log_url'),
+    ('jobs.views.get_unassigned_task', 'get_unassigned_task'),
+    ('jobs.views.get_assignment_from_builder_and_task', 'get_assignment_from_builder_and_task'),
 )
