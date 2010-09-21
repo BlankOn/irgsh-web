@@ -35,10 +35,15 @@ class Builder(models.Model):
     description = models.TextField()
     location = models.CharField(max_length=100)
     architecture = models.ForeignKey(Architecture, limit_choices_to={'logical': False})
+    last_ping = models.DateTimeField(default=datetime.now,editable=False)
     active = models.BooleanField()
 
     def __unicode__(self):
         return self.name
+
+    def ping(self):
+        self.last_ping = datetime.now()
+        self.save()
 
 class BuilderAdministrator(models.Model):
     handler = models.ForeignKey(Builder)
@@ -105,6 +110,10 @@ class Task(models.Model):
         self.state = 'A'
         self.save()
 
+    def log(self, text):
+        log = TaskLog(task=self)
+        log.log(text)
+
     def start_running(self):
         if self.state != 'A':
             raise Exception("Incorrect state prior to run: %s" % self.state) 
@@ -125,7 +134,6 @@ class Task(models.Model):
                     has_all = 1
 
         can_run = 0
-        log = TaskLog(task=self)
         if has_any or has_all:
             if has_any:
                 # all builders for all archs has been assigned
@@ -143,20 +151,20 @@ class Task(models.Model):
         if can_run:
             self.state = 'R'
             self.save()
-            log.log(_("All builders are assigned, running now"))
+            self.log(_("All builders are assigned, running now"))
             return retval
 
     def fail(self, message):
         self.state = 'F'
         self.save()
         log = TaskLog(task=self)
-        log.log(_("Task is failed: %s" % message))
+        self.log(_("Task is failed: %s" % message))
 
     def cancel(self):
         self.state = 'X'
         self.save()
         log = TaskLog(task=self)
-        log.log( _("Task is canceled"))
+        self.log( _("Task is canceled"))
 
     def completing(self):
         assignments = TaskAssignment.objects.filter(task=self)
@@ -168,7 +176,7 @@ class Task(models.Model):
             self.state = 'C'
             self.save()
             log = TaskLog(task=self)
-            log.log(_("All builders has completed their tasks, completing"))
+            self.log(_("All builders has completed their tasks, completing"))
 
 class TaskLog(models.Model):
     task = models.ForeignKey(Task)
@@ -200,6 +208,7 @@ class TaskAssignment(models.Model):
         (u'D', u'Downloading'),
         (u'E', u'Preparing environment'),
         (u'B', u'Building'),
+        (u'W', u'Waiting for uploading'),
         (u'U', u'Uploading'),
         (u'C', u'Completed'),
         (u'F', u'Failed'),
@@ -213,9 +222,7 @@ class TaskAssignment(models.Model):
     handler = models.ForeignKey(Builder)
     log_url = models.CharField(max_length=2048) 
     state = models.CharField(max_length=1, choices=BUILDER_STATES, default=u'N')
-
-    tasklog = TaskLog(task = Task(task))
-    t=Task(task)
+    dsc = models.CharField(max_length=1024,blank=True)
 
     class Meta:
         unique_together = (("task", "architecture"),)
@@ -228,40 +235,46 @@ class TaskAssignment(models.Model):
         self.state = 'D'
         self.start_time = datetime.now()
         self.save()
-        self.tasklog.log(_("Builder %s is starting to download" % self.handler))
+        self.task.log(_("Builder %s is starting to download" % self.handler))
 
     def start_environment(self):
         self.state = 'E'
         self.save()
-        self.tasklog.log(_("Builder %s is starting to prepare the environment" % self.handler))
+        self.task.log(_("Builder %s is starting to prepare the environment" % self.handler))
 
     def start_building(self):
         self.state = 'B'
         self.save()
-        self.tasklog.log(_("Builder %s is starting to build" % self.handler))
+        self.task.log(_("Builder %s is starting to build" % self.handler))
+
+    def wait_for_upload(self, dsc):
+        self.state = 'W'
+        self.dsc = dsc
+        self.save()
+        self.task.log(_("Builder %s is finished producing %s and waiting for upload" % (self.handler, dsc)))
 
     def start_uploading(self):
         self.state = 'U'
         self.save()
-        self.tasklog.log(_("Builder %s is starting to upload" % self.handler))
+        self.task.log(_("Builder %s is starting to upload" % self.handler))
 
     def start_completing(self):
         self.state = 'C'
         self.completion_time = datetime.now()
         self.save()
-        self.tasklog.log(_("Builder %s is starting to complete task" % self.handler))
+        self.task.log(_("Builder %s is starting to complete task" % self.handler))
         self.task.completing()
 
-    def fail(self):
+    def fail(self, message):
         self.state = 'F'
         self.completion_time = datetime.now()
         self.save()
-        self.task.fail(_("Builder %s fails to complete task" % self.handler))
+        self.task.fail(_("Builder %s fails to complete task: %s" % (self.handler, message)))
 
     def cancel(self):
         self.state = 'X'
         self.completion_time = datetime.now()
         self.save()
-        self.tasklog.log(_("Builder %s cancels the task" % self.handler))
+        self.task.log(_("Builder %s cancels the task" % self.handler))
         self.task.cancel()
 

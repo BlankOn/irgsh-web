@@ -65,24 +65,29 @@ class TaskInit:
             self.x.task_init_failed(entry, str(e))
 
     def init_and_copy_debian(self, info, entry, path):
+        orig_path = path
         d = DvcsLoader(info['debian_vcs'], info['debian_url'])        
+        path = os.path.join(path, "debian")
         if d.instance.export(path) == False:
             raise Exception("Unable to export")
 
-        basename = os.path.join(path, os.path.basename(d.instance.url))
+        basename = os.path.join(orig_path, os.path.basename(d.instance.url))
         try:
-            debian_info = self.explode_debian(basename)
+            debian_info = self.explode_debian(path)
             (code, msg) = self.x.populate_debian_info(entry, debian_info)
             if code == -1:
                 raise Exception(msg)
         except Exception as e:
-            shutil.rmtree(basename)
+            shutil.rmtree(path)
             raise
 
+        cwd = os.getcwd()
         t = tarfile.open(basename + ".tar.bz2", "w:bz2")
-        t.add(basename)
+        os.chdir(path)
+        t.add("./")
         t.close()
-        shutil.rmtree(basename)
+        os.chdir(cwd)
+        shutil.rmtree(path)
         (code, msg) = self.x.set_debian_copy(entry, "%s/task/%d/%s.tar.bz2" % (self.copy_path, entry, os.path.basename(basename)))
 
     def explode_debian(self, dir):
@@ -154,10 +159,11 @@ class TaskInit:
         if info['orig_url'] == "":
             return
 
-        d = DvcsLoader('tarball', info['orig_url'])        
-        if d.instance.export(path) == False:
-            raise Exception("Unable to export")
+        f = urllib2.urlopen(info['orig_url'])
+        local = open(path, "w")
+        local.write(f.read())
+        local.close()
 
-        (code, msg) = self.x.set_orig_copy(entry, "%s/task/%d/%s.tar.bz2" % (self.copy_path, entry, os.path.basename(info['orig_url'])))
+        (code, msg) = self.x.set_orig_copy(entry, "%s/task/%d/%s" % (self.copy_path, entry, os.path.basename(info['orig_url'])))
 
 t = TaskInit()

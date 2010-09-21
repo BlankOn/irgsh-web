@@ -39,7 +39,7 @@ Original source code copy: {{ task.orig_copy}}<br/>
 <fieldset>
 <legend>{{ a.architecture }}</legend>
 Start time: {{ a.start_time }}<br/>
-Builder: {{ a.handler }}<br/>
+Builder: <a href="/builder/{{ a.handler }}">{{ a.handler }}</a><br/>
 State: {{ a.get_state_display }}<br/>
 </fieldset>
 {% endfor %}

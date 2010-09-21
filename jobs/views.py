@@ -67,6 +67,35 @@ def task(request, task_id):
         context_instance=RequestContext(request),
     )
     
+def builder(request, builder_id):
+    try:
+        builder_query = Builder.objects.get(name=builder_id)
+    except:
+        return HttpResponseRedirect("/")
+
+    assignments = TaskAssignment.objects.filter(handler=builder_query).order_by('-id')[:5]
+    delta = datetime.now() - builder_query.last_ping
+
+    if builder_query.active == False:
+        status = _("Dormant")
+    else:
+        if delta.days > 1:
+            status = _("Unreachable")
+        elif delta.seconds > 3600:
+            status = _("Active (but almost unresponsive)")
+        else:
+            status = _("Active")
+        
+    return render_to_response("builder.html", 
+        { 
+            "builder_id": builder_id,
+            "builder": builder_query,
+            "assignments": assignments,
+            "status": status,
+        } ,
+        context_instance=RequestContext(request),
+    )
+ 
 @login_required
 def new_job(request):
 
@@ -218,6 +247,21 @@ def assign_task(task_id, handler):
         return (-1, str(e)) 
     return (0, assignment.id)
 
+def get_assignment_info(assignment):
+    try:
+        assignment = Task.objects.get(id=assignment)
+        
+        retval = {
+            'state': assignment.state,
+            'dsc': assignment.dsc
+        }
+
+        return (0, retval)
+    except Exception as e:
+        return (-1, str(e)) 
+
+
+
 def get_assignment_from_builder_and_task(task_id, handler):
     try:
         task_object = Task.objects.get(id=task_id)
@@ -269,14 +313,21 @@ def assignment_complete(id):
         return (-1, str(e)) 
     return (0, "")
 
-def assignment_fail(id):
+def assignment_fail(id, message):
     try:
         assignment = TaskAssignment.objects.get(id=id)
-        assignment.fail()
+        assignment.fail(message)
     except Exception as e:
         return (-1, str(e)) 
     return (0, "")
 
+def assignment_wait_for_upload(id, dsc):
+    try:
+        assignment = TaskAssignment.objects.get(id=id)
+        assignment.wait_for_upload(dsc)
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
 
 def assignment_set_log_url(id, url):
     try:
@@ -298,6 +349,15 @@ def get_unassigned_task():
         return (-1, str(e)) 
     
     return (0, id)
+
+def builder_ping(id):
+    try:
+        builder = Builder.objects.get(name=id)
+        builder.ping()
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
 
 #def ()
 #    try:
