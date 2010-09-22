@@ -205,7 +205,7 @@ def set_orig_copy(task_id, url):
         return (-1, str(e)) 
     return (0, "")
 
-def start_running(task_id):
+def xstart_running(task_id):
     try:
         task = Task.objects.get(id=task_id)
         task.start_running()
@@ -215,7 +215,7 @@ def start_running(task_id):
         return (-1, str(e)) 
     return (0, "")
 
-def start_assigning(task_id):
+def xstart_assigning(task_id):
     try:
         task = Task.objects.get(id=task_id)
         task.start_assigning()
@@ -249,12 +249,14 @@ def assign_task(task_id, handler):
 
 def get_assignment_info(assignment):
     try:
-        assignment = Task.objects.get(id=assignment)
+        assignment = TaskAssignment.objects.get(id=assignment)
         
         retval = {
+            'task': assignment.task.id,
             'state': assignment.state,
             'dsc': assignment.dsc
         }
+        print retval
 
         return (0, retval)
     except Exception as e:
@@ -262,15 +264,19 @@ def get_assignment_info(assignment):
 
 
 
-def get_assignment_from_builder_and_task(task_id, handler):
+def get_assignment_for_builder(handler):
+    id = -1
     try:
-        task_object = Task.objects.get(id=task_id)
         handler_object = Builder.objects.get(name=handler)
         architecture_object = handler_object.architecture
-        assignment = TaskAssignment.objects.get(task=task_object, architecture=architecture_object, handler=handler_object)
+        assignments = TaskAssignment.objects.filter(handler=handler_object)
+        for assignment in assignments:
+            if assignment.new_or_stalled():
+                id = assignment.id
+                break
     except Exception as e:
         return (-1, str(e)) 
-    return (0, assignment.id)
+    return (0, id)
         
 
 def assignment_download(id):
@@ -338,13 +344,24 @@ def assignment_set_log_url(id, url):
     return (0, "")
 
 
-def get_unassigned_task():
+def get_unassigned_task(handler):
     id = -1
     try:
+        builder = Builder.objects.get(name=handler)
+        architecture = builder.architecture
         task = Task.objects.filter(state='A').order_by('-id')[:1]
         if len(task) == 0:
             return (0, -1)
-        id = task[0].id
+
+        task[0].start_running()
+        assignments = TaskAssignment.objects.filter(task=task[0])
+        skip = False
+        for assignment in assignments:
+            # There is already assignment for this architecuture, skip it
+            if assignment.architecture == architecture:
+                skip = True
+        if skip == False:
+            id = task[0].id
     except Exception as e:
         return (-1, str(e)) 
     

@@ -9,7 +9,7 @@ import shutil
 from irgsh.dvcs import *
 from debian_bundle import deb822
 from debian_bundle.changelog import Changelog
-
+import urllib2
 
 class TaskInit:
     def __init__(self):
@@ -63,6 +63,7 @@ class TaskInit:
         except Exception as e:
             print "Unable to initialize task %d: %s" % (entry, e)
             self.x.task_init_failed(entry, str(e))
+            raise
 
     def init_and_copy_debian(self, info, entry, path):
         orig_path = path
@@ -96,6 +97,26 @@ class TaskInit:
             raise Exception("Not a debian directory")
 
         f = open(control)
+        w = None
+        start = False
+        for line in f:
+            if start == False:
+                if line.startswith("Source: "):
+                    if w == None:
+                        f.seek(0)
+                        break
+                    else:
+                        start = True
+                        w.write(line)
+                else:
+                    w = open("%s.stripped" % control, "w")
+            else:
+                w.write(line)
+
+        if w != None:
+            f = open("%s.stripped" % control)
+            w.close()
+
         source = ""
         packages = []
         for p in deb822.Packages.iter_paragraphs(f):
@@ -160,7 +181,7 @@ class TaskInit:
             return
 
         f = urllib2.urlopen(info['orig_url'])
-        local = open(path, "w")
+        local = open(os.path.join(path, os.path.basename(info['orig_url'])), "w")
         local.write(f.read())
         local.close()
 

@@ -19,6 +19,13 @@ DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
+DEFAULT_FROM_EMAIL = 'webmaster@blankon.in'
+EMAIL_USE_TLS = False
+EMAIL_HOST = 'smtp.welho.com'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_PORT = '25'
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -102,11 +109,10 @@ XMLRPC_METHODS = (
     ('jobs.views.populate_debian_info', 'populate_debian_info'),
     ('jobs.views.set_debian_copy', 'set_debian_copy'),
     ('jobs.views.set_orig_copy', 'set_orig_copy'),
-    ('jobs.views.start_running', 'start_running'),
-    ('jobs.views.start_assigning', 'start_assigning'),
+    ('jobs.views.xstart_assigning', 'start_assigning'),
     ('jobs.views.set_orig_copy', 'set_orig_copy'),
     ('jobs.views.task_init_failed', 'task_init_failed'),
-    ('jobs.views.start_running', 'start_running'),
+    ('jobs.views.xstart_running', 'start_running'),
     ('jobs.views.assign_task', 'assign_task'),
     ('jobs.views.assignment_download', 'assignment_download'),
     ('jobs.views.assignment_environment', 'assignment_environment'),
@@ -117,7 +123,7 @@ XMLRPC_METHODS = (
     ('jobs.views.assignment_wait_for_upload', 'assignment_wait_for_upload'),
     ('jobs.views.assignment_set_log_url', 'assignment_set_log_url'),
     ('jobs.views.get_unassigned_task', 'get_unassigned_task'),
-    ('jobs.views.get_assignment_from_builder_and_task', 'get_assignment_from_builder_and_task'),
+    ('jobs.views.get_assignment_for_builder', 'get_assignment_for_builder'),
     ('jobs.views.builder_ping', 'builder_ping'),
     ('jobs.views.get_assignment_info', 'get_assignment_info'),
 )

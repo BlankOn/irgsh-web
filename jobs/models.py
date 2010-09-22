@@ -2,6 +2,12 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.db import models
 from datetime import datetime
+from django.template.loader import render_to_string
+
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core.mail import send_mail
+current_site = Site.objects.get_current()
 
 class Architecture(models.Model):
     architecture = models.CharField(max_length=6, primary_key=True)
@@ -121,7 +127,11 @@ class Task(models.Model):
         retval = False
         manifest = TaskManifest.objects.filter(task=self) 
         archs = Architecture.objects.filter(active=True, logical=False)
-        total_archs = len(archs)
+        total_archs = 0
+        for arch in archs:
+            b = Builder.objects.filter(active=True, architecture=arch)
+            if len(b) > 0:
+                total_archs = total_archs + 1
         assignments = TaskAssignment.objects.filter(task=self)
         total_assignments = len(assignments)
         has_all = 0
@@ -158,13 +168,32 @@ class Task(models.Model):
         self.state = 'F'
         self.save()
         log = TaskLog(task=self)
+
         self.log(_("Task is failed: %s" % message))
+
+        self.mail('task-failed-subject.mail.txt', 'task-failed-body.mail.txt')
+
+    def mail(self, subject, body):
+        subject = render_to_string(subject,
+                                    { 'task_id': self.id,
+                                      'site': current_site
+                                    })
+        subject = subject.splitlines()
+        
+        message = render_to_string(body,
+                                   {
+                                     'task_id': self.id, 
+                                     'name': self.job.submitter.first_name, 
+                                     'site': current_site })
+        
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.job.submitter.email])
 
     def cancel(self):
         self.state = 'X'
         self.save()
         log = TaskLog(task=self)
         self.log( _("Task is canceled"))
+        self.mail('task-canceled-subject.mail.txt', 'task-canceled-body.mail.txt')
 
     def completing(self):
         assignments = TaskAssignment.objects.filter(task=self)
@@ -177,6 +206,7 @@ class Task(models.Model):
             self.save()
             log = TaskLog(task=self)
             self.log(_("All builders has completed their tasks, completing"))
+            self.mail('task-completed-subject.mail.txt', 'task-completed-body.mail.txt')
 
 class TaskLog(models.Model):
     task = models.ForeignKey(Task)
@@ -205,8 +235,6 @@ class TaskManifest(models.Model):
 class TaskAssignment(models.Model):
     BUILDER_STATES = (
         (u'N', u'New'),
-        (u'D', u'Downloading'),
-        (u'E', u'Preparing environment'),
         (u'B', u'Building'),
         (u'W', u'Waiting for uploading'),
         (u'U', u'Uploading'),
@@ -226,6 +254,11 @@ class TaskAssignment(models.Model):
 
     class Meta:
         unique_together = (("task", "architecture"),)
+
+    def new_or_stalled(self):
+        if self.state == "N" or self.state == "B":
+            return True
+        return False
 
     def set_log_url(self, url):
         self.log_url = url

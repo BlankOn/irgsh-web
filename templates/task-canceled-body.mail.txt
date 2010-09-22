@@ -1,0 +1,9 @@
+{% load i18n %}
+{% blocktrans %}Hi {{ name }},
+
+Your submitted task {{ task_id }} was canceled. 
+Please visit {{ site }}/task/{{ task_id }} for more detail.
+
+Yours sincerely,
+irgsh.
+{% endblocktrans %}
