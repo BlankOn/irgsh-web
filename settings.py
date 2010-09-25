@@ -121,6 +121,7 @@ XMLRPC_METHODS = (
     ('jobs.views.assignment_upload', 'assignment_upload'),
     ('jobs.views.assignment_complete', 'assignment_complete'),
     ('jobs.views.assignment_fail', 'assignment_fail'),
+    ('jobs.views.assignment_cancel', 'assignment_cancel'),
     ('jobs.views.assignment_wait_for_upload', 'assignment_wait_for_upload'),
     ('jobs.views.assignment_wait_for_installing', 'assignment_wait_for_installing'),
     ('jobs.views.assignment_upload_log', 'assignment_upload_log'),

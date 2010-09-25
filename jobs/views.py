@@ -374,6 +374,15 @@ def assignment_fail(id, message):
         return (-1, str(e)) 
     return (0, "")
 
+def assignment_cancel(id, message):
+    try:
+        assignment = TaskAssignment.objects.get(id=id)
+        assignment.cancel(False, message)
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+
 def assignment_wait_for_upload(id, dsc):
     try:
         assignment = TaskAssignment.objects.get(id=id)

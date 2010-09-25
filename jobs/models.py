@@ -347,10 +347,11 @@ class TaskAssignment(models.Model):
         self.save()
 
 
-    def cancel(self):
+    def cancel(self, cancel_task_too, message):
         self.state = 'X'
         self.completion_time = datetime.now()
         self.save()
-        self.task.log(_("Builder %s cancels the task" % self.handler))
-        self.task.cancel()
+        self.task.log(_("Builder %s cancels the task: %s" % (self.handler, message)))
+        if cancel_task_too:
+            self.task.cancel()
 
