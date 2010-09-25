@@ -72,7 +72,7 @@ class TaskInit:
         if d.instance.export(path) == False:
             raise Exception("Unable to export")
 
-        basename = os.path.join(orig_path, os.path.basename(d.instance.url))
+        basename = os.path.join(orig_path, os.path.basename(d.instance.url).strip("/"))
         try:
             debian_info = self.explode_debian(path)
             (code, msg) = self.x.populate_debian_info(entry, debian_info)
