@@ -102,6 +102,7 @@ LOGIN_REDIRECT_URL = '/o'
 OPENID_SSO_SERVER_URL = "http://82.181.46.34:8081/o/"
 FULL_LOGOUT_URL = "http://82.181.46.34:8081/logout"
 OPENID_USE_AS_ADMIN_LOGIN = True
+LOG_PATH = "/home/mdamt/tmp/logs"
 
 XMLRPC_METHODS = (
     ('jobs.views.get_new_tasks', 'get_new_tasks'),
@@ -121,9 +122,12 @@ XMLRPC_METHODS = (
     ('jobs.views.assignment_complete', 'assignment_complete'),
     ('jobs.views.assignment_fail', 'assignment_fail'),
     ('jobs.views.assignment_wait_for_upload', 'assignment_wait_for_upload'),
-    ('jobs.views.assignment_set_log_url', 'assignment_set_log_url'),
+    ('jobs.views.assignment_wait_for_installing', 'assignment_wait_for_installing'),
+    ('jobs.views.assignment_upload_log', 'assignment_upload_log'),
     ('jobs.views.get_unassigned_task', 'get_unassigned_task'),
     ('jobs.views.get_assignment_for_builder', 'get_assignment_for_builder'),
     ('jobs.views.builder_ping', 'builder_ping'),
     ('jobs.views.get_assignment_info', 'get_assignment_info'),
+    ('jobs.views.get_assignments_to_upload', 'get_assignments_to_upload'),
+    ('jobs.views.get_assignments_to_install', 'get_assignments_to_install'),
 )

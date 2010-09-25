@@ -25,6 +25,28 @@ class Distribution(models.Model):
     def __unicode__(self):
         return self.name
 
+class Component(models.Model):
+    name = models.CharField(_("Component name"), max_length=50)
+    distribution = models.ForeignKey('Distribution')
+    others = models.CharField(_("Other components required"), max_length=200, blank=True)
+
+    def __unicode__(self):
+        return "%s/%s" % (self.distribution.name, self.name)
+
+    class Meta:
+        unique_together = (("name", "distribution"),)
+
+class Package(models.Model):
+    name = models.CharField("Source package name", max_length=1024)
+    distribution = models.ForeignKey('Distribution')
+    component = models.ForeignKey('Component')
+
+    def __unicode__(self):
+        return "%s/%s/%s" % (self.name, self.distribution.name, self.component.name)
+
+    class Meta:
+        unique_together = (("name", "distribution"),)
+
 class DistributionArchitecture(models.Model):
     name = models.ForeignKey('Distribution')
     architecture = models.ForeignKey(Architecture, limit_choices_to={'logical': False})
@@ -178,7 +200,7 @@ class Task(models.Model):
                                     { 'task_id': self.id,
                                       'site': current_site
                                     })
-        subject = subject.splitlines()
+        subject = subject.strip()
         
         message = render_to_string(body,
                                    {
@@ -214,6 +236,8 @@ class TaskLog(models.Model):
     text = models.TextField() 
 
     def log(self, text):
+        if text == None or len(text) == 0:
+            text = "No message"
         self.text = text
         self.save()
 
@@ -238,6 +262,7 @@ class TaskAssignment(models.Model):
         (u'B', u'Building'),
         (u'W', u'Waiting for uploading'),
         (u'U', u'Uploading'),
+        (u'R', u'Waiting for installing to repository'),
         (u'C', u'Completed'),
         (u'F', u'Failed'),
         (u'X', u'Canceled'),
@@ -291,6 +316,16 @@ class TaskAssignment(models.Model):
         self.save()
         self.task.log(_("Builder %s is starting to upload" % self.handler))
 
+    def wait_for_installing(self):
+        self.state = 'R'
+        self.save()
+        self.task.log(_("Upload was successful. Builder %s is waiting to install to repository" % self.handler))
+
+    def start_uploading(self):
+        self.state = 'U'
+        self.save()
+        self.task.log(_("Builder %s is starting to upload" % self.handler))
+
     def start_completing(self):
         self.state = 'C'
         self.completion_time = datetime.now()
@@ -299,10 +334,18 @@ class TaskAssignment(models.Model):
         self.task.completing()
 
     def fail(self, message):
+        previous_state = self.state
         self.state = 'F'
         self.completion_time = datetime.now()
+        if previous_state == "B":
+            if len(self.log_url) > 0:
+                self.task.fail(_("Builder %s fails to complete task: %s. Please see the log at %s" % (self.handler, message, self.log_url)))
+            else:
+                self.task.fail(_("Builder %s fails to complete task: %s" % (self.handler, message)))
+        else:
+            self.task.fail(_("%s" % message))
         self.save()
-        self.task.fail(_("Builder %s fails to complete task: %s" % (self.handler, message)))
+
 
     def cancel(self):
         self.state = 'X'

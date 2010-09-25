@@ -22,6 +22,8 @@ class JobAdmin(admin.ModelAdmin):
     inlines = [TaskInline,]
 
 admin.site.register(Architecture)
+admin.site.register(Component)
+admin.site.register(Package)
 admin.site.register(Builder,AdministratorAdmin)
 admin.site.register(Job, JobAdmin)
 admin.site.register(Distribution, DistributionAdmin)

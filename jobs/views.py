@@ -4,13 +4,17 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
+from django.db.models import Q
 
 from settings import FULL_LOGOUT_URL
+from settings import LOG_PATH 
 
 from jobs.forms import *
 from jobs.models import *
 from django.shortcuts import render_to_response
 from django.forms.models import inlineformset_factory
+
+import os
 
 def site_logout(request):
     logout(request)
@@ -56,10 +60,16 @@ def task(request, task_id):
     assignments_query = TaskAssignment.objects.filter(task=task_query)
     manifest_query = TaskManifest.objects.filter(task=task_query)
     log_query = TaskLog.objects.filter(task=task_query)
+    print task_query.state
+    if task_query.state == "N" or task_query.state == "A" or task_query.state == "R":
+        show_end_time = False
+    else:
+        show_end_time = True
     return render_to_response("task.html", 
         { 
             "task_id": task_id,
             "task": task_query,
+            "show_end_time": show_end_time,
             "manifest": manifest_query,
             "assignments": assignments_query,
             "log": log_query,
@@ -140,6 +150,15 @@ def get_new_tasks():
 
 def get_task_info(task):
     task = Task.objects.get(id=task)
+    components = ""
+    component_name = ""
+    try:
+        package = Package.objects.get(name=task.package, distribution=task.job.distro)
+        component_name = package.component.name
+        component = Component.objects.get(name=package.component.name, distribution=task.job.distro)
+        components = "%s %s" % (package.component.name, component.others)
+    except:
+        pass
     log = TaskLog(task=task)
     
     retval = {
@@ -151,13 +170,40 @@ def get_task_info(task):
         'state': task.state,
         'debian_copy': task.debian_copy,
         'orig_copy': task.orig_copy,
+        'components': components.strip(),
+        'component': component_name,
     }
 
     return retval
 
+def get_assignments_to_upload(handler):
+    retval = []
+    try:
+        handler = Builder.objects.get(name=handler)
+        assignments = TaskAssignment.objects.filter(Q(state='W')|Q(state='U'), handler=handler)
+        for assignment in assignments:
+            retval.append(assignment.id)
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, retval)
+
+def get_assignments_to_install():
+    retval = []
+    try:
+        assignments = TaskAssignment.objects.filter(state='R')
+        for assignment in assignments:
+            retval.append(assignment.id)
+    except Exception as e:
+        return (-1, str(e)) 
+    return (0, retval)
+
 def populate_debian_info(task_id, info):
     try:
         task = Task.objects.get(id=task_id)
+        try:
+            p = Package.objects.get(name=info["source"], distribution=task.job.distro)
+        except Exception:
+            raise Exception(_("Package %s of distribution %s does not exist in database. Please add it first.") % (info["source"], task.job.distro.name))
 
         task.package = info["source"]
         task.version = info["version"]
@@ -253,6 +299,7 @@ def get_assignment_info(assignment):
         
         retval = {
             'task': assignment.task.id,
+            'architecture': assignment.architecture.architecture,
             'state': assignment.state,
             'dsc': assignment.dsc
         }
@@ -335,11 +382,23 @@ def assignment_wait_for_upload(id, dsc):
         return (-1, str(e)) 
     return (0, "")
 
-def assignment_set_log_url(id, url):
+def assignment_wait_for_installing(id):
     try:
         assignment = TaskAssignment.objects.get(id=id)
-        assignment.set_log_url(url)
+        assignment.wait_for_installing()
     except Exception as e:
+        return (-1, str(e)) 
+    return (0, "")
+
+def assignment_upload_log(id, filename, data):
+    try:
+        with open(os.path.join(LOG_PATH, filename), "wb") as handle:
+            handle.write(data.data)
+
+        assignment = TaskAssignment.objects.get(id=id)
+        assignment.set_log_url(filename)
+    except Exception as e:
+        raise
         return (-1, str(e)) 
     return (0, "")
 
