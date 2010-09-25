@@ -2,45 +2,57 @@
 {% load i18n %}
 
 {% block title %}
-Information about task #{{ task_id }} {{ task.package }} {{ task.version }}
+{% blocktrans with task.package as package and task.version as version %}Task #{{ task_id }} {{ package }} {{ version }}{% endblocktrans %}
 {% endblock %}
 
 {% block content %}
-<h1>Task #{{ task_id }}</h1>
-Job id: {{ task.job.id }}<br/>
+<h1>
+{% blocktrans %}Task #{{ task_id }}{% endblocktrans %}
+</h1>
+{% blocktrans with task.job.id as id %}Job id: {{ id }}{% endblocktrans %}<br/>
 {% if task.package %}
-Package: {{ task.package }}<br/>
+{% blocktrans with task.package as package %}Package: {{ package }}{% endblocktrans %}<br/>
 {% endif %}
 {% if task.version %}
-Version: {{ task.version }}<br/>
+{% blocktrans with task.version as version %}Version: {{ version }}{% endblocktrans %}<br/>
 {% endif %}
-Task status: {{ task.get_state_display }}<br/>
-Debian URL: {{ task.debian_url }}<br/>
-Debian VCS: {{ task.debian_vcs }}<br/>
+{% blocktrans with task.get_state_display as state %}Task status: {{ state }}{% endblocktrans %}<br/>
+{% blocktrans with task.debian_url as debian_url %}Debian URL: {{ debian_url }}{% endblocktrans %}<br/>
+{% blocktrans with task.debian_vcs as debian_vcs %}Debian VCS: {{ debian_vcs }}{% endblocktrans %}<br/>
 {% if task.debian_tag %}
-Debian tag: {{ task.debian_tag }}<br/>
+{% blocktrans with task.debian_tag as debian_tag %}Debian tag: {{ debian_tag }}{% endblocktrans %}<br/>
 {% endif %}
 {% if task.debian_copy %}
-Debian copy: {{ task.debian_copy }}<br/>
+{% blocktrans with task.debian_copy as debian_copy %}Debian copy: {{ debian_copy }}{% endblocktrans %}<br/>
 {% endif %}
 {% if task.orig_url %}
-Original source code: {{ task.orig_url}}<br/>
+{% blocktrans with task.orig_url as orig_url %}Original source code: {{ orig_url}}{% endblocktrans %}<br/>
 {% endif %}
 
 {% if task.orig_copy %}
-Original source code copy: {{ task.orig_copy}}<br/>
+{% blocktrans with task.orig_copy as orig_copy %}Original source code copy: {{ orig_copy}}{% endblocktrans %}<br/>
 {% endif %}
 
+{% if task.changelog %}
+{% blocktrans with task.changelog as changelog %}ChangeLog: {{ changelog}}{% endblocktrans %}<br/>
+{% endif %}
 
 {% if assignments %}
 <fieldset>
-<legend>Builders</legend>
+<legend>{% trans "Builders" %}</legend>
 {% for a in assignments %}
 <fieldset>
 <legend>{{ a.architecture }}</legend>
-Start time: {{ a.start_time }}<br/>
-Builder: <a href="/builder/{{ a.handler }}">{{ a.handler }}</a><br/>
-State: {{ a.get_state_display }}<br/>
+{% blocktrans with a.id as id %}Internal build ID: {{ id }}{% endblocktrans %}<br/>
+{% blocktrans with a.start_time as start_time %}Start time: {{ start_time }}{% endblocktrans %}<br/>
+{% if show_end_time %}
+{% blocktrans with a.completion_time as completion_time %}End time: {{ completion_time }} {% endblocktrans %}<br/>
+{% endif %}
+{% trans "Builder:" %} <a href="/builder/{{ a.handler }}">{{ a.handler }}</a><br/>
+{% blocktrans with a.get_state_display as state %}State: {{ state }}{% endblocktrans %}<br/>
+{% if a.log_url %}
+{% trans "Build log:" %} <a href="/site-media/logs/{{ a.log_url }}">{{ a.log_url }}</a>
+{% endif %}
 </fieldset>
 {% endfor %}
 </fieldset>
@@ -48,13 +60,13 @@ State: {{ a.get_state_display }}<br/>
 
 {% if manifest %}
 <fieldset>
-<legend>Manifest</legend>
+<legend>{% trans "Manifest" %}</legend>
 {% for m in manifest %}
 <fieldset>
 <legend>{{ m.name }}</legend>
-Name: {{ m.name }}<br/>
-Architecture: {{ m.architecture }}<br/>
-Type: {{ m.get_type_display }}<br/>
+{% blocktrans with m.name as name %}Name: {{ name }}{% endblocktrans %}<br/>
+{% blocktrans with m.architecture as architecture %}Architecture: {{ architecture }}{% endblocktrans %}<br/>
+{% blocktrans with m.get_type_display as type %}Type: {{ type }}{% endblocktrans %}<br/>
 </fieldset>
 {% endfor %}
 </fieldset>
@@ -63,7 +75,7 @@ Type: {{ m.get_type_display }}<br/>
 
 {% if log%}
 <fieldset>
-<legend>Log</legend>
+<legend>{% trans "Log" %}</legend>
 <table>
 {% for entry in log %}
 <tr>

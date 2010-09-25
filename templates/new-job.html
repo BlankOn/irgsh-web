@@ -1,17 +1,18 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block title %}
-Submit a new job
+{% trans "Submit a new job" %}
 {% endblock %}
 
 
 {% block content %}
 {% if job_id %}
-<div class="success">Success</div>
-Your job is accepted as job: {{ job_id }}   
+<div class="success">{% trans "Success" %}</div>
+{% blocktrans %}Your job is accepted as job: {{ job_id }}{% endblocktrans %}
 {% else %}
-<h1>New job</h1>
+<h1>{% trans "New job" %}</h1>
 <p>
+{% blocktrans %}
 Please fill in the data below to submit a new job.
 The newly entered job will be put into a queue which then 
 taken by the builders.
@@ -20,11 +21,14 @@ be able to edit them later. You can either end up with a
 failed job or you can cancel the job.
 You can submit up to four tasks within the same job. A failure
 in a task will make the whole tasks in the job fail.
+{% endblocktrans %}
 </p>
 <form action="." method=post class="job-form">
 <fieldset class="module aligned ">
-<legend>Job description</legend>
+<legend>{% trans "Job description" %}</legend>
+{% blocktrans %}
 <p>Fill in here the email address(es) of people you want to give update about the job, separated by comma. Make sure you are putting the people you know and relevant to this job. Then choose the Distribution that you are targetting.</p>
+{% endblocktrans %}
 {% for field in form %}
     <div class="form-row">
             <div class="field-box">
@@ -38,8 +42,8 @@ in a task will make the whole tasks in the job fail.
 </fieldset>
 
 <fieldset class="module aligned ">
-<legend>Tasks</legend>
-<p>Put here the information about the task.</p>
+<legend>{% trans "Tasks" %}</legend>
+<p>{% trans "Put here the information about the task." %}</p>
 {% for f in formset.management_form %}
 {{ f }}
 {% endfor %}

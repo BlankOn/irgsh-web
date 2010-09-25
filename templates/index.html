@@ -2,34 +2,34 @@
 {% load i18n %}
 
 {% block title %}
-irgsh: Package Builder
+{% trans "irgsh: Package Builder" %}
 {% endblock %}
 
 {% block content %}
 <div class="span-8 prepend-3">
 <fieldset>
-<legend>Latest Tasks</legend>
+<legend>{% trans "Latest Tasks" %}</legend>
 <table>
 <tr>
-<th>Job</th>
-<th>Submitter</th>
-<th>Package</th>
-<th>Version</th>
-<th>Status</th>
+<th>{% trans "Task" %}</th>
+<th>{% trans "Submitter" %}</th>
+<th>{% trans "Package" %}</th>
+<th>{% trans "Version" %}</th>
+<th>{% trans "Status" %}</th>
 </tr>
 {% for t in tasks %}
 <tr>
 <td><a href=/task/{{ t.id }}>{{ t.id }}</a></td>
 <td>{{ t.job.submitter }}</td>
 <td>{% if t.package %}{{ t.package }}
-{% else %}Unprocessed{% endif %}</td>
+{% else %}{% trans "Unprocessed" %}{% endif %}</td>
 <td>{% if t.version %}{{ t.version }}
-{% else %}Unprocessed{% endif %}</td>
+{% else %}{% trans "Unprocessed" %}{% endif %}</td>
 <td>{{ t.get_state_display }}</td>
 </tr>
 {% endfor %}
 </table>
-<a href=/tasks/>More...</a>
+<a href=/tasks/>{% trans "More..." %}</a>
 </fieldset>
 </div>
 {% endblock content %}
