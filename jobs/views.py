@@ -152,6 +152,18 @@ def get_task_info(task):
     task = Task.objects.get(id=task)
     components = ""
     component_name = ""
+    arch_independent = True 
+    try:
+        manifest = TaskManifest.objects.filter(task=task)
+        for entry in manifest:
+            if entry.type == "S":
+                continue
+            if entry.architecture != "all":
+                arch_independent = False
+                break
+    except:
+        pass
+
     try:
         package = Package.objects.get(name=task.package, distribution=task.job.distro)
         component_name = package.component.name
@@ -172,6 +184,7 @@ def get_task_info(task):
         'orig_copy': task.orig_copy,
         'components': components.strip(),
         'component': component_name,
+        'arch_independent': arch_independent,
     }
 
     return retval
