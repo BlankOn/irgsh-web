@@ -99,23 +99,21 @@ class TaskInit:
         f = open(control)
         w = None
         start = False
+        # Strip debian/control for comments
         for line in f:
             if start == False:
                 if line.startswith("Source: "):
-                    if w == None:
-                        f.seek(0)
-                        break
-                    else:
-                        start = True
-                        w.write(line)
-                else:
+                    start = True
                     w = open("%s.stripped" % control, "w")
+                    w.write(line)
             else:
-                w.write(line)
+                if not line.startswith("#"):
+                    w.write(line)
 
         if w != None:
-            f = open("%s.stripped" % control)
             w.close()
+        f.close()
+        f = open("%s.stripped" % control)
 
         source = ""
         packages = []
