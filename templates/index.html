@@ -6,7 +6,28 @@
 {% endblock %}
 
 {% block content %}
-<div class="span-8 prepend-3">
+
+<div class="span-8">
+<fieldset>
+<legend>{% trans "Builders" %}</legend>
+<table>
+<tr>
+<th>{% trans "Builder" %}</th>
+<th>{% trans "Arch" %}</th>
+<th>{% trans "Status" %}</th>
+</tr>
+{% for b in builders %}
+<tr>
+<td><a href=/builder/{{ b.name }}>{{ b.name }}</a></td>
+<td>{{ b.architecture }}</td>
+<td>{{ b.state }}</td>
+</tr>
+{% endfor %}
+</table>
+</fieldset>
+</div>
+
+<div class="span-8">
 <fieldset>
 <legend>{% trans "Latest Tasks" %}</legend>
 <table>

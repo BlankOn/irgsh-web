@@ -26,10 +26,12 @@ def site_logout(request):
 
 def site_index(request):
     tasks_query = Task.objects.all().order_by('-id')[:5]
+    builders = Builder.objects.all().order_by('architecture')
 
     return render_to_response("index.html", 
         {
             "tasks": tasks_query, 
+            "builders": builders, 
         },
         context_instance=RequestContext(request),
     )
@@ -84,24 +86,13 @@ def builder(request, builder_id):
         return HttpResponseRedirect("/")
 
     assignments = TaskAssignment.objects.filter(handler=builder_query).order_by('-id')[:5]
-    delta = datetime.now() - builder_query.last_ping
-
-    if builder_query.active == False:
-        status = _("Dormant")
-    else:
-        if delta.days > 1:
-            status = _("Unreachable")
-        elif delta.seconds > 3600:
-            status = _("Active (but almost unresponsive)")
-        else:
-            status = _("Active")
-        
+       
     return render_to_response("builder.html", 
         { 
             "builder_id": builder_id,
             "builder": builder_query,
             "assignments": assignments,
-            "status": status,
+            "status": builder_query.state(),
         } ,
         context_instance=RequestContext(request),
     )

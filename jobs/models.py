@@ -73,6 +73,22 @@ class Builder(models.Model):
         self.last_ping = datetime.now()
         self.save()
 
+    def state(self):
+        delta = datetime.now() - self.last_ping
+
+        status = "N/A"
+        if self.active == False:
+            status = _("Dormant")
+        else:
+            if delta.days > 1:
+                status = _("Unreachable")
+            elif delta.seconds > 3600:
+                status = _("Active (but almost unresponsive)")
+            else:
+                status = _("Active")
+     
+        return status
+
 class BuilderAdministrator(models.Model):
     handler = models.ForeignKey(Builder)
     administrator = models.ForeignKey(User)
