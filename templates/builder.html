@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}
+Builder #{{ builder_id}}
+{% endblock %}
+
+{% block content %}
+<h1>{{ builder_id }}</h1>
+{{ builder.description }}<br/>
+Architecture: {{ builder.architecture }}<br/>
+Location: {{ builder.location }}<br/>
+Status: {{ status }}<br/>
+
+<p>
+{% if assignments %}
+Latest tasks handled by {{ builder_id }}:
+<table>
+<tr>
+<th>Task</th>
+<th>Submitter</th>
+<th>Package</th>
+<th>Version</th>
+<th>Status</th>
+</tr>
+{% for t in assignments %}
+<tr>
+<td><a href=/task/{{ t.task.id }}>{{ t.task.id }}</a></td>
+<td>{{ t.task.job.submitter }}</td>
+<td>{% if t.task.package %}{{ t.task.package }}
+{% else %}Unprocessed{% endif %}</td>
+<td>{% if t.task.version %}{{ t.task.version }}
+{% else %}Unprocessed{% endif %}</td>
+<td>{{ t.get_state_display }}</td>
+</tr>
+{% endfor %}
+
+</table>
+{% endif %}
+{% endblock content %}

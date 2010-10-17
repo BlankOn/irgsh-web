@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}
+{% trans "irgsh: Tasks" %}
+{% endblock %}
+
+{% block content %}
+<h1>{% trans "Tasks" %}</h1>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if tasks.has_previous %}
+            <a href="?page={{ tasks.previous_page_number }}">{% trans "previous" %}</a>
+        {% endif %}
+
+        <span class="current">
+            {% blocktrans with tasks.number as number and tasks.paginator.num_pages as num_pages %}Page {{ number }} of {{ num_pages }}{% endblocktrans %}
+        </span>
+
+        {% if tasks.has_next %}
+            <a href="?page={{ tasks.next_page_number }}">{% trans "next" %}</a>
+        {% endif %}
+    </span>
+</div>
+
+<table>
+<tr>
+<th>{% trans "Task" %}</th>
+<th>{% trans "Submitter" %}</th>
+<th>{% trans "Package" %}</th>
+<th>{% trans "Version" %}</th>
+<th>{% trans "Status" %}</th>
+</tr>
+{% for t in tasks.object_list %}
+<tr>
+<td><a href=/task/{{ t.id }}>{{ t.id }}</a></td>
+<td>{{ t.job.submitter }}</td>
+<td>{% if t.package %}{{ t.package }}
+{% else %}{% trans "Unprocessed" %}{% endif %}</td>
+<td>{% if t.version %}{{ t.version }}
+{% else %}{% trans "Unprocessed" %}{% endif %}</td>
+<td>{{ t.get_state_display }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if tasks.has_previous %}
+            <a href="?page={{ tasks.previous_page_number }}">{% trans "previous" %}</a>
+        {% endif %}
+
+        <span class="current">
+            {% blocktrans with tasks.number as number and tasks.paginator.num_pages as num_pages %}Page {{ number }} of {{ num_pages }}{% endblocktrans %}
+        </span>
+
+        {% if tasks.has_next %}
+            <a href="?page={{ tasks.next_page_number }}">{% trans "next" %}</a>
+        {% endif %}
+    </span>
+</div>
+
+
+{% endblock content %}
