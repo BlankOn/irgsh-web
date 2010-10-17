@@ -73,8 +73,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 
-ROOT_URLCONF = 'web_builder.urls'
-
 TEMPLATE_DIRS = (
      os.path.join(PROJECT_PATH, 'templates'),
 )
@@ -104,31 +102,4 @@ FULL_LOGOUT_URL = "http://82.181.46.34:8081/logout"
 OPENID_USE_AS_ADMIN_LOGIN = True
 LOG_PATH = "/home/mdamt/tmp/logs"
 
-XMLRPC_METHODS = (
-    ('jobs.views.get_new_tasks', 'get_new_tasks'),
-    ('jobs.views.get_task_info', 'get_task_info'),
-    ('jobs.views.populate_debian_info', 'populate_debian_info'),
-    ('jobs.views.set_debian_copy', 'set_debian_copy'),
-    ('jobs.views.set_orig_copy', 'set_orig_copy'),
-    ('jobs.views.xstart_assigning', 'start_assigning'),
-    ('jobs.views.set_orig_copy', 'set_orig_copy'),
-    ('jobs.views.task_init_failed', 'task_init_failed'),
-    ('jobs.views.xstart_running', 'start_running'),
-    ('jobs.views.assign_task', 'assign_task'),
-    ('jobs.views.assignment_download', 'assignment_download'),
-    ('jobs.views.assignment_environment', 'assignment_environment'),
-    ('jobs.views.assignment_building', 'assignment_building'),
-    ('jobs.views.assignment_upload', 'assignment_upload'),
-    ('jobs.views.assignment_complete', 'assignment_complete'),
-    ('jobs.views.assignment_fail', 'assignment_fail'),
-    ('jobs.views.assignment_cancel', 'assignment_cancel'),
-    ('jobs.views.assignment_wait_for_upload', 'assignment_wait_for_upload'),
-    ('jobs.views.assignment_wait_for_installing', 'assignment_wait_for_installing'),
-    ('jobs.views.assignment_upload_log', 'assignment_upload_log'),
-    ('jobs.views.get_unassigned_task', 'get_unassigned_task'),
-    ('jobs.views.get_assignment_for_builder', 'get_assignment_for_builder'),
-    ('jobs.views.builder_ping', 'builder_ping'),
-    ('jobs.views.get_assignment_info', 'get_assignment_info'),
-    ('jobs.views.get_assignments_to_upload', 'get_assignments_to_upload'),
-    ('jobs.views.get_assignments_to_install', 'get_assignments_to_install'),
-)
+
