@@ -7,7 +7,6 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
-current_site = Site.objects.get_current()
 
 class Architecture(models.Model):
     architecture = models.CharField(max_length=6, primary_key=True)
@@ -212,6 +211,7 @@ class Task(models.Model):
         self.mail('task-failed-subject.mail.txt', 'task-failed-body.mail.txt')
 
     def mail(self, subject, body):
+        current_site = Site.objects.get_current()
         subject = render_to_string(subject,
                                     { 'task_id': self.id,
                                       'site': current_site
