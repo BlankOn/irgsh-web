@@ -13,6 +13,7 @@ setup(
     author = 'BlankOn Developers',
     packages = ['irgsh_web'],
     entry_points = {'console_scripts': console_scripts},
-    install_requires = ['setuptools', 'django-openid-auth', 'django-xmlrpc']
+    install_requires = ['setuptools', 'django-openid-auth', 'django-xmlrpc',
+                        'python-openid']
 )
 
