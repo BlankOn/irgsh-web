@@ -1,6 +1,6 @@
 from basesettings import *
 
-ROOT_URLCONF = 'web_builder.xmlrpcurls'
+ROOT_URLCONF = 'irgsh_web.xmlrpcurls'
 
 XMLRPC_METHODS = (
     ('jobs.xmlrpc.get_new_tasks', 'get_new_tasks'),

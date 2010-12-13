@@ -1,5 +1,5 @@
 from basesettings import * 
-ROOT_URLCONF = 'web_builder.urls'
+ROOT_URLCONF = 'irgsh_web.urls'
 
 XMLRPC_METHODS = ()
 
