@@ -1,9 +1,5 @@
 from setuptools import setup, find_packages
 
-console_scripts = [
-    'irgsh-www = irgsh_web.bin.www:main',
-    'irgsh-xmlrpc = irgsh_web.bin.xmlrpc:main',
-]
 packages = ['irgsh_web']
 packages += ['irgsh_web.%s' % pkg for pkg in find_packages('irgsh_web')]
 
