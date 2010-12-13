@@ -7,6 +7,6 @@ setup(
     description = 'Ir. Robot Gedek, SH',
     author = 'BlankOn Developers',
     packages = ['irgsh_web'],
-    install_requires = ['setuptools']
+    install_requires = ['setuptools', 'django-openid-auth', 'django-xmlrpc']
 )
 
