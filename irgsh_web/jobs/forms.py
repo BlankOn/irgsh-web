@@ -3,7 +3,7 @@ from django.forms import ModelForm, Textarea
 from django import forms 
 from django.forms.models import BaseInlineFormSet
 from django.utils.translation import ugettext as _
-from jobs.models import *
+from irgsh_web.jobs.models import *
 
 class JobForm(ModelForm):
     class Meta:

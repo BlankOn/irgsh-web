@@ -85,7 +85,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django_openid_auth',
     'django_xmlrpc',
-    'jobs',
+    'irgsh_web.jobs',
 )
 
 AUTHENTICATION_BACKENDS = (

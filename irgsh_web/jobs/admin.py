@@ -1,4 +1,4 @@
-from jobs.models import * 
+from irgsh_web.jobs.models import *
 from django.contrib import admin
 
 class AdministratorInline(admin.StackedInline):

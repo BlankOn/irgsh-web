@@ -5,11 +5,10 @@ from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.db.models import Q
 
-from settings import FULL_LOGOUT_URL
-from settings import LOG_PATH 
+from django.conf import settings
 
-from jobs.forms import *
-from jobs.models import *
+from irgsh_web.jobs.forms import *
+from irgsh_web.jobs.models import *
 from django.shortcuts import render_to_response
 
 import os
@@ -287,7 +286,7 @@ def assignment_wait_for_installing(id):
 
 def assignment_upload_log(id, filename, data):
     try:
-        with open(os.path.join(LOG_PATH, filename), "wb") as handle:
+        with open(os.path.join(settings.LOG_PATH, filename), "wb") as handle:
             handle.write(data.data)
 
         assignment = TaskAssignment.objects.get(id=id)

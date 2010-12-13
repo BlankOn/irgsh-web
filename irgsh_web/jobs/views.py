@@ -6,11 +6,10 @@ from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.db.models import Q
 
-from settings import FULL_LOGOUT_URL
-from settings import LOG_PATH 
+from django.conf import settings
 
-from jobs.forms import *
-from jobs.models import *
+from irgsh_web.jobs.forms import *
+from irgsh_web.jobs.models import *
 from django.shortcuts import render_to_response
 from django.forms.models import inlineformset_factory
 
@@ -19,7 +18,7 @@ import os
 def site_logout(request):
     logout(request)
     return render_to_response("logout.html", {
-        "full_logout_url": FULL_LOGOUT_URL,
+        "full_logout_url": settings.FULL_LOGOUT_URL,
         },
         context_instance=RequestContext(request),
     )

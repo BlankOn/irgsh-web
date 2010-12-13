@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
-from jobs.views import *
+from irgsh_web.jobs.views import *
 
 urlpatterns = patterns('',
     # Example:
