@@ -10,7 +10,6 @@ setup(
     description = 'Ir. Robot Gedek, SH',
     author = 'BlankOn Developers',
     packages = packages,
-    entry_points = {'console_scripts': console_scripts},
     install_requires = ['setuptools', 'django-openid-auth', 'django-xmlrpc',
                         'python-openid']
 )
