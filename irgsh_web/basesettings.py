@@ -86,6 +86,7 @@ INSTALLED_APPS = (
     'django_openid_auth',
     'django_xmlrpc',
     'irgsh_web.jobs',
+    'djcelery',
 )
 
 AUTHENTICATION_BACKENDS = (
