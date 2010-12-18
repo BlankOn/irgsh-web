@@ -18,6 +18,8 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
+    (r'^build/', include('irgsh_web.build.urls')),
+
     (r'^o/', include('django_openid_auth.urls')),
     (r'^logout/', site_logout),
     ('^new-job/', new_job),
