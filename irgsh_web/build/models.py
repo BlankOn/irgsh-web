@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 
 from picklefield.fields import PickledObjectField
 
-SOURCE_PACKAGE = 0
-BINARY_PACKAGE = 1
+SOURCE = 0
+BINARY = 1
 
 TARBALL = 'tarball'
 BZR = 'bzr'
@@ -22,8 +22,8 @@ BUILD_TASK_STATUS = (
 )
 
 PACKAGE_CONTENT_TYPE = (
-    (SOURCE_PACKAGE, _('Source')),
-    (BINARY_PACKAGE, _('Binary')),
+    (SOURCE, _('Source')),
+    (BINARY, _('Binary')),
 )
 
 ORIG_TYPE = (
