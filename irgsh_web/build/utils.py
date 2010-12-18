@@ -1,8 +1,8 @@
 import uuid
 
 def create_build_task_param(spec):
-    from irgsh.specification.Specification as BuildSpecification
-    from irgsh.distribution.distribution as BuildDistribution
+    from irgsh.specification import Specification as BuildSpecification
+    from irgsh.distribution import distribution as BuildDistribution
 
     dist = spec.distribution
 

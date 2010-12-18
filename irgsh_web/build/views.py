@@ -4,16 +4,16 @@ from django.shortcuts import get_object_or_404
 from .models import BuildTask
 
 def _task_id_required(func):
-    def _func(request, task_id, *args):
+    def _func(request, task_id, *args, **kwargs):
         task = get_object_or_404(BuildTask, pk=task_id)
-        return func(request, task, *args)
+        return func(request, task, *args, **kwargs)
     return _func
 
 def _post_required(func):
-    def _func(request, *args):
+    def _func(request, *args, **kwargs):
         if request.method != 'POST':
             return HttpResponse(status=405)
-        return func(request, *args)
+        return func(request, *args, **kwargs)
     return _func
 
 @_post_required
