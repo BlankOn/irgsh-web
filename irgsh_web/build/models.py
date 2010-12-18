@@ -9,8 +9,8 @@ from picklefield.fields import PickledObjectField
 SOURCE_PACKAGE = 0
 BINARY_PACKAGE = 1
 
-TARBALL = 0
-BZR = 1
+TARBALL = 'tarball'
+BZR = 'bzr'
 
 BUILD_TASK_STATUS = (
     (-1, _('Failed')),
@@ -93,9 +93,10 @@ class Specification(models.Model):
 
     source = models.CharField(max_length=255)
     orig = models.CharField(max_length=255, null=True, default=None)
-    source_type = models.IntegerField(choices=ORIG_TYPE, null=True, default=None)
+    source_type = models.CharField(max_length=25, choices=ORIG_TYPE,
+                                   null=True, default=None)
     source_opts = PickledObjectField(null=True, default=None)
-    
+
     source_package = models.ForeignKey(SourcePackage, null=True, default=None)
 
     created = models.DateTimeField(default=datetime.now)
