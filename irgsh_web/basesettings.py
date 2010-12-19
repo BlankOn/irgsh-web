@@ -1,5 +1,4 @@
 import os
-import os.path
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 # Django settings for web_builder project.
 
@@ -102,6 +101,7 @@ LOGIN_REDIRECT_URL = '/o'
 OPENID_SSO_SERVER_URL = "http://82.181.46.34:8081/o/"
 FULL_LOGOUT_URL = "http://82.181.46.34:8081/logout"
 OPENID_USE_AS_ADMIN_LOGIN = True
-LOG_PATH = "/home/mdamt/tmp/logs"
-
+LOG_PATH = os.path.join(PROJECT_PATH, 'run', 'logs')
+is not os.path.exists(LOG_PATH):
+    os.makedirs(LOG_PATH)
 
