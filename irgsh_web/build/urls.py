@@ -7,6 +7,8 @@ urlpatterns = patterns('irgsh_web.build.views',
     url(r'^%s/built/' % TASK_ID, 'report_built', name='build_report_built'),
     url(r'^%s/uploaded/' % TASK_ID, 'report_uploaded', name='build_report_uploaded'),
     url(r'^%s/' % TASK_ID, 'show', name='build_show'),
+    url(r'^spec/(?P<spec_id>\d+)/$', 'show_spec', name='build_show_spec'),
+    url(r'^submit/$', 'submit', name='build_submit'),
     url(r'^$', 'index', name='build_index'),
 )
 
