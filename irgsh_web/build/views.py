@@ -28,13 +28,13 @@ JSON_MIME = 'plain/text'
 
 def _task_id_required(func):
     def _func(request, task_id, *args, **kwargs):
-        task = get_object_or_404(BuildTask, pk=task_id)
+        task = get_object_or_404(BuildTask, task_id=task_id)
         return func(request, task, *args, **kwargs)
     return _func
 
 def _spec_id_required(func):
     def _func(request, spec_id, *args, **kwargs):
-        spec = get_object_or_404(Specification, pk=spec_id)
+        spec = get_object_or_404(Specification, pk=int(spec_id))
         return func(request, spec, *args, **kwargs)
     return _func
 
@@ -88,7 +88,7 @@ def build_log(request, task):
     '''
     [API] Set build log
     '''
-    if not request.FILES.has_key('log')
+    if not request.FILES.has_key('log'):
         return HttpResponse(status=400)
 
     fin = request.FILES['control']
@@ -130,7 +130,7 @@ def update_status(request, task):
         try:
             task.builder = Builder.objects.get(name=builder_name)
             task.add_log(_('Task picked up by %(builder)s') % \
-                           {'builder': task.builder}))
+                           {'builder': task.builder})
         except Builder.DoesNotExist:
             # TODO: fatal error
             pass
