@@ -26,7 +26,7 @@ PACKAGE_CONTENT_TYPE = (
     (BINARY, _('Binary')),
 )
 
-ORIG_TYPE = (
+SOURCE_TYPE = (
     (TARBALL, _('Tarball')),
     (BZR, _('Bazaar')),
 )
@@ -101,7 +101,7 @@ class Specification(models.Model):
     source = models.CharField(max_length=255)
     orig = models.CharField(max_length=255, null=True, default=None,
                             blank=True)
-    source_type = models.CharField(max_length=25, choices=ORIG_TYPE,
+    source_type = models.CharField(max_length=25, choices=SOURCE_TYPE,
                                    null=True, default=None)
     source_opts = PickledObjectField(null=True, default=None)
 
@@ -112,11 +112,11 @@ class Specification(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        param = {'distribution': self.distribution}
-        if self.package is None:
+        param = {'dist': self.distribution}
+        if self.source_package is None:
             return _('Unknown package (%(dist)s)') % param
         else:
-            param.update({'package': self.package})
+            param.update({'package': self.source_package})
             return _('%(package)s (%(dist)s)') % param
 
 class Package(models.Model):
