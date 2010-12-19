@@ -1,40 +1,57 @@
-from celery.decorators import task as celery_task
+from celery.task import Task
 from celery.task.sets import subtask
+
+from irgsh_node.tasks import BuildPackage
 
 from . import utils
 from .models import Architecture, Specification, BuildTask
 
-@celery_task
-def init_specification(spec_id):
-    '''
-    Initialize specification.
+class InitSpecification(Task):
+    '''Initialize specification.
 
     Get all active architecture and create build task for each of them.
     '''
-    spec = Specification.objects.get(pk=spec_id)
 
-    task_name = 'irgsh_node.tasks.BuildPackage'
-    args = utils.create_build_task_param(spec)
-    kwargs = None
+    ignore_result = True
 
-    archs = Architecture.objects.filter(active=True)
-    for arch in archs:
-        task_id = utils.build_task_id()
+    def run(self, spec_id):
+        spec = Specification.objects.get(pk=spec_id)
 
-        # store task info
-        task = BuildTask()
-        task.task_id = task_id
-        task.specification = spec
-        task.arch = arch
-        task.save()
+        task_name = BuildPackage.name # 'irgsh_node.tasks.BuildPackage'
+        args = utils.create_build_task_param(spec)
+        kwargs = None
 
-        # create build package task
-        opts = {'routing_key': 'builder.%s' % arch.name,
-                'task_id': task_id}
+        archs = Architecture.objects.filter(active=True)
+        for arch in archs:
+            task_id = utils.build_task_id()
 
-        # execute build task asynchronously
-        s = subtask(task_name, args, kwargs, opts)
-        s.apply_async()
+            # store task info
+            task = BuildTask()
+            task.task_id = task_id
+            task.specification = spec
+            task.architecture = arch
+            task.save()
 
-    spec.save()
+            # declare exchange, queue, and binding
+            routing_key = 'builder.%s' % arch.name
+
+            consumer = self.get_consumer()
+            consumer.queue = 'builder_%s' % arch.name
+            consumer.exchange = 'builder'
+            consumer.exchange_type = 'topic'
+            consumer.routing_key = routing_key
+            consumer.declare()
+            consumer.connection.close()
+
+            # create build package task
+            opts = {'exchange': 'builder',
+                    'exchange_type': 'topic',
+                    'routing_key': routing_key,
+                    'task_id': task_id}
+
+            # execute build task asynchronously
+            s = subtask(task_name, args, kwargs, opts)
+            s.apply_async()
+
+        spec.save()
 
