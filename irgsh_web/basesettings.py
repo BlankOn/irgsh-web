@@ -102,6 +102,4 @@ OPENID_SSO_SERVER_URL = "http://82.181.46.34:8081/o/"
 FULL_LOGOUT_URL = "http://82.181.46.34:8081/logout"
 OPENID_USE_AS_ADMIN_LOGIN = True
 LOG_PATH = os.path.join(PROJECT_PATH, 'run', 'logs')
-is not os.path.exists(LOG_PATH):
-    os.makedirs(LOG_PATH)
 
