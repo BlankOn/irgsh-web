@@ -35,7 +35,8 @@ class Architecture(models.Model):
     '''
     List of supported architectures
     '''
-    name = models.CharField(max_length=10, unique=True)
+    name = models.CharField(max_length=10, unique=True,
+                            help_text=_('e.g. i386, amd64'))
     active = models.BooleanField(default=True)
 
     def __unicode__(self):
@@ -48,10 +49,15 @@ class Distribution(models.Model):
     name = models.CharField(max_length=50)
     active = models.BooleanField(default=True)
 
-    mirror = models.CharField(max_length=255)
-    dist = models.CharField(max_length=50)
-    components = models.CharField(max_length=255)
-    extra = models.TextField(blank=True, default='')
+    mirror = models.CharField(max_length=255,
+                              help_text=_('e.g. http://arsip.blankonlinux.or.id/blankon/'))
+    dist = models.CharField(max_length=50,
+                            help_text=_('e.g. ombilin, pattimura, etc'))
+    components = models.CharField(max_length=255,
+                                  help_text=_('e.g. main universe. Separate multiple components by a space'))
+    extra = models.TextField(blank=True, default='',
+                             verbose_name=_('Additional repositories'),
+                             help_text=_('Use sources.list syntax'))
 
     def __unicode__(self):
         return self.name
@@ -62,11 +68,12 @@ class Builder(models.Model):
     '''
     name = models.CharField(max_length=50)
     active = models.BooleanField(default=True)
-    last_activity = models.DateTimeField(null=True, default=None)
+    last_activity = models.DateTimeField(null=True, default=None, blank=True)
 
     architecture = models.ForeignKey(Architecture)
-    location = models.CharField(max_length=255, null=True)
-    remark = models.TextField(null=True)
+    location = models.CharField(max_length=255, null=True, default=None,
+                                blank=True)
+    remark = models.TextField(default='', blank=True)
 
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.architecture)
@@ -92,12 +99,14 @@ class Specification(models.Model):
     submitter = models.ForeignKey(User)
 
     source = models.CharField(max_length=255)
-    orig = models.CharField(max_length=255, null=True, default=None)
+    orig = models.CharField(max_length=255, null=True, default=None,
+                            blank=True)
     source_type = models.CharField(max_length=25, choices=ORIG_TYPE,
                                    null=True, default=None)
     source_opts = PickledObjectField(null=True, default=None)
 
-    source_package = models.ForeignKey(SourcePackage, null=True, default=None)
+    source_package = models.ForeignKey(SourcePackage, null=True, default=None,
+                                       blank=True)
 
     created = models.DateTimeField(default=datetime.now)
     updated = models.DateTimeField(auto_now=True)
@@ -130,7 +139,7 @@ class Package(models.Model):
             return _('%(package)s (source)') % param
         else:
             return _('%(package)s (%(arch)s)') % param
-    
+
 class BuildTask(models.Model):
     '''
     List of tasks assigned to package builders
@@ -156,7 +165,7 @@ class BuildTaskLog(models.Model):
     '''
     task = models.ForeignKey(BuildTask)
     log = models.TextField()
-    
+
     created = models.DateTimeField(default=datetime.now)
 
     class Meta:
