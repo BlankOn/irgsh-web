@@ -120,6 +120,7 @@ def submit(request):
             spec.submitter = request.user
             spec.source = data['source']
             spec.orig = data['orig']
+            spec.source_type = data['source_type']
             spec.source_opts = data['source_opts']
             spec.save()
 
