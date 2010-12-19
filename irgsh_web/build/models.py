@@ -59,6 +59,9 @@ class Distribution(models.Model):
                              verbose_name=_('Additional repositories'),
                              help_text=_('Use sources.list syntax'))
 
+    class Meta:
+        ordering = ('name',)
+
     def __unicode__(self):
         return self.name
 
@@ -149,6 +152,7 @@ class BuildTask(models.Model):
 
     task_id = models.CharField(max_length=255) # celery task_id
     status = models.IntegerField(choices=BUILD_TASK_STATUS, default=0)
+    builder = models.ForeignKey(Builder, null=True, default=None)
 
     created = models.DateTimeField(default=datetime.now)
     updated = models.DateTimeField(auto_now=True)
