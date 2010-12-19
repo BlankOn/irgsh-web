@@ -1,4 +1,5 @@
 import tempfile
+from datetime import datetime
 try:
     import simplejson as json
 except ImportError:
@@ -9,6 +10,8 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
+from django.conf import settings
+from django.utils.translation import ugettext as _
 
 try:
     from debian.deb822 import Packages
@@ -16,7 +19,8 @@ except ImportError:
     from debian_bundle.deb822 import Packages
 
 from . import utils, models, tasks
-from .models import BuildTask, Distribution, Specification
+from .models import BuildTask, Distribution, Specification, BuildTaskLog, \
+                    Builder
 from .forms import SpecificationForm
 
 JSON_MIME = 'application/json'
@@ -79,19 +83,64 @@ def debian_info(request, task):
 
 @_post_required
 @_task_id_required
-def report_built(request, task):
+@_json_result
+def build_log(request, task):
     '''
-    [API] Packages have been built, ready to upload
+    [API] Set build log
     '''
-    pass
+    if not request.FILES.has_key('log')
+        return HttpResponse(status=400)
+
+    fin = request.FILES['control']
+
+    logdir = os.path.join(settings.LOG_PATH, task.task_id)
+    if not os.path.exists(logdir):
+        os.makedirs(logdir)
+    target = os.path.join(logdir, 'build.log.gz')
+
+    fin = open(target, 'wb')
+    fin.write(fin.read())
+    fout.close()
+
+    task.build_log = datetime.now()
+    task.save()
+
+    task.add_log(_('Build log added'))
+
+    return {'status': 'ok'}
 
 @_post_required
 @_task_id_required
-def report_uploaded(request, task):
+@_json_result
+def update_status(request, task):
     '''
-    [API] Packages have been uploaded, repository needs to be rebuilt
+    [API] Update task status
     '''
-    pass
+    try:
+        status = int(request.POST['status'])
+        builder_name = request.POST['builder']
+    except ValueError:
+        return HttpResponse(status=400)
+
+    status_list = dict(models.BUILD_TASK_STATUS)
+    if not status in status_list:
+        return HttpResponse(status=400)
+
+    if task.builder is None:
+        try:
+            task.builder = Builder.objects.get(name=builder_name)
+            task.add_log(_('Task picked up by %(builder)s') % \
+                           {'builder': task.builder}))
+        except Builder.DoesNotExist:
+            # TODO: fatal error
+            pass
+
+    task.status = status
+    task.save()
+
+    task.add_log(status_list[status])
+
+    return {'status': 'ok'}
 
 @_task_id_required
 def show(request, task):

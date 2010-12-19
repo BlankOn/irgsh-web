@@ -154,8 +154,10 @@ class BuildTask(models.Model):
     architecture = models.ForeignKey(Architecture)
 
     task_id = models.CharField(max_length=255) # celery task_id
-    status = models.IntegerField(choices=BUILD_TASK_STATUS, default=0)
     builder = models.ForeignKey(Builder, null=True, default=None)
+
+    status = models.IntegerField(choices=BUILD_TASK_STATUS, default=0)
+    build_log = models.DateTimeField(null=True, default=None)
 
     created = models.DateTimeField(default=datetime.now)
     updated = models.DateTimeField(auto_now=True)
@@ -166,9 +168,16 @@ class BuildTask(models.Model):
     def __unicode__(self):
         return '%s (%s)' % (self.task_id, self.id)
 
+    def add_log(self, message):
+        log = BuildTaskLog(task=self)
+        log.log = message
+        log.save()
+        return log
+
 class BuildTaskLog(models.Model):
     '''
-    List of logs sent by package bulders during building packages
+    List of messages (including status change) sent by builders during
+    building a package
     '''
     task = models.ForeignKey(BuildTask)
     log = models.TextField()
