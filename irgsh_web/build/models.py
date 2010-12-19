@@ -13,12 +13,16 @@ TARBALL = 'tarball'
 BZR = 'bzr'
 
 BUILD_TASK_STATUS = (
-    (-1, _('Failed')),
-    (0, _('Unknown')),
-    (1, _('Specification received')),
-    (2, _('Downloading source file')),
-    (3, _('Downloading orig file')),
-    (4, _('Building package')),
+    ( -1, _('Failed')),
+    (  0, _('Waiting for builder')),
+    (100, _('Preparing builder')),
+    (101, _('Downloading source file')),
+    (102, _('Downloading orig file')),
+    (102, _('Building package')),
+    (104, _('Package built')),
+    (201, _('Uploading package')),
+    (202, _('Package uploaded')),
+    (999, _('Finished')),
 )
 
 PACKAGE_CONTENT_TYPE = (
