@@ -1,10 +1,10 @@
-from celery.task import Task
-from celery.task.sets import subtask
+import tempfile
+import shutil
+import os
 
-from irgsh_node.tasks import BuildPackage
+from celery.task import Task
 
 from . import utils
-from .models import Architecture, Specification, BuildTask
 
 class InitSpecification(Task):
     '''Initialize specification.
