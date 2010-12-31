@@ -1,20 +1,39 @@
 import uuid
+import gzip
+import shutil
+import tempfile
+import urllib
+import os
+import tarfile
+from datetime import datetime
 
+from django.db import IntegrityError
 from django.utils.translation import ugettext as _
+from django.conf import settings
+
+try:
+    from debian.deb822 import Packages
+    from debian.changelog import Changelog
+except ImportError:
+    from debian_bundle.deb822 import Packages
+    from debian_bundle.changelog import Changelog
+
+from bzrlib.branch import Branch
+from bzrlib.export import export
 
 def create_build_task_param(spec):
     from irgsh.specification import Specification as BuildSpecification
     from irgsh.distribution import Distribution as BuildDistribution
 
-    dist = spec.distribution
-
+    spec_id = spec.id
     build_spec = BuildSpecification(spec.source, spec.orig,
                                     spec.source_type, spec.source_opts)
 
+    dist = spec.distribution
     build_dist = BuildDistribution(dist.name, dist.mirror, dist.dist,
                                    dist.components, dist.extra)
 
-    return build_dist, build_spec
+    return spec_id, build_spec, build_dist
 
 def build_task_id():
     return str(uuid.uuid4())
@@ -22,32 +41,40 @@ def build_task_id():
 def get_package_info(packages):
     from .models import Package, SOURCE, BINARY
 
-    result = []
+    items = []
+    name = None
     for info in packages:
         pkg = {}
         if info.has_key('Source'):
             pkg['name'] = info['Source']
             pkg['type'] = SOURCE
+            name = info['Source']
         else:
             pkg['name'] = info['Package']
             pkg['type'] = BINARY
             pkg['architecture'] = info['Architecture']
 
-        pkg.save()
+        items.append(pkg)
+
+    result = {'name': name,
+              'packages': items}
 
     return result
 
-def store_package_info(spec, packages):
+def store_package_info(spec, info):
     from .models import Package, BINARY
 
-    for info in packages:
+    for data in info['packages']:
         pkg = Package()
         pkg.specification = spec
-        pkg.name = info['name']
-        pkg.type = info['type']
+        pkg.name = data['name']
+        pkg.type = data['type']
         if pkg.type == BINARY:
-            pkg.architecture = info['architecture']
-        pkg.save()
+            pkg.architecture = data['architecture']
+        try:
+            pkg.save()
+        except IntegrityError:
+            pass
 
 def build_source_opts(source_type, source_opts):
     from .models import TARBALL, BZR

@@ -12,6 +12,6 @@ setup(
     packages = packages,
     install_requires = ['setuptools', 'django-openid-auth', 'django-xmlrpc',
                         'python-openid', 'celery', 'django-celery',
-                        'django-picklefield']
+                        'django-picklefield', 'poster']
 )
 

@@ -22,6 +22,7 @@ from . import utils, models, tasks
 from .models import BuildTask, Distribution, Specification, BuildTaskLog, \
                     Builder
 from .forms import SpecificationForm
+from irgsh_web.repo.models import Package as RepoPackage
 
 JSON_MIME = 'application/json'
 JSON_MIME = 'plain/text'
@@ -57,10 +58,38 @@ def _json_result(func):
         return res
     return _func
 
+def _set_description(spec, f):
+    # Get packages info
+    packages = Packages.iter_paragraphs(f)
+    info = utils.get_package_info(packages)
+    name = info['name']
+
+    # The package must have a name
+    if name is None:
+        spec.status = -2
+        spec.save()
+        return {'status': 'fail', 'code': 406, 'msg': _('Invalid package name')}
+
+    # Check if this package is registered
+    spec = task.specification
+    total = len(RepoPackage.objects.filter(name=name,
+                                           distribution=spec.distribution.repo))
+    if total == 0:
+        spec.status = -2
+        spec.save()
+        return {'status': 'fail', 'code': 406,
+                'msg': _('Unregistered package: %(name)s') % {'name': name}}
+
+    # Save packages info
+    utils.store_package_info(task.specification, info)
+
+    return {'status': 'ok', 'package': name}
+
+
 @_post_required
 @_task_id_required
 @_json_result
-def debian_info(request, task):
+def description(request, task):
     '''
     [API] Update package information
 
@@ -70,16 +99,9 @@ def debian_info(request, task):
     if not request.FILES.has_key('control'):
         return HttpResponse(status=400)
 
-    packages = Packages.iter_paragraphs(request.FILES['control'])
-    info = utils.get_package_info(packages)
-    utils.store_package_info(task.specification, info)
-
-    name = None
-    names = [pkg['name'] for pkg in info if info['type'] == models.SOURCE]
-    if len(names) > 0:
-        name = names[0]
-
-    return {'status': 'ok', 'package': name}
+    f = request.FILES['control']
+    spec = task.specification
+    return _set_description(spec, f)
 
 @_post_required
 @_task_id_required
@@ -119,7 +141,7 @@ def update_status(request, task):
     try:
         status = int(request.POST['status'])
         builder_name = request.POST['builder']
-    except ValueError:
+    except (ValueError, KeyError):
         return HttpResponse(status=400)
 
     status_list = dict(models.BUILD_TASK_STATUS)
@@ -140,6 +162,9 @@ def update_status(request, task):
 
     task.add_log(status_list[status])
 
+    if status == 202: # Package uploaded
+        pass
+
     return {'status': 'ok'}
 
 @_task_id_required
@@ -155,6 +180,35 @@ def show(request, task):
 @_spec_id_required
 def show_spec(request, spec):
     return HttpResponse('show spec: %s' % spec)
+
+@_post_required
+@_spec_id_required
+@_json_result
+def spec_description(request, spec):
+    '''
+    [API] Update package information
+
+    - source package
+    - package list
+    '''
+    if not request.FILES.has_key('control'):
+        return HttpResponse(status=400)
+
+    f = request.FILES['control']
+    return _set_description(spec, f)
+
+@_spec_id_required
+@_json_result
+def spec_status(request, spec):
+    if request.method == 'POST':
+        try:
+            status = int(request.POST['status'])
+            spec.status = status
+            spec.save()
+        except ValueError:
+            return HttpResponse(status=400)
+
+    return {'status': 'ok', 'code': spec.status, 'msg': spec.get_status_display()}
 
 @login_required
 def submit(request):
