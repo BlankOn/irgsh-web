@@ -18,7 +18,7 @@ BUILD_TASK_STATUS = (
     (100, _('Preparing builder')),
     (101, _('Downloading source file')),
     (102, _('Downloading orig file')),
-    (102, _('Building package')),
+    (103, _('Building package')),
     (104, _('Package built')),
     (201, _('Uploading package')),
     (202, _('Package uploaded')),

@@ -85,6 +85,7 @@ INSTALLED_APPS = (
     'django_openid_auth',
     'django_xmlrpc',
     'irgsh_web.jobs',
+    'irgsh_web.repo',
     'irgsh_web.build',
     'djcelery',
 )
