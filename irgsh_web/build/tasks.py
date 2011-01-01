@@ -12,6 +12,7 @@ class InitSpecification(Task):
     Get all active architecture and create build task for each of them.
     '''
 
+    exchange = 'specinit'
     ignore_result = True
 
     def run(self, spec_id):
