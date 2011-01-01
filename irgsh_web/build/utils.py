@@ -5,6 +5,7 @@ import tempfile
 import urllib
 import os
 import tarfile
+import logging
 from datetime import datetime
 
 from django.db import IntegrityError
@@ -124,8 +125,12 @@ class SpecInit(object):
         self.source_name = None
         self.orig_name = None
 
+        self.log = logging.getLogger('irgsh_web.specinit')
+
     def start(self):
         init_status = self.spec.status
+
+        self.log.debug('[%s] Initializing specification' % self.spec_id)
 
         try:
             self.init()
@@ -134,7 +139,9 @@ class SpecInit(object):
             self.orig_name = self.download_orig()
             self.distribute()
         except (ValueError, AssertionError), e:
+            self.log.error('[%s] Error! %s' % (self.spec_id, e))
             if init_status != self.spec.status:
+                self.log.error('[%s] Status not changed, set to failed' % self.spec_id)
                 # Status has not been changed, set to failed
                 self.spec.status = -1
                 self.spec.save()
@@ -143,6 +150,8 @@ class SpecInit(object):
         self.target = os.path.join(settings.DOWNLOAD_TARGET, str(self.spec_id))
         if not os.path.exists(self.target):
             os.makedirs(self.target)
+
+        self.log.debug('[%s] Resource directory: %s' % (self.spec_id, self.target))
 
     def download_source(self):
         '''
@@ -174,6 +183,7 @@ class SpecInit(object):
         Download source from a Bazaar repository
         '''
         self.update_resource(source_started=datetime.now())
+        self.log.debug('[%s] Downloading source from Bazaar repostiory' % (self.spec_id,))
 
         try:
             tmpdir = tempfile.mkdtemp()
@@ -235,6 +245,8 @@ class SpecInit(object):
             name = changelog.package
             version = str(changelog.version).split(':')[-1]
 
+            self.log.debug('[%s] Package name=%s version=%s' % (self.spec_id, name, version,))
+
             # Send changelog and control
             #   send_description will raise an exception if this specification
             #   is rejected
@@ -253,6 +265,8 @@ class SpecInit(object):
 
             self.update_resource(source_finished=datetime.now())
 
+            self.log.debug('[%s] Source downloaded to %s' % (self.spec_id, target))
+
             return source_name
 
         finally:
@@ -263,6 +277,7 @@ class SpecInit(object):
         Download source file in an archive
         '''
         self.update_resource(source_started=datetime.now())
+        self.log.debug('[%s] Download source in tarball format' % (self.spec_id,))
 
         try:
             source_name = os.path.basename(self.spec.source)
@@ -274,6 +289,7 @@ class SpecInit(object):
 
             self.update_resource(source_finished=datetime.now())
 
+            self.log.debug('[%s] Source downloaded to %s' % (self.spec_id, target))
             return source_name
 
         finally:
@@ -291,6 +307,8 @@ class SpecInit(object):
 
         if self.description_sent:
             return
+
+        self.log.debug('[%s] Sending description' % (self.spec_id,))
 
         try:
             tmpdir = tempfile.mkdtemp()
@@ -314,9 +332,14 @@ class SpecInit(object):
             res = manager.send_spec_description(self.spec.id,
                                                 gzchangelog, gzcontrol)
             if res['status'] != 'ok':
+                self.log.debug('[%s] Package is rejected: %s' % (self.spec_id, res))
+
                 # Package is rejected
                 raise ValueError(_('Package rejected: %(msg)s') % \
                                  {'msg': res['msg']})
+
+            self.log.debug('[%s] Package is accepted: %s' % \
+                           (self.spec_id, res['package']))
 
         finally:
             self.description_sent = True
@@ -326,6 +349,8 @@ class SpecInit(object):
         '''
         Extract source and send description
         '''
+        self.log.debug('[%s] Inspecting source file' % (self.spec_id,))
+
         # FIXME is it safe to assume that all tarball source files
         #       are in tar/gz format?
         source_name = os.path.join(self.target, self.source_name)
@@ -342,6 +367,8 @@ class SpecInit(object):
         if self.spec.orig is None:
             return None
 
+        self.log.debug('[%s] Downloading orig file' % (self.spec_id,))
+
         self.update_resource(orig_started=datetime.now())
 
         try:
@@ -354,6 +381,8 @@ class SpecInit(object):
 
             self.update_resource(orig_finished=datetime.now())
 
+            self.log.debug('[%s] Orig file downloaded to %s' % (self.spec_id, target))
+
             return orig_name
 
         finally:
@@ -364,6 +393,9 @@ class SpecInit(object):
         '''
         Declare queues, exchanges, and routing keys to the builders
         '''
+        self.log.debug('[%s] Declaring queues for %s' % \
+                       (self.spec_id, ', '.join([arch.name for arch in archs])))
+
         for arch in archs:
             # declare exchange, queue, and binding
             routing_key = 'builder.%s' % arch.name
@@ -385,6 +417,8 @@ class SpecInit(object):
         '''
         Distribute specification to builders
         '''
+        self.log.debug('[%s] Distributing tasks' % self.spec_id)
+
         from celery.task.sets import subtask
 
         from .models import BuildTask
