@@ -13,7 +13,7 @@ class SpecificationForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(SpecificationForm, self).__init__(*args, **kwargs)
 
-        distributions = [(dist.id, dist.name)
+        distributions = [(dist.id, dist.name())
                          for dist in Distribution.objects.filter(active=True)]
         self.fields['distribution'].choices = distributions
 

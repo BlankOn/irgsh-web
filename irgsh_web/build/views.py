@@ -1,4 +1,6 @@
 import tempfile
+import os
+import gzip
 from datetime import datetime
 try:
     import simplejson as json
@@ -68,10 +70,9 @@ def _set_description(spec, f):
     if name is None:
         spec.status = -2
         spec.save()
-        return {'status': 'fail', 'code': 406, 'msg': _('Invalid package name')}
+        return {'status': 'fail', 'code': 406, 'msg': _('Package name not found')}
 
     # Check if this package is registered
-    spec = task.specification
     total = len(RepoPackage.objects.filter(name=name,
                                            distribution=spec.distribution.repo))
     if total == 0:
@@ -81,10 +82,9 @@ def _set_description(spec, f):
                 'msg': _('Unregistered package: %(name)s') % {'name': name}}
 
     # Save packages info
-    utils.store_package_info(task.specification, info)
+    utils.store_package_info(spec, info)
 
     return {'status': 'ok', 'package': name}
-
 
 @_post_required
 @_task_id_required
@@ -100,8 +100,16 @@ def description(request, task):
         return HttpResponse(status=400)
 
     f = request.FILES['control']
-    spec = task.specification
-    return _set_description(spec, f)
+    try:
+        fx, tmp = tempfile.mkstemp()
+        fo = open(tmp, 'wb')
+        fo.write(f.read())
+        fo.close()
+
+        ff = gzip.open(tmp)
+        return _set_description(task.specification, ff)
+    finally:
+        os.unlink(tmp)
 
 @_post_required
 @_task_id_required
@@ -195,7 +203,16 @@ def spec_description(request, spec):
         return HttpResponse(status=400)
 
     f = request.FILES['control']
-    return _set_description(spec, f)
+    try:
+        fx, tmp = tempfile.mkstemp()
+        fo = open(tmp, 'wb')
+        fo.write(f.read())
+        fo.close()
+
+        ff = gzip.open(tmp)
+        return _set_description(spec, ff)
+    finally:
+        os.unlink(tmp)
 
 @_spec_id_required
 @_json_result

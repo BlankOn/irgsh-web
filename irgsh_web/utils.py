@@ -1,12 +1,13 @@
 import urllib2
+import httplib
 
-from .conf import settings
+from django.conf import settings
 
 class HTTPSHandler(urllib2.HTTPSHandler):
     handler_order = urllib2.HTTPSHandler.handler_order - 1
 
     def __init__(self, debuglevel=0, key_file=None, cert_file=None):
-        super(HTTPSHandler, self).__init__(debuglevel)
+        urllib2.HTTPSHandler.__init__(self, debuglevel)
 
         class HTTPSConnection(httplib.HTTPSConnection):
             def __init__(self, *args, **kwargs):
@@ -23,12 +24,15 @@ class HTTPSHandler(urllib2.HTTPSHandler):
 
 def send_message(url, param=None):
     from poster.encode import multipart_encode
+    from poster.streaminghttp import register_openers
 
     # Set custom HTTPS handler, other protocols will use the defaults
     key_file = getattr(settings, 'SSL_KEY', None)
     cert_file = getattr(settings, 'SSL_CERT', None)
     handler = HTTPSHandler(key_file=key_file, cert_file=cert_file)
-    opener = urllib2.build_opener(handler)
+
+    opener = register_openers()
+    opener.add_handler(handler)
 
     # Construct data and headers
     data = None

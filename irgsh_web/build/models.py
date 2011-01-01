@@ -67,7 +67,7 @@ class Distribution(models.Model):
                              help_text=_('Use sources.list syntax'))
 
     def __unicode__(self):
-        return self.name()
+        return unicode(self.name())
 
     def name(self):
         return self.repo.name
@@ -110,10 +110,10 @@ class Specification(models.Model):
 
     def __unicode__(self):
         param = {'dist': self.distribution}
-        if self.source_package is None:
+        if self.package is None:
             return _('Unknown package (%(dist)s)') % param
         else:
-            param.update({'package': self.source_package})
+            param.update({'package': self.package})
             return _('%(package)s (%(dist)s)') % param
 
     def dsc(self):

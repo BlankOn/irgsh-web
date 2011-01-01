@@ -22,3 +22,13 @@ BROKER_USER = 'irgsh'
 BROKER_PASSWORD = 'irgsh'
 BROKER_VHOST = 'irgsh'
 
+BROKER_HOST = '127.0.0.1'
+
+import os
+PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
+DOWNLOAD_TARGET = 'static/assets/'
+if not os.path.exists(DOWNLOAD_TARGET):
+    os.makedirs(DOWNLOAD_TARGET)
+
+SERVER = 'http://localhost:8000/'
+

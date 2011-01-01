@@ -125,7 +125,7 @@ class SpecInit(object):
         self.orig_name = None
 
     def start(self):
-        init_status = spec.status
+        init_status = self.spec.status
 
         try:
             self.init()
@@ -134,13 +134,13 @@ class SpecInit(object):
             self.orig_name = self.download_orig()
             self.distribute()
         except (ValueError, AssertionError), e:
-            if init_status != spec.status:
+            if init_status != self.spec.status:
                 # Status has not been changed, set to failed
-                spec.status = -1
-                spec.save()
+                self.spec.status = -1
+                self.spec.save()
 
     def init(self):
-        self.target = os.path.join(settings.DOWNLOAD_TARGET, int(self.spec_id))
+        self.target = os.path.join(settings.DOWNLOAD_TARGET, str(self.spec_id))
         if not os.path.exists(self.target):
             os.makedirs(self.target)
 
@@ -157,7 +157,7 @@ class SpecInit(object):
         assert hasattr(self, func_name)
 
         func = getattr(self, func_name)
-        func()
+        return func()
 
     def update_resource(self, **param):
         '''
@@ -311,8 +311,8 @@ class SpecInit(object):
                 gz.write(open(control, 'rb').read())
             gz.close()
 
-            res = manager.send_description(self.spec.id,
-                                           gzchangelog, gzcontrol)
+            res = manager.send_spec_description(self.spec.id,
+                                                gzchangelog, gzcontrol)
             if res['status'] != 'ok':
                 # Package is rejected
                 raise ValueError(_('Package rejected: %(msg)s') % \
@@ -328,7 +328,8 @@ class SpecInit(object):
         '''
         # FIXME is it safe to assume that all tarball source files
         #       are in tar/gz format?
-        tar = tarfile.open(self.source_name, 'r:gz')
+        source_name = os.path.join(self.target, self.source_name)
+        tar = tarfile.open(source_name, 'r:gz')
         fchangelog = tar.extractfile('debian/changelog')
         fcontrol = tar.extractfile('debian/control')
 
