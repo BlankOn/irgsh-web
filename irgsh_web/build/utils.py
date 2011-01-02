@@ -353,9 +353,23 @@ class SpecInit(object):
         #       are in tar/gz format?
         source_name = os.path.join(self.target, self.source_name)
         tar = tarfile.open(source_name, 'r:gz')
-        fchangelog = tar.extractfile('debian/changelog')
-        fcontrol = tar.extractfile('debian/control')
 
+        # Find changelog and control
+        fchangelog = None
+        fcontrol = None
+        for fname in tar.getnames():
+            if fname == 'debian/changelog':
+                fchangelog = tar.extractfile(fname)
+            elif fname == 'debian/control':
+                fcontrol = tar.extractfile(fname)
+
+            if len(fname.split('/')) == 3:
+                if fchangelog is None and fname.endswith('debian/changelog'):
+                    fchangelog = tar.extractfile(fname)
+                if fcontrol is None and fname.endswith('debian/control'):
+                    fcontrol = tar.extractfile(fname)
+
+        # Send the files
         self.send_description(fchangelog, fcontrol)
 
     def download_orig(self):
