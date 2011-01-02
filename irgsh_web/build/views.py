@@ -89,31 +89,6 @@ def _set_description(spec, f):
 @_post_required
 @_task_id_required
 @_json_result
-def description(request, task):
-    '''
-    [API] Update package information
-
-    - source package
-    - package list
-    '''
-    if not request.FILES.has_key('control'):
-        return HttpResponse(status=400)
-
-    f = request.FILES['control']
-    try:
-        fx, tmp = tempfile.mkstemp()
-        fo = open(tmp, 'wb')
-        fo.write(f.read())
-        fo.close()
-
-        ff = gzip.open(tmp)
-        return _set_description(task.specification, ff)
-    finally:
-        os.unlink(tmp)
-
-@_post_required
-@_task_id_required
-@_json_result
 def build_log(request, task):
     '''
     [API] Set build log
