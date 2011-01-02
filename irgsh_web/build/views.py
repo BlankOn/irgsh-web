@@ -108,15 +108,15 @@ def build_log(request, task):
     if not request.FILES.has_key('log'):
         return HttpResponse(status=400)
 
-    fin = request.FILES['control']
+    fin = request.FILES['log']
 
     logdir = os.path.join(settings.LOG_PATH, task.task_id)
     if not os.path.exists(logdir):
         os.makedirs(logdir)
     target = os.path.join(logdir, 'build.log.gz')
 
-    fin = open(target, 'wb')
-    fin.write(fin.read())
+    fout = open(target, 'wb')
+    fout.write(fin.read())
     fout.close()
 
     task.build_log = datetime.now()
