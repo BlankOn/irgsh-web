@@ -36,8 +36,25 @@ def create_build_task_param(spec):
 
     return spec_id, build_spec, build_dist
 
+def baseN(num, base):
+    res = []
+    while True:
+        res.append('01234567890abcdefghijklmnopqrstuvwxyz'[num%base])
+        num = num // base
+        if num == 0:
+            break
+    return ''.join(reversed(res))
+
 def build_task_id():
-    return str(uuid.uuid4())
+    '''
+    Generate task id
+
+    The task id is a ten digits alphanumeric characters that is
+    made of a random number concatenated with a timestamp.
+    '''
+    num = random.randint(23646, 851265)
+    num = (num << 32) + (int(time.time()) & 0xFFFFFFFF)
+    return baseN(num, 36)
 
 def get_package_info(packages):
     from .models import Package, SOURCE, BINARY
