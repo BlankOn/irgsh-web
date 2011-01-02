@@ -1,6 +1,7 @@
 import tempfile
 import os
 import gzip
+import shutil
 from datetime import datetime
 try:
     import simplejson as json
@@ -17,8 +18,10 @@ from django.utils.translation import ugettext as _
 
 try:
     from debian.deb822 import Packages
+    from debian.changelog import Changelog
 except ImportError:
     from debian_bundle.deb822 import Packages
+    from debian_bundle.changelog import Changelog
 
 from . import utils, models, tasks
 from .models import BuildTask, Distribution, Specification, BuildTaskLog, \
@@ -60,9 +63,9 @@ def _json_result(func):
         return res
     return _func
 
-def _set_description(spec, f):
+def _set_description(spec, fcontrol, fchangelog):
     # Get packages info
-    packages = Packages.iter_paragraphs(f)
+    packages = Packages.iter_paragraphs(fcontrol)
     info = utils.get_package_info(packages)
     name = info['name']
 
@@ -73,15 +76,24 @@ def _set_description(spec, f):
         return {'status': 'fail', 'code': 406, 'msg': _('Package name not found')}
 
     # Check if this package is registered
-    total = len(RepoPackage.objects.filter(name=name,
-                                           distribution=spec.distribution.repo))
-    if total == 0:
+    try:
+        pkg = RepoPackage.objects.get(name=name,
+                                      distribution=spec.distribution.repo)
+    except RepoPackage.DoesNotExist:
         spec.status = -2
         spec.save()
         return {'status': 'fail', 'code': 406,
                 'msg': _('Unregistered package: %(name)s') % {'name': name}}
 
+    # Get package version
+    c = Changelog(fchangelog)
+    version = str(c.version)
+
     # Save packages info
+    spec.package = pkg
+    spec.version = version
+    spec.save()
+
     utils.store_package_info(spec, info)
 
     return {'status': 'ok', 'package': name}
@@ -174,20 +186,27 @@ def spec_description(request, spec):
     - source package
     - package list
     '''
-    if not request.FILES.has_key('control'):
+    if not request.FILES.has_key('control') or \
+       not request.FILES.has_key('changelog'):
         return HttpResponse(status=400)
 
-    f = request.FILES['control']
-    try:
-        fx, tmp = tempfile.mkstemp()
-        fo = open(tmp, 'wb')
-        fo.write(f.read())
-        fo.close()
+    files = ['control', 'changelog']
 
-        ff = gzip.open(tmp)
-        return _set_description(spec, ff)
+    try:
+        tmpdir = tempfile.mkdtemp()
+
+        for fname in files:
+            fin = request.FILES[fname]
+            f = open(os.path.join(tmpdir, '%s.gz' % fname), 'wb')
+            f.write(fin.read())
+            f.close()
+
+        gz = [gzip.open(os.path.join(tmpdir, '%s.gz' % fname))
+              for fname in files]
+        return _set_description(spec, gz[0], gz[1])
+
     finally:
-        os.unlink(tmp)
+        shutil.rmtree(tmpdir)
 
 @_spec_id_required
 @_json_result
