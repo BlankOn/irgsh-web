@@ -1,4 +1,5 @@
 import urllib2
+import urllib
 import httplib
 
 from django.conf import settings
@@ -15,7 +16,7 @@ class HTTPSHandler(urllib2.HTTPSHandler):
                     kwargs['key_file'] = key_file
                 if cert_file is not None:
                     kwargs['cert_file'] = cert_file
-                super(HTTPSConnection, self).__init__(*args, **kwargs)
+                httplib.HTTPSConnection.__init__(self, *args, **kwargs)
 
         self.HTTPSConnection = HTTPSConnection
 
