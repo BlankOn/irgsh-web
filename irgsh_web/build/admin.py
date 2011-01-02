@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import ugettext as _
 
-from .models import Distribution, Builder, Specification
+from .models import Distribution, Builder, Specification, BuildTask
 
 class DistributionAdmin(admin.ModelAdmin):
     list_display = ('repo', 'active', 'mirror', 'dist', 'components',)
@@ -28,7 +28,12 @@ class BuilderAdmin(admin.ModelAdmin):
     )
 
 class SpecificationAdmin(admin.ModelAdmin):
-    list_display = ('distribution', 'submitter', 'status',
+    def specification_id(obj):
+        return str(obj.id)
+    specification_id.short_description = _('spec id')
+    specification_id.admin_order_field = 'id'
+
+    list_display = (specification_id, 'distribution', 'submitter', 'status',
                     'package', 'version',
                     'created',)
 
@@ -44,7 +49,18 @@ class SpecificationAdmin(admin.ModelAdmin):
         }),
     )
 
+class BuildTaskAdmin(admin.ModelAdmin):
+    def specification_id(obj):
+        return str(obj.specification.id)
+    specification_id.short_description = _('spec id')
+    specification_id.admin_order_field = 'specification__id'
+
+    list_display = (specification_id, 'architecture', 'task_id',
+                    'created', 'updated',
+                    'status', 'builder',)
+
 admin.site.register(Distribution, DistributionAdmin)
 admin.site.register(Builder, BuilderAdmin)
 admin.site.register(Specification, SpecificationAdmin)
+admin.site.register(BuildTask, BuildTaskAdmin)
 
