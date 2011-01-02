@@ -113,11 +113,9 @@ class SpecInit(object):
     Prepare and distribute specification
     '''
 
-    def __init__(self, spec_id):
-        from .models import Specification
-
-        self.spec_id = spec_id
-        self.spec = Specification.objects.get(pk=spec_id)
+    def __init__(self, spec):
+        self.spec_id = spec.id
+        self.spec = spec
 
         self.description_sent = False
         self.distributed = False
@@ -411,30 +409,33 @@ class SpecInit(object):
         if self.distributed:
             return
 
+        spec = self.spec
+        spec_id = self.spec_id
 
         # Prepare arguments
         task_name = BuildPackage.name
-        args = utils.create_build_task_param(spec)
+        args = create_build_task_param(spec)
 
         build_spec = BuildSpecification(spec.source, spec.orig,
                                         spec.source_type, spec.source_opts)
 
         dist = spec.distribution
-        build_dist = BuildDistribution(dist.name, dist.mirror, dist.dist,
+        build_dist = BuildDistribution(dist.name(), dist.mirror, dist.dist,
                                        dist.components, dist.extra)
 
-        args = [spec.id, build_spec, build_dist]
+        args = [self.spec_id, build_spec, build_dist]
         kwargs = None
 
-        spec_id, d, s = args
+        spec_id, s, d = args
         print 'init: spec_id=%s' % spec_id
         print '- distribution: name=%s mirror=%s dist=%s comp=%s extra=%s' % (d.name, d.mirror, d.dist, repr(d.components), repr(d.extra))
         print '- spec: location=%s type=%s orig=%s opts=%s' % (s.location, repr(s.source_type), repr(s.orig), repr(s.source_opts))
 
         # Distribute to builder of each architecture
         subtasks = []
+        archs = self.get_archs(spec)
         for arch in archs:
-            task_id = utils.build_task_id()
+            task_id = build_task_id()
 
             # store task info
             task = BuildTask()
