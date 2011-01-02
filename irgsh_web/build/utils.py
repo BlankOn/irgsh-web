@@ -389,24 +389,6 @@ class SpecInit(object):
             if os.path.exists(fname):
                 os.unlink(fname)
 
-    def declare_queues(self, archs):
-        '''
-        Declare queues, exchanges, and routing keys to the builders
-        '''
-        self.log.debug('[%s] Declaring queues for %s' % \
-                       (self.spec_id, ', '.join([arch.name for arch in archs])))
-
-        for arch in archs:
-            # declare exchange, queue, and binding
-            routing_key = 'builder.%s' % arch.name
-            consumer = self.get_consumer()
-            consumer.queue = 'builder_%s' % arch.name
-            consumer.exchange = 'builder'
-            consumer.exchange_type = 'topic'
-            consumer.routing_key = routing_key
-            consumer.declare()
-            consumer.connection.close()
-
     def get_archs(self, spec):
         '''
         List all architectures associated to this specification
@@ -429,9 +411,6 @@ class SpecInit(object):
         if self.distributed:
             return
 
-        # Declare queues
-        archs = self.get_archs(spec)
-        self.declare_queues(archs)
 
         # Prepare arguments
         task_name = BuildPackage.name
