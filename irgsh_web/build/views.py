@@ -160,6 +160,11 @@ def update_status(request, task):
     if status == 202: # Package uploaded
         pass
 
+    elif status == -1: # Failed
+        spec = task.specification
+        spec.status = -1
+        spec.save()
+
     return {'status': 'ok'}
 
 @_task_id_required
