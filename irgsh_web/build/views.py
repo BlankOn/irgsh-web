@@ -101,7 +101,7 @@ def _set_description(spec, fcontrol, fchangelog):
 @_post_required
 @_task_id_required
 @_json_result
-def build_log(request, task):
+def task_log(request, task):
     '''
     [API] Set build log
     '''
@@ -129,7 +129,7 @@ def build_log(request, task):
 @_post_required
 @_task_id_required
 @_json_result
-def update_status(request, task):
+def task_status(request, task):
     '''
     [API] Update task status
     '''
@@ -170,7 +170,7 @@ def update_status(request, task):
     return {'status': 'ok'}
 
 @_task_id_required
-def show(request, task):
+def task_show(request, task):
     '''
     Show build task information
 
@@ -180,7 +180,7 @@ def show(request, task):
     pass
 
 @_spec_id_required
-def show_spec(request, spec):
+def spec_show(request, spec):
     return HttpResponse('show spec: %s' % spec)
 
 @_post_required
