@@ -193,6 +193,13 @@ class BuildTask(models.Model):
         log.save()
         return log
 
+    def changes(self):
+        if self.specification.package is None:
+            return None
+        return '%s_%s_%s.changes' % (self.specification.package,
+                                     self.specification.version,
+                                     self.architecture.name)
+
 class BuildTaskLog(models.Model):
     '''
     List of messages (including status change) sent by builders during
