@@ -158,6 +158,8 @@ def update_status(request, task):
     task.add_log(status_list[status])
 
     if status == 202: # Package uploaded
+        # TODO: Start rebuilding repo if packages
+        #       from all builders (archs) have been uploaded
         pass
 
     elif status == -1: # Failed
