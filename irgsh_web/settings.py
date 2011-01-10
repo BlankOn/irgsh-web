@@ -142,3 +142,11 @@ if not os.path.exists(DOWNLOAD_TARGET):
 
 SERVER = 'http://localhost:8000/'
 
+EXTRA_SETTINGS_DIR = None
+
+if EXTRA_SETTINGS_DIR is not None:
+    from glob import glob
+    mods = sorted(glob(os.path.join(EXTRA_SETTINGS_DIR, '*.py')))
+    for mod in mods:
+        execfile(mod)
+
