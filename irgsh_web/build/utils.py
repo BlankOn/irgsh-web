@@ -47,7 +47,7 @@ def baseN(num, base):
             break
     return ''.join(reversed(res))
 
-def build_task_id():
+def create_task_id():
     '''
     Generate task id
 
@@ -468,7 +468,7 @@ class SpecInit(object):
         subtasks = []
         archs = self.get_archs(spec)
         for arch in archs:
-            task_id = build_task_id()
+            task_id = create_task_id()
 
             # store task info
             task = BuildTask()
