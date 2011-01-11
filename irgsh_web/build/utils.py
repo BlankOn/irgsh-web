@@ -6,6 +6,8 @@ import urllib
 import os
 import tarfile
 import logging
+import random
+import time
 from datetime import datetime
 
 from django.db import IntegrityError
@@ -39,7 +41,7 @@ def create_build_task_param(spec):
 def baseN(num, base):
     res = []
     while True:
-        res.append('01234567890abcdefghijklmnopqrstuvwxyz'[num%base])
+        res.append('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'[num%base])
         num = num // base
         if num == 0:
             break
@@ -52,9 +54,9 @@ def build_task_id():
     The task id is a ten digits alphanumeric characters that is
     made of a random number concatenated with a timestamp.
     '''
-    num = random.randint(23646, 851265)
+    num = random.randint(3151848, 195414610)
     num = (num << 32) + (int(time.time()) & 0xFFFFFFFF)
-    return baseN(num, 36)
+    return baseN(num, 62)
 
 def get_package_info(packages):
     from .models import Package, SOURCE, BINARY
