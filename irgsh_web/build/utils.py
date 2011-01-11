@@ -53,6 +53,12 @@ def create_task_id():
 
     The task id is a ten digits alphanumeric characters that is
     made of a random number concatenated with a timestamp.
+
+        >>> digits = 10
+        >>> min_random = (62 ** (digits-1)) >> 32
+        3151848
+        >>> max_random = (((62 ** digits) - 1) >> 32) - 1
+        195414610
     '''
     num = random.randint(3151848, 195414610)
     num = (num << 32) + (int(time.time()) & 0xFFFFFFFF)
