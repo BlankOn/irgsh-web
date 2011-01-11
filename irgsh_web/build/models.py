@@ -200,6 +200,9 @@ class BuildTask(models.Model):
                                      self.specification.version,
                                      self.architecture.name)
 
+    def upload_path(self):
+        return str(self.architecture.name)
+
 class BuildTaskLog(models.Model):
     '''
     List of messages (including status change) sent by builders during
