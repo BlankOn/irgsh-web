@@ -142,8 +142,11 @@ if not os.path.exists(DOWNLOAD_TARGET):
 
 SERVER = 'http://localhost:8000/'
 
-EXTRA_SETTINGS_DIR = None
+EXTRA_SETTINGS = '/etc/irgsh/web/settings.py'
+if EXTRA_SETTINGS is not None and os.path.exists(EXTRA_SETTINGS):
+    execfile(EXTRA_SETTINGS)
 
+EXTRA_SETTINGS_DIR = '/etc/irgsh/web/settings.py.d'
 if EXTRA_SETTINGS_DIR is not None:
     from glob import glob
     mods = sorted(glob(os.path.join(EXTRA_SETTINGS_DIR, '*.py')))
