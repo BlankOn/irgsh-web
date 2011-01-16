@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
 
-TASK_ID = r'(?P<task_id>[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})'
+TASK_ID = r'(?P<task_id>[0-9a-zA-Z]{10})'
 
 urlpatterns = patterns('irgsh_web.build.views',
     url(r'^(?P<spec_id>\d+)/$', 'spec_show', name='build_spec_show'),
