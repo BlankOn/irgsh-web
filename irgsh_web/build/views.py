@@ -157,12 +157,26 @@ def task_status(request, task):
 
     task.add_log(status_list[status])
 
-    if status == 202: # Package uploaded
-        # TODO: Start rebuilding repo if packages
-        #       from all builders (archs) have been uploaded
-        pass
+    if status == 202:
+        # Package uploaded
+        # Start rebuilding repo if packages
+        # from all builders (archs) have been uploaded
+        tasks = BuildTask.objects.filter(specification=task.specification)
+        all_uploaded = all([t.status == 202 for t in tasks])
 
-    elif status == -1: # Failed
+        if all_uploaded:
+            # Atomicaly update spec status to building repository.
+            total = Specification.objects.filter(pk=task.specification.id) \
+                                         .exclude(status=200, status__lt=0) \
+                                         .update(status=200)
+
+            if total > 0:
+                # Successfully updated the spec => got token
+                spec = Specification.objects.get(pk=task.specification.id)
+                utils.rebuild_repo(spec)
+
+    elif status == -1:
+        # Task failed
         spec = task.specification
         spec.status = -1
         spec.save()
