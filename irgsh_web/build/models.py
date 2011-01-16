@@ -19,10 +19,12 @@ BZR = 'bzr'
 SPECIFICATION_STATUS = (
     ( -2, _('Rejected')),
     ( -1, _('Failed')),
-    (  0, _('Waiting for initialization')),
-    (  1, _('Downloading source file')),
-    (  2, _('Downloading orig file')),
-    (  3, _('Distributed')),
+    (100, _('Waiting for initialization')),
+    (101, _('Downloading source file')),
+    (102, _('Downloading orig file')),
+    (103, _('Distributed')),
+    (200, _('Building repository')),
+    (999, _('Finished')),
 )
 
 BUILD_TASK_STATUS = (
