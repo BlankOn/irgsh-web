@@ -228,6 +228,46 @@ def spec_status(request, spec):
 
     return {'status': 'ok', 'code': spec.status, 'msg': spec.get_status_display()}
 
+@_spec_id_required
+@_json_result
+@_post_required
+def repo_status(request, spec):
+    arch = request.POST.get('arch', None)
+    status = request.POST.get('status', None)
+
+    try:
+        status = int(status)
+        if not status in [-1, 0, 1]:
+            raise ValueError
+    except ValueError:
+        raise HttpResponse(status=406)
+
+    if status != 1:
+        archs = spec.distribution.repo.architectures
+        arch_valid = len(archs.filter(name=arch)) > 0
+        if not arch_valid:
+            raise HttpResponse(status=406)
+
+    if status == -1:
+        # FAIL
+        spec.status == -1
+        spec.save()
+
+        spec.add_log('Rebuilding repository for %s failed' % arch)
+
+    elif status == 0:
+        # SUCCESS
+        spec.add_log('Rebuilding repository for %s succeeded' % arch
+
+    elif status == 1:
+        # COMPLETE
+        spec.status = 999
+        spec.save()
+
+        spec.add_log('Repository rebuilt, all done.')
+
+    return {'status': 'ok', 'code': status}
+
 @login_required
 def submit(request):
     if request.method == 'POST':
