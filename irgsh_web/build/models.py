@@ -156,7 +156,7 @@ class Package(models.Model):
     '''
     specification = models.ForeignKey(Specification, related_name='content')
     name = models.CharField(max_length=1024)
-    architecture = models.CharField(max_length=50)
+    architecture = models.CharField(max_length=255)
     type = models.IntegerField(choices=PACKAGE_CONTENT_TYPE)
     description = models.CharField(max_length=1025, null=True, default=None)
     long_description = models.TextField(null=True, default=None)
