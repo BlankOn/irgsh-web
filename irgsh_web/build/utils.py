@@ -505,3 +505,16 @@ class SpecInit(object):
 
         self.distributed = True
 
+def rebuild_repo(spec):
+    from irgsh_repo.tasks import RebuildRepo
+
+    tasks = BuildTask.objects.filter(specification=spec) \
+                             .select_related()
+    task_arch_list = [(task.task_id, task.architecture.name)
+                      for task in tasks]
+    args = [spec.id, spec.package.name, spec.version,
+            spec.package.distribution.name,
+            spec.package.component.name,
+            task_arch_list]
+    RebuildRepo.apply_async(args)
+
