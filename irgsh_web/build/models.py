@@ -123,6 +123,12 @@ class Specification(models.Model):
             return None
         return '%s_%s.dsc' % (self.package, self.version.split(':')[-1])
 
+    def add_log(self, message):
+        log = SpecificationLog(spec=self)
+        log.log = message
+        log.save()
+        return log
+
 class SpecificationResource(models.Model):
     '''
     List of files needed by a specification
@@ -211,6 +217,21 @@ class BuildTaskLog(models.Model):
     building a package
     '''
     task = models.ForeignKey(BuildTask)
+    log = models.TextField()
+
+    created = models.DateTimeField(default=datetime.now)
+
+    class Meta:
+        ordering = ('-created',)
+
+    def __unicode__(self):
+        if len(self.log) > 50:
+            return '%s...' % self.log[:50]
+        else:
+            return self.log
+
+class SpecificationLog(models.Model):
+    spec = models.ForeignKey(Specification)
     log = models.TextField()
 
     created = models.DateTimeField(default=datetime.now)
