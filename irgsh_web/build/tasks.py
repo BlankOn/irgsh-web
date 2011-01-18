@@ -50,34 +50,15 @@ class UploadSource(Task):
 
     ignore_result = True
 
-    def run(self, spec_id):
+    def run(self, spec_id, files):
         spec = Specification.objects.get(pk=spec_id)
 
         path = os.path.join(settings.DOWNLOAD_TARGET, str(spec_id))
-        dsc = spec.dsc()
-        dsc_file = os.path.join(path, dsc)
-
-        files = self.get_files(dsc_file)
-        files.append(dsc)
-
         files = [os.path.join(path, fname) for fname in files]
 
         self.upload(files)
 
-        self.set_status(spec_id, 104)
-
-    def get_files(self, dsc_file):
-        start = False
-        files = []
-        for line in open(dsc_file):
-            if line.startswith('Files:'):
-                start = True
-            if start:
-                if not line.startswith(' '):
-                    break
-                p = line.strip().split()
-                files.append(p[2])
-        return files
+        self.set_status(spec_id, 105)
 
     def upload(self, files):
         target = '%s@%s:%s' % (settings.SOURCE_UPLOAD_USER,
