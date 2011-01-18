@@ -82,10 +82,10 @@ class UploadSource(Task):
         return files
 
     def upload(self, files):
-        target = '%s@%s:%s' % (settings.UPLOAD_USER,
-                               settings.UPLOAD_HOST,
-                               settings.UPLOAD_PATH)
-        cmd = 'scp -P %s %s %s' % (settings.UPLOAD_PORT,
+        target = '%s@%s:%s' % (settings.SOURCE_UPLOAD_USER,
+                               settings.SOURCE_UPLOAD_HOST,
+                               settings.SOURCE_UPLOAD_PATH)
+        cmd = 'scp -P %s %s %s' % (settings.SOURCE_UPLOAD_PORT,
                                    ' '.join(files),
                                    target)
 
