@@ -239,15 +239,13 @@ def spec_status(request, spec):
     if request.method == 'POST':
         try:
             status = int(request.POST['status'])
-            spec.status = status
-            spec.save()
-
+            _set_spec_status(spec.id, status)
             if status == 104:
                 _rebuild_repo(spec)
         except ValueError:
             return HttpResponse(status=400)
 
-    return {'status': 'ok', 'code': spec.status, 'msg': spec.get_status_display()}
+    return {'status': 'ok', 'code': status, 'msg': spec.get_status_display()}
 
 @_spec_id_required
 @_json_result
