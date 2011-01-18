@@ -171,8 +171,7 @@ def task_status(request, task):
             # TODO: fatal error
             pass
 
-    task.status = status
-    task.save()
+    BuildTask.objects.filter(pk=task.id).update(status=status)
 
     task.add_log(status_list[status])
 
