@@ -151,175 +151,84 @@ class SpecInit(object):
         self.log = logging.getLogger('irgsh_web.specinit')
 
     def start(self):
-        init_status = self.spec.status
+        from .models import Specification
 
         self.log.debug('[%s] Initializing specification' % self.spec_id)
 
         try:
             self.init()
-            self.source_name = self.download_source()
-            self.inspect_source()
-            self.orig_name = self.download_orig()
+            files = self.download()
             self.distribute()
-            self.upload()
-        except (ValueError, AssertionError), e:
+            self.upload(files)
+        except (ValueError, AssertionError, TypeError), e:
             self.log.error('[%s] Error! %s' % (self.spec_id, e))
-            if init_status != self.spec.status:
-                self.log.error('[%s] Status not changed, set to failed' % self.spec_id)
-                # Status has not been changed, set to failed
+            current_status = Specification.objects.get(pk=self.spec_id).status
+            print 'current status: %s' % current_status
+            if current_status >= 0:
                 self.set_status(-1)
 
     def init(self):
+        # Prepare source directory
         self.target = os.path.join(settings.DOWNLOAD_TARGET, str(self.spec_id))
         if not os.path.exists(self.target):
             os.makedirs(self.target)
 
         self.log.debug('[%s] Resource directory: %s' % (self.spec_id, self.target))
 
-    def download_source(self):
-        '''
-        Download source file according to the type
-        '''
-        from .models import SOURCE_TYPE
-        types = zip(*SOURCE_TYPE)[0]
+    def download(self):
+        # Prepare source package builder
+        from irgsh.packager import Packager
+        from irgsh.utils import find_changelog
+        from irgsh.specification import Specification as BuildSpecification
 
-        assert self.spec.source_type in types
-
-        func_name = '_download_source_%s' % self.spec.source_type
-        assert hasattr(self, func_name)
-
-        self.set_status(101)
-
-        func = getattr(self, func_name)
-        return func()
-
-    def update_resource(self, **param):
-        '''
-        Update resource database associated to the specification
-        '''
-        from .models import SpecificationResource
-
-        SpecificationResource.objects.get_or_create(specification=self.spec)
-        SpecificationResource.objects.filter(specification=self.spec) \
-                                     .update(**param)
-
-    def _download_source_bzr(self):
-        '''
-        Download source from a Bazaar repository
-        '''
-        self.update_resource(source_started=datetime.now())
-        self.log.debug('[%s] Downloading source from Bazaar repostiory' % (self.spec_id,))
+        spec = self.spec
+        build_spec = BuildSpecification(spec.source, spec.orig,
+                                        spec.source_type, spec.source_opts)
+        packager = Packager(build_spec, None, None)
 
         try:
-            tmpdir = tempfile.mkdtemp()
+            # Download source and build source package
+            build_dir = tempfile.mkdtemp()
+            source_dir = tempfile.mkdtemp()
 
-            # Get options
-            source = self.spec.source
-            opts = self.spec.source_opts
-            if opts is None:
-                opts = {}
+            self.set_status(101)
+            packager.export_source(source_dir)
 
-            # Open branch
-            branch = Branch.open(self.spec.source)
+            self.set_status(102)
+            orig_path = packager.retrieve_orig()
 
-            # Get revision
-            revid = None
-            if 'revision' in opts:
-                revid = branch.get_rev_id(opts['revision'])
-            elif 'tag' in opts:
-                revid = branch.tags.lookup_tag(opts['tag'])
-            else:
-                revid = branch.last_revision()
+            self.set_status(103)
+            self.dsc = packager.generate_dsc(build_dir, source_dir, orig_path)
 
-            # Get tree
-            tree = branch.repository.revision_tree(revid)
+            # Copy source packages
+            dsc_file = os.path.join(build_dir, self.dsc)
+            started = False
+            files = [self.dsc]
+            for line in open(dsc_file):
+                if line.startswith('Files:'):
+                    started = True
+                elif started:
+                    if not line.startswith(' '):
+                        break
+                    p = line.strip().split()
+                    files.append(p[2])
+            for fname in files:
+                shutil.copyfile(os.path.join(build_dir, fname),
+                                os.path.join(self.target, fname))
 
-            # Find debian/control and debian/changelog
-            #   These two files are checked before extracting the whole files
-            #   because they will determine whether this specification is
-            #   allowed to proceed or not
-            tree.lock_read()
-            if not tree.has_filename('debian/control') or \
-               not tree.has_filename('debian/changelog'):
-                raise ValueError('Invalid source')
+            # Send description
+            dirname = find_changelog(source_dir)
+            changelog = os.path.join(dirname, 'debian', 'changelog')
+            control = os.path.join(dirname, 'debian', 'control')
+            self.send_description(changelog, control)
 
-            file_id_control = None
-            file_id_changelog = None
-            for item in tree.list_files(from_dir='debian', recursive=False):
-                if item[2] == 'file':
-                    if item[0] == 'control':
-                        file_id_control = item[3]
-                    elif item[0] == 'changelog':
-                        file_id_changelog = item[3]
-
-            fcontrol = os.path.join(tmpdir, 'control')
-            fchangelog = os.path.join(tmpdir, 'changelog')
-
-            f = open(fcontrol, 'wb')
-            f.write(tree.get_file(file_id_control).read())
-            f.close()
-
-            f = open(fchangelog, 'wb')
-            f.write(tree.get_file(file_id_changelog).read())
-            f.close()
-
-            tree.unlock()
-
-            # Get source package name
-            changelog = Changelog(fchangelog)
-            name = changelog.package
-            version = str(changelog.version).split(':')[-1]
-
-            self.log.debug('[%s] Package name=%s version=%s' % (self.spec_id, name, version,))
-
-            # Send changelog and control
-            #   send_description will raise an exception if this specification
-            #   is rejected
-            self.send_description(fchangelog, fcontrol)
-
-            # Package is accepted, distribution can begin
-            self.distribute()
-
-            # Export
-            #   everything looks good, continue to proceed
-            source_name = '%s_%s.tar.gz' % (name, version)
-            self.update_resource(source_name=source_name)
-
-            target = os.path.join(self.target, source_name)
-            export(tree, target)
-
-            self.update_resource(source_finished=datetime.now())
-
-            self.log.debug('[%s] Source downloaded to %s' % (self.spec_id, target))
-
-            return source_name
+            return files
 
         finally:
-            shutil.rmtree(tmpdir)
-
-    def _download_source_tarball(self):
-        '''
-        Download source file in an archive
-        '''
-        self.update_resource(source_started=datetime.now())
-        self.log.debug('[%s] Download source in tarball format' % (self.spec_id,))
-
-        try:
-            source_name = os.path.basename(self.spec.source)
-            self.update_resource(source_name=source_name)
-
-            fname, http = urllib.urlretrieve(self.spec.source)
-            target = os.path.join(self.target, source_name)
-            shutil.move(fname, target)
-
-            self.update_resource(source_finished=datetime.now())
-
-            self.log.debug('[%s] Source downloaded to %s' % (self.spec_id, target))
-            return source_name
-
-        finally:
-            if os.path.exists(fname):
-                os.unlink(fname)
+            shutil.rmtree(build_dir)
+            shutil.rmtree(source_dir)
+            if orig_path is not None:
+                os.unlink(orig_path)
 
     def send_description(self, changelog, control):
         '''
@@ -369,65 +278,6 @@ class SpecInit(object):
         finally:
             self.description_sent = True
             shutil.rmtree(tmpdir)
-
-    def inspect_source(self):
-        '''
-        Extract source and send description
-        '''
-        self.log.debug('[%s] Inspecting source file' % (self.spec_id,))
-
-        # FIXME is it safe to assume that all tarball source files
-        #       are in tar/gz format?
-        source_name = os.path.join(self.target, self.source_name)
-        tar = tarfile.open(source_name, 'r:gz')
-
-        # Find changelog and control
-        fchangelog = None
-        fcontrol = None
-        for fname in tar.getnames():
-            if fname == 'debian/changelog':
-                fchangelog = tar.extractfile(fname)
-            elif fname == 'debian/control':
-                fcontrol = tar.extractfile(fname)
-
-            if len(fname.split('/')) == 3:
-                if fchangelog is None and fname.endswith('debian/changelog'):
-                    fchangelog = tar.extractfile(fname)
-                if fcontrol is None and fname.endswith('debian/control'):
-                    fcontrol = tar.extractfile(fname)
-
-        # Send the files
-        self.send_description(fchangelog, fcontrol)
-
-    def download_orig(self):
-        '''
-        Download orig file
-        '''
-        if self.spec.orig is None:
-            return None
-
-        self.set_status(102)
-        self.log.debug('[%s] Downloading orig file' % (self.spec_id,))
-
-        self.update_resource(orig_started=datetime.now())
-
-        try:
-            orig_name = os.path.basename(self.spec.orig)
-            self.update_resource(orig_name=orig_name)
-
-            fname, http = urllib.urlretrieve(self.spec.orig)
-            target = os.path.join(self.target, orig_name)
-            shutil.move(fname, target)
-
-            self.update_resource(orig_finished=datetime.now())
-
-            self.log.debug('[%s] Orig file downloaded to %s' % (self.spec_id, target))
-
-            return orig_name
-
-        finally:
-            if os.path.exists(fname):
-                os.unlink(fname)
 
     def get_archs(self, spec):
         '''
@@ -511,9 +361,17 @@ class SpecInit(object):
         from .models import Specification
         Specification.objects.filter(pk=self.spec.id).update(status=status)
 
-    def upload(self):
+    def build_source(self):
+        from irgsh.packages.source import SourcePackage
+
+        pkg = SourcePackage(source_dir, orig_path)
+        return pkg.generate_dsc(target)
+
+    def upload(self, files):
+        self.log.debug('[%s] Scheduling source package upload' % self.spec_id)
+
         from .tasks import UploadSource
-        UploadSource.apply_async(args=(self.spec_id,))
+        UploadSource.apply_async(args=(self.spec_id, files))
 
 def rebuild_repo(spec):
     from celery.task.sets import subtask
