@@ -301,7 +301,7 @@ def submit(request):
             print 'task init:', data
             print '- spec:', spec
 
-            url = reverse('build_show_spec', args=[spec.id])
+            url = reverse('build_spec_show', args=[spec.id])
             return HttpResponseRedirect(url)
     else:
         form = SpecificationForm()
