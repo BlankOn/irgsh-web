@@ -32,6 +32,9 @@ from irgsh_web.repo.models import Package as RepoPackage
 JSON_MIME = 'application/json'
 JSON_MIME = 'plain/text'
 
+def _set_spec_status(spec_id, status):
+    Specification.objects.filter(pk=spec_id).update(status=status)
+
 def _task_id_required(func):
     def _func(request, task_id, *args, **kwargs):
         task = get_object_or_404(BuildTask, task_id=task_id)
@@ -71,8 +74,7 @@ def _set_description(spec, fcontrol, fchangelog):
 
     # The package must have a name
     if name is None:
-        spec.status = -2
-        spec.save()
+        _set_spec_status(spec.id, -2)
         return {'status': 'fail', 'code': 406, 'msg': _('Package name not found')}
 
     # Check if this package is registered
@@ -80,8 +82,7 @@ def _set_description(spec, fcontrol, fchangelog):
         pkg = RepoPackage.objects.get(name=name,
                                       distribution=spec.distribution.repo)
     except RepoPackage.DoesNotExist:
-        spec.status = -2
-        spec.save()
+        _set_spec_status(spec.id, -2)
         return {'status': 'fail', 'code': 406,
                 'msg': _('Unregistered package: %(name)s') % {'name': name}}
 
@@ -178,8 +179,7 @@ def task_status(request, task):
     elif status == -1:
         # Task failed
         spec = task.specification
-        spec.status = -1
-        spec.save()
+        _set_spec_status(spec.id, -1)
 
     return {'status': 'ok'}
 
@@ -264,19 +264,17 @@ def repo_status(request, spec):
 
     if status == -1:
         # FAIL
-        spec.status == -1
-        spec.save()
+        _set_spec_status(spec.id, -1)
 
         spec.add_log('Rebuilding repository for %s failed' % arch)
 
     elif status == 0:
         # SUCCESS
-        spec.add_log('Rebuilding repository for %s succeeded' % arch
+        spec.add_log('Rebuilding repository for %s succeeded' % arch)
 
     elif status == 1:
         # COMPLETE
-        spec.status = 999
-        spec.save()
+        _set_spec_status(spec.id, 999)
 
         spec.add_log('Repository rebuilt, all done.')
 

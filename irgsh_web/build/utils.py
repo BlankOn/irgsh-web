@@ -166,8 +166,7 @@ class SpecInit(object):
             if init_status != self.spec.status:
                 self.log.error('[%s] Status not changed, set to failed' % self.spec_id)
                 # Status has not been changed, set to failed
-                self.spec.status = -1
-                self.spec.save()
+                self.set_status(-1)
 
     def init(self):
         self.target = os.path.join(settings.DOWNLOAD_TARGET, str(self.spec_id))
@@ -187,6 +186,8 @@ class SpecInit(object):
 
         func_name = '_download_source_%s' % self.spec.source_type
         assert hasattr(self, func_name)
+
+        self.set_status(101)
 
         func = getattr(self, func_name)
         return func()
@@ -404,6 +405,7 @@ class SpecInit(object):
         if self.spec.orig is None:
             return None
 
+        self.set_status(102)
         self.log.debug('[%s] Downloading orig file' % (self.spec_id,))
 
         self.update_resource(orig_started=datetime.now())
@@ -496,14 +498,17 @@ class SpecInit(object):
             s = subtask(task_name, args, kwargs, opts)
             subtasks.append(s)
 
-        spec.status = 3
-        spec.save()
+        self.set_status(103)
 
         for s in subtasks:
             print '  - subtask: %s' % s
             s.apply_async()
 
         self.distributed = True
+
+    def set_status(self, status):
+        from .models import Specification
+        Specification.objects.filter(pk=self.spec.id).update(status=status)
 
 def rebuild_repo(spec):
     from irgsh_repo.tasks import RebuildRepo
