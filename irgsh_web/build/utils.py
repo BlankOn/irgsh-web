@@ -161,6 +161,7 @@ class SpecInit(object):
             self.inspect_source()
             self.orig_name = self.download_orig()
             self.distribute()
+            self.upload()
         except (ValueError, AssertionError), e:
             self.log.error('[%s] Error! %s' % (self.spec_id, e))
             if init_status != self.spec.status:
@@ -509,6 +510,10 @@ class SpecInit(object):
     def set_status(self, status):
         from .models import Specification
         Specification.objects.filter(pk=self.spec.id).update(status=status)
+
+    def upload(self):
+        from .tasks import UploadSource
+        UploadSource.apply_async(args=(self.spec_id,))
 
 def rebuild_repo(spec):
     from celery.task.sets import subtask
