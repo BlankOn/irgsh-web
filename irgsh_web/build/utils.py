@@ -511,15 +511,26 @@ class SpecInit(object):
         Specification.objects.filter(pk=self.spec.id).update(status=status)
 
 def rebuild_repo(spec):
+    from celery.task.sets import subtask
+
+    from .models import BuildTask
     from irgsh_repo.tasks import RebuildRepo
 
     tasks = BuildTask.objects.filter(specification=spec) \
                              .select_related()
     task_arch_list = [(task.task_id, task.architecture.name)
                       for task in tasks]
+
+    task_name = RebuildRepo.name
     args = [spec.id, spec.package.name, spec.version,
             spec.package.distribution.name,
             spec.package.component.name,
             task_arch_list]
-    RebuildRepo.apply_async(args)
+    kwargs = None
+    opts = {'exchange': 'repo',
+            'exchange_type': 'direct',
+            'routing_key': 'repo'}
+
+    s = subtask(task_name, args, kwargs, opts)
+    return s.apply_async()
 
