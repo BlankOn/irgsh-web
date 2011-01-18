@@ -22,8 +22,9 @@ SPECIFICATION_STATUS = (
     (100, _('Waiting for initialization')),
     (101, _('Downloading source file')),
     (102, _('Downloading orig file')),
-    (103, _('Distributed')),
-    (104, _('Source uploaded')),
+    (103, _('Building source package')),
+    (104, _('Build task distributed')),
+    (105, _('Source package uploaded')),
     (200, _('Building repository')),
     (999, _('Finished')),
 )

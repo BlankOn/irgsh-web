@@ -499,7 +499,7 @@ class SpecInit(object):
             s = subtask(task_name, args, kwargs, opts)
             subtasks.append(s)
 
-        self.set_status(103)
+        self.set_status(104)
 
         for s in subtasks:
             print '  - subtask: %s' % s
