@@ -35,6 +35,24 @@ JSON_MIME = 'plain/text'
 def _set_spec_status(spec_id, status):
     Specification.objects.filter(pk=spec_id).update(status=status)
 
+def _rebuild_repo(spec):
+    # Start rebuilding repo if
+    # all builders have uploaded their packages
+    # and source package has been uploaded
+    tasks = BuildTask.objects.filter(specification=spec)
+    all_uploaded = all([task.status == 202 for task in tasks])
+
+    if all_uploaded:
+        # Atomicaly update spec status to building repository.
+        total = Specification.objects.filter(pk=spec.id) \
+                                     .filter(status=104) \
+                                     .update(status=200)
+
+        if total > 0:
+            # Successfully updated the spec => got token
+            specification = Specification.objects.get(pk=spec.id)
+            utils.rebuild_repo(specification)
+
 def _task_id_required(func):
     def _func(request, task_id, *args, **kwargs):
         task = get_object_or_404(BuildTask, task_id=task_id)
@@ -160,21 +178,8 @@ def task_status(request, task):
 
     if status == 202:
         # Package uploaded
-        # Start rebuilding repo if packages
-        # from all builders (archs) have been uploaded
-        tasks = BuildTask.objects.filter(specification=task.specification)
-        all_uploaded = all([t.status == 202 for t in tasks])
-
-        if all_uploaded:
-            # Atomicaly update spec status to building repository.
-            total = Specification.objects.filter(pk=task.specification.id) \
-                                         .exclude(status=200, status__lt=0) \
-                                         .update(status=200)
-
-            if total > 0:
-                # Successfully updated the spec => got token
-                spec = Specification.objects.get(pk=task.specification.id)
-                utils.rebuild_repo(spec)
+        spec = task.specification
+        _rebuild_repo(task.specification)
 
     elif status == -1:
         # Task failed
