@@ -23,6 +23,7 @@ SPECIFICATION_STATUS = (
     (101, _('Downloading source file')),
     (102, _('Downloading orig file')),
     (103, _('Distributed')),
+    (104, _('Source uploaded')),
     (200, _('Building repository')),
     (999, _('Finished')),
 )
