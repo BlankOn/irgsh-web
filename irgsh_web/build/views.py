@@ -242,6 +242,9 @@ def spec_status(request, spec):
             status = int(request.POST['status'])
             spec.status = status
             spec.save()
+
+            if status == 104:
+                _rebuild_repo(spec)
         except ValueError:
             return HttpResponse(status=400)
 
