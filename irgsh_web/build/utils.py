@@ -319,9 +319,6 @@ class SpecInit(object):
         kwargs = None
 
         spec_id, s, d = args
-        print 'init: spec_id=%s' % spec_id
-        print '- distribution: name=%s mirror=%s dist=%s comp=%s extra=%s' % (d.name, d.mirror, d.dist, repr(d.components), repr(d.extra))
-        print '- spec: location=%s type=%s orig=%s opts=%s' % (s.location, repr(s.source_type), repr(s.orig), repr(s.source_opts))
 
         # Distribute to builder of each architecture
         subtasks = []
@@ -352,7 +349,6 @@ class SpecInit(object):
         self.set_status(104)
 
         for s in subtasks:
-            print '  - subtask: %s' % s
             s.apply_async()
 
         self.distributed = True

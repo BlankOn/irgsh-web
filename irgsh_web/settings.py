@@ -128,8 +128,6 @@ BROKER_USER = 'irgsh'
 BROKER_PASSWORD = 'irgsh'
 BROKER_VHOST = 'irgsh'
 
-BROKER_HOST = '127.0.0.1'
-
 SOURCE_UPLOAD_PATH = 'incoming/source/'
 SOURCE_UPLOAD_HOST = 'yeyen.blankonlinux.or.id'
 SOURCE_UPLOAD_USER = 'incoming'
