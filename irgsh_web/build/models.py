@@ -169,7 +169,7 @@ class Package(models.Model):
 
     def __unicode__(self):
         param = {'package': self.name, 'arch': self.architecture}
-        if self.type == SOURCE_PACKAGE:
+        if self.type == SOURCE:
             return _('%(package)s (source)') % param
         else:
             return _('%(package)s (%(arch)s)') % param
