@@ -117,14 +117,6 @@ CELERY_QUEUES = {
         'exchange': 'celery',
         'exchange_type': 'direct',
     },
-    'specinit': {
-        'exchange': 'specinit',
-        'exchange_type': 'direct',
-    },
-    'upload': {
-        'exchange': 'upload',
-        'exchange_type': 'direct',
-    }
 }
 CELERY_DEFAULT_QUEUE = 'celery'
 CELERY_DEFAULT_EXCHANGE = 'celery'
