@@ -138,6 +138,11 @@ BROKER_VHOST = 'irgsh'
 
 BROKER_HOST = '127.0.0.1'
 
+UPLOAD_PATH = 'incoming/source/'
+UPLOAD_HOST = 'yeyen.blankonlinux.or.id'
+UPLOAD_USER = 'incoming'
+UPLOAD_PORT = 22
+
 import os
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 DOWNLOAD_TARGET = 'static/assets/'
