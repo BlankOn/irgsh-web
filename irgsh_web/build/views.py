@@ -245,6 +245,9 @@ def spec_status(request, spec):
         except ValueError:
             return HttpResponse(status=400)
 
+    else:
+        status = spec.status
+
     return {'status': 'ok', 'code': status, 'msg': spec.get_status_display()}
 
 @_spec_id_required
