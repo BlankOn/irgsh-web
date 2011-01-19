@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -89,8 +90,14 @@ class Builder(models.Model):
                                 blank=True)
     remark = models.TextField(default='', blank=True)
 
+    class Meta:
+        ordering = ('-active', 'name')
+
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.architecture)
+
+    def get_absolute_url(self):
+        return reverse('build_builder_show', args=[self.name])
 
 class Specification(models.Model):
     '''
@@ -112,6 +119,9 @@ class Specification(models.Model):
     created = models.DateTimeField(default=datetime.now)
     updated = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ('-created',)
+
     def __unicode__(self):
         param = {'dist': self.distribution}
         if self.package is None:
@@ -130,6 +140,9 @@ class Specification(models.Model):
         log.log = message
         log.save()
         return log
+
+    def get_absolute_url(self):
+        return reverse('build_spec_show', args=[self.id])
 
 class SpecificationResource(models.Model):
     '''
@@ -212,6 +225,9 @@ class BuildTask(models.Model):
 
     def upload_path(self):
         return str(self.architecture.name)
+
+    def get_absolute_url(self):
+        return reverse('build_task_show', args=[self.task_id])
 
 class BuildTaskLog(models.Model):
     '''
