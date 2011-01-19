@@ -133,6 +133,7 @@ def _set_description(spec, fcontrol, fchangelog):
 @_task_id_required
 @_json_result
 def task_log(request, task):
+    # TODO access should be limited from client authenticated HTTPS only
     '''
     [API] Set build log
     '''
@@ -161,6 +162,7 @@ def task_log(request, task):
 @_task_id_required
 @_json_result
 def task_status(request, task):
+    # TODO access should be limited from client authenticated HTTPS only
     '''
     [API] Update task status
     '''
@@ -249,6 +251,7 @@ def spec_show(request, spec):
 @_spec_id_required
 @_json_result
 def spec_description(request, spec):
+    # TODO access should be limited from client authenticated HTTPS only
     '''
     [API] Update package information
 
@@ -280,6 +283,7 @@ def spec_description(request, spec):
 @_spec_id_required
 @_json_result
 def spec_status(request, spec):
+    # TODO access should be limited from client authenticated HTTPS only
     if request.method == 'POST':
         try:
             status = int(request.POST['status'])
@@ -304,6 +308,7 @@ def spec_list(request):
 @_json_result
 @_post_required
 def repo_status(request, spec):
+    # TODO access should be limited from client authenticated HTTPS only
     arch = request.POST.get('arch', None)
     status = request.POST.get('status', None)
 
