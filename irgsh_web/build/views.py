@@ -280,19 +280,22 @@ def repo_status(request, spec):
         if not status in [-1, 0, 1]:
             raise ValueError
     except ValueError:
-        raise HttpResponse(status=406)
+        return HttpResponse(status=406)
 
-    if status != 1:
+    if arch is not None:
         archs = spec.distribution.repo.architectures
         arch_valid = len(archs.filter(name=arch)) > 0
         if not arch_valid:
-            raise HttpResponse(status=406)
+            return HttpResponse(status=406)
 
     if status == -1:
         # FAIL
         _set_spec_status(spec.id, -1)
 
-        spec.add_log('Rebuilding repository for %s failed' % arch)
+        if arch is None:
+            spec.add_log('Rebuilding repository failed')
+        else:
+            spec.add_log('Rebuilding repository for %s failed' % arch)
 
     elif status == 0:
         # SUCCESS
