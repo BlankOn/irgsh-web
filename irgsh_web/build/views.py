@@ -108,6 +108,15 @@ def _set_description(spec, fcontrol, fchangelog):
     c = Changelog(fchangelog)
     version = str(c.version)
 
+    dist = c.distributions.split('-')[0]
+    target_dist = spec.distribution.repo.name.split('-')[0]
+    if dist != target_dist:
+        _set_spec_status(spec.id, -2)
+        spec.add_log(_('Package rejected (distribution mismatch: %(dist)s)') % \
+                     {'dist': dist})
+        return {'status': 'fail', 'code': 406,
+                'msg': _('Distribution mismatch: %(dist)s') % {'dist': dist}}
+
     # Save packages info
     spec.package = pkg
     spec.version = version
