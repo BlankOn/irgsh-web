@@ -1,0 +1,10 @@
+{% extends "account/base.html" %}
+{% load i18n %}
+
+{% block content %}
+<p class="success">{% trans "You have logged out from this system." %}</p>
+<p>{% blocktrans %}To complete the logout process from the whole BlankOn system, please click 
+<a href="{{ full_logout_url }}">logout completely</a>{% endblocktrans %}</p>
+<p>&larr; <a href="{% url build_summary %}">{% trans "back to home" %}</a></p>
+{% endblock %}
+

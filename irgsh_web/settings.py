@@ -86,6 +86,7 @@ INSTALLED_APPS = (
     'django_xmlrpc',
     'irgsh_web',
     'irgsh_web.jobs',
+    'irgsh_web.account',
     'irgsh_web.repo',
     'irgsh_web.build',
     'djcelery',
@@ -98,8 +99,8 @@ AUTHENTICATION_BACKENDS = (
 
 OPENID_CREATE_USERS = True
 OPENID_UPDATE_DETAILS_FROM_SREG = True
-LOGIN_URL = '/o/login'
-LOGIN_REDIRECT_URL = '/o'
+LOGIN_URL = '/account/login'
+LOGIN_REDIRECT_URL = '/'
 OPENID_SSO_SERVER_URL = "http://82.181.46.34:8081/o/"
 FULL_LOGOUT_URL = "http://82.181.46.34:8081/logout"
 OPENID_USE_AS_ADMIN_LOGIN = True

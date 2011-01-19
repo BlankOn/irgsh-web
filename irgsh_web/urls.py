@@ -10,8 +10,7 @@ urlpatterns = patterns('',
     (r'^o/', include('django_openid_auth.urls')),
     (r'^site-media/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': settings.MEDIA_ROOT}),
-    (r'^new-job', 'django.views.generic.simple.redirect_to',
-        {'url': '/submit/'}),
+    (r'^account/', include('irgsh_web.account.urls')),
 )
 
 TASK_ID = r'(?P<task_id>[0-9a-zA-Z]{10})'
