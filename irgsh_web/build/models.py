@@ -153,7 +153,7 @@ class Specification(models.Model):
     def dsc(self):
         if self.package is None:
             return None
-        return '%s_%s.dsc' % (self.package, self.version.split(':')[-1])
+        return '%s_%s.dsc' % (self.package.name, self.version.split(':')[-1])
 
     def add_log(self, message):
         log = SpecificationLog(spec=self)
