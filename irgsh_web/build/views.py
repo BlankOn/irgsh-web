@@ -40,7 +40,7 @@ def _rebuild_repo(spec):
     # all builders have uploaded their packages
     # and source package has been uploaded
     tasks = BuildTask.objects.filter(specification=spec)
-    all_uploaded = all([task.status == 202 for task in tasks])
+    all_uploaded = all([task.status == 999 for task in tasks])
 
     if all_uploaded:
         # Atomicaly update spec status to building repository.
@@ -175,8 +175,8 @@ def task_status(request, task):
 
     task.add_log(status_list[status])
 
-    if status == 202:
-        # Package uploaded
+    if status == 999:
+        # Finished
         spec = task.specification
         _rebuild_repo(task.specification)
 
