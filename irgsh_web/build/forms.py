@@ -1,14 +1,19 @@
 from django import forms
+from django.utils.translation import ugettext as _
 
 from . import utils
 from .models import Distribution, SOURCE_TYPE
 
 class SpecificationForm(forms.Form):
-    distribution = forms.ChoiceField(choices=())
-    source = forms.CharField(max_length=255)
-    source_type = forms.ChoiceField(choices=SOURCE_TYPE)
-    source_opts = forms.CharField(max_length=255, required=False)
-    orig = forms.CharField(max_length=255, required=False)
+    distribution = forms.ChoiceField(label=_('Distribution'),
+                                     choices=())
+    source = forms.CharField(label=_('Source URL'), max_length=255)
+    source_type = forms.ChoiceField(label=_('Source Type'),
+                                    choices=SOURCE_TYPE)
+    source_opts = forms.CharField(label=_('Source Options'),
+                                  max_length=255, required=False)
+    orig = forms.CharField(label=_('Original URL'), max_length=255,
+                           required=False)
 
     def __init__(self, *args, **kwargs):
         super(SpecificationForm, self).__init__(*args, **kwargs)
