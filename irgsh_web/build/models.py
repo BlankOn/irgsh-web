@@ -1,9 +1,11 @@
 from datetime import datetime
+import os
 
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 from picklefield.fields import PickledObjectField
 
@@ -247,6 +249,19 @@ class BuildTask(models.Model):
 
     def get_absolute_url(self):
         return reverse('build_task_show', args=[self.task_id])
+
+    def build_log_path(self):
+        return os.path.join(settings.LOG_PATH, 'task',
+                            self.task_id, 'build.log.gz')
+
+    def has_build_log(self):
+        return os.path.exists(self.build_log_path())
+
+    def build_log_url(self):
+        return reverse('build_task_build_log', args=[self.task_id])
+
+    def build_log_name(self):
+        return 'build.log.gz'
 
 class BuildTaskLog(models.Model):
     '''
