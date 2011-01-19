@@ -123,8 +123,8 @@ def build_source_opts(source_type, source_opts):
 
         try:
             key, value = source_opts.split('=', 1)
-            key = key.strip()
-            value = value.strip()
+            key = str(key.strip())
+            value = str(value.strip())
             if key in ['tag', 'rev']:
                 return {key: value}
 
