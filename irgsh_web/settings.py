@@ -135,11 +135,7 @@ SOURCE_UPLOAD_HOST = 'yeyen.blankonlinux.or.id'
 SOURCE_UPLOAD_USER = 'incoming'
 SOURCE_UPLOAD_PORT = 22
 
-import os
-PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
-DOWNLOAD_TARGET = 'static/assets/'
-if not os.path.exists(DOWNLOAD_TARGET):
-    os.makedirs(DOWNLOAD_TARGET)
+DOWNLOAD_TARGET = 'static/source/'
 
 SERVER = 'http://localhost:8000/'
 
