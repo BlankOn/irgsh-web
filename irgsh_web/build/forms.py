@@ -32,10 +32,10 @@ class SpecificationForm(forms.Form):
 
         source_opts = None
         try:
-            source_opts = utils.build_source_opts(data['source_type'],
-                                                  data['source_opts'])
+            utils.build_source_opts(data['source_type'],
+                                    data['source_opts'])
         except ValueError, e:
             raise forms.ValidationError(str(e))
 
-        return source_opts
+        return data['source_opts']
 

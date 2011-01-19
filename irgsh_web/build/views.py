@@ -360,7 +360,9 @@ def submit(request):
             spec.source = data['source']
             spec.orig = data['orig']
             spec.source_type = data['source_type']
-            spec.source_opts = data['source_opts']
+            spec.source_opts_raw = data['source_opts']
+            spec.source_opts = utils.build_source_opts(data['source_type'],
+                                                       data['source_opts'])
             spec.save()
             spec.add_log('Build specification created')
 
