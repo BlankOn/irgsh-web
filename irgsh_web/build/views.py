@@ -185,7 +185,11 @@ def task_status(request, task):
                          {'name': builder_name})
             return HttpResponse(status=400)
 
-    BuildTask.objects.filter(pk=task.id).update(status=status)
+    if task.status >= 0 and (status > task.status or status < 0):
+        # Only update when the new status is larger (showing progression)
+        # or failed/cancelled
+        task.status = status
+    task.save()
 
     task.add_log(status_list[status])
 
