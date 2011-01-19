@@ -9,27 +9,27 @@
 {% block extrahead %}{% endblock extrahead %}
 </head><body>
 
-<div id="b-bar-menu">
-<img id="b" src=/site-media/images/logo.png>
-  <a id="b-a" href>Wiki</a>
-  <a id="b-a" href>Alih bahasa</a>
-  <a id="b-a" href>Akun</a>
-  </div>
-  <div id="b-bar-closure">
-  &nbsp;
-  </div>
+<header>
+    <img id="logo" src="{{ MEDIA_URL }}images/logo.png"/>
+    <menu>
+    <li><a href="">Wiki</a></li>
+    <li><a href="">Alih bahasa</a></li>
+    <li><a href="">Akun</a></li>
+    </menu>
+</header>
+
 <div class="container">
 
-<div class="span-20 prepend-2">
-{% if not user.is_authenticated %}
-<a id=submenu href=/o/login?next=/>{% trans "Login" %}</a>
+<nav><p>
+<a class="submenu" href="{% url build_summary %}">{% trans "Home" %}</a>
+{% if user.is_authenticated %}
+<a class="submenu" href="{% url build_submit %}">{% trans "New Build Job" %}</a>
+Logged in as: <strong>{{ user }}</strong>
+(<a href="{% url account_logout %}">{% trans "logout" %}</a>)
 {% else %}
-<a id=submenu href=/>{% trans "Home" %}</a>
-<a id=submenu href=/new-job>{% trans "New Job" %}</a>
-<a id=submenu href=/logout>{% trans "Logout" %}</a>
-Logged in as: {{ user }}
+<a class="submenu" href="{% url account_login %}">{% trans "Login" %}</a>
 {% endif %}
-        </div>
+</p></nav>
 
 <div class="span-20" id="content">
 {% block content %}{% endblock content %}
