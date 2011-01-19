@@ -3,6 +3,8 @@ import os
 import gzip
 import shutil
 from datetime import datetime
+import mimetypes
+import stat
 try:
     import simplejson as json
 except ImportError:
@@ -16,6 +18,8 @@ from django.template import RequestContext
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
+from django.views.static import was_modified_since
+from django.utils.http import http_date
 
 try:
     from debian.deb822 import Packages
@@ -145,6 +149,25 @@ def _set_description(spec, fcontrol, fchangelog):
     utils.store_package_info(spec, info)
 
     return {'status': 'ok', 'package': name}
+
+@_task_id_required
+def task_build_log(request, task):
+    fullpath = os.path.join(settings.LOG_PATH, 'task',
+                            task.task_id, 'build.log.gz')
+    if not os.path.exists(fullpath):
+        raise Http404()
+
+    # From Django source code: django/views/static.py
+    statobj = os.stat(fullpath)
+    mimetype = mimetypes.guess_type(fullpath)[0] or 'application/octet-stream'
+    if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
+                              statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
+        return HttpResponseNotModified(mimetype=mimetype)
+    contents = open(fullpath, 'rb').read()
+    response = HttpResponse(contents, mimetype=mimetype)
+    response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
+    response["Content-Length"] = len(contents)
+    return response
 
 @_post_required
 @_task_id_required
