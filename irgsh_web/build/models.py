@@ -128,6 +128,7 @@ class Specification(models.Model):
     orig = models.CharField(max_length=1024, null=True, default=None,
                             blank=True)
     source_type = models.CharField(max_length=25, choices=SOURCE_TYPE)
+    source_opts_raw = models.TextField(null=True, default=None)
     source_opts = PickledObjectField(null=True, default=None)
 
     package = models.ForeignKey(RepoPackage, null=True, default=None)
