@@ -160,7 +160,7 @@ class SpecInit(object):
             files = self.download()
             self.distribute()
             self.upload(files)
-        except (ValueError, AssertionError, TypeError), e:
+        except (ValueError, AssertionError, TypeError, IOError), e:
             self.log.error('[%s] Error! %s' % (self.spec_id, e))
             current_status = Specification.objects.get(pk=self.spec_id).status
             print 'current status: %s' % current_status
@@ -185,6 +185,8 @@ class SpecInit(object):
         build_spec = BuildSpecification(spec.source, spec.orig,
                                         spec.source_type, spec.source_opts)
         packager = Packager(build_spec, None, None)
+
+        orig_path = None
 
         try:
             # Download source and build source package
