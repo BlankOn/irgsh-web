@@ -109,11 +109,11 @@ th {
 #spec-page #spec-pkglist tr > td:nth-child(4) {
     width: 100%;
 }
-#spec-page #spec-tasks tr > td + td + td + td {
+#spec-page #spec-tasks tr > td:nth-child(6) {
     width: 100%;
 }
-#spec-page #spec-tasks tr > td:nth-child(5),
-#spec-page #spec-tasks tr > td:nth-child(6),
+#spec-page #spec-tasks tr > td:nth-child(3),
+#spec-page #spec-tasks tr > td:nth-child(4),
 #spec-page #spec-tasks tr > td:nth-child(7) {
     white-space: nowrap;
 }
@@ -141,8 +141,10 @@ th {
     white-space: nowrap;
 }
 #builder-page #builder-tasks td:nth-child(6),
-#builder-page #builder-tasks td:nth-child(7) {
-    width: 50%;
+#builder-page #builder-tasks td:nth-child(7),
+#builder-page #builder-tasks td:nth-child(8) {
+    width: 33%;
     white-space: normal;
+    font-size: .8em;
 }
 

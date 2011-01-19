@@ -7,35 +7,30 @@
 <h1>{% blocktrans with task.task_id as task_id %}Build task <code>{{ task_id }}</code>{% endblocktrans %}</h1>
 
 <table class="vertical" id="task-info">
-<tr><th class="span-2">{% trans "Task status" %}</th>
+<tr><th>{% trans "Task ID" %}</th>
+    <td class="code">{{ task.task_id }}</td>
+</tr>
+<tr><th>{% trans "Task status" %}</th>
     <td>{{ task.get_status_display }}</td>
+</tr>
+<tr><th>{% trans "Build" %}</th>
+    <td><a href="{{ build.get_absolute_url }}">{{ build.id }}</a>
+        {% if build.package %}&rarr; {{ build.package.name }}_{{ build.version }}{% endif %}</td>
+</tr>
+<tr><th>{% trans "Created" %}</th>
+    <td>{{ task.created|datetime_and_age }}</td>
+</tr>
+<tr><th>{% trans "Last update" %}</th>
+    <td>{{ task.updated|datetime_and_since:task.created }}</td>
 </tr>
 <tr><th>{% trans "Architecture" %}</th>
     <td>{{ task.architecture.name }}</td>
 </tr>
-<tr><th>{% trans "Created" %}</th>
-    <td>{{ task.created|full_datetime_or_age }}</td>
-</tr>
-<tr><th>{% trans "Build" %}</th>
-    <td><a href="{{ build.get_absolute_url }}">{{ build.id }}</a></td>
-</tr>
-<tr><th>{% trans "Build status" %}</th>
-    <td>{{ build.get_status_display }}</td>
-</tr>
-<tr><th>{% trans "Package" %}</th>
-    <td>{{ build.package.name }}</td>
-</tr>
-<tr><th>{% trans "Version" %}</th>
-    <td>{{ build.version }}</td>
-</tr>
 <tr><th>{% trans "Builder" %}</th>
-    <td><a href="{{ task.builder.get_absolute_url }}">{{ task.builder.name }}</a></td>
+    <td>{% if task.builder %}<a href="{{ task.builder.get_absolute_url }}">{{ task.builder.name }}</a>{% endif %}</td>
 </tr>
 <tr><th>{% trans "Assigned" %}</th>
-    <td>{{ task.assigned|full_datetime_or_age }}</td>
-</tr>
-<tr><th>{% trans "Updated" %}</th>
-    <td>{{ task.updated|full_datetime_or_age }}</td>
+    <td>{% if task.assigned %}{{ task.assigned|datetime_and_since:task.created }}{% endif %}</td>
 </tr>
 </table>
 
@@ -46,7 +41,7 @@
     <th>{% trans "Message" %}</th>
 </tr>
 {% for log in logs %}
-<tr><td>{{ log.created|datetime_or_age }}</td>
+<tr><td><span title="+{{ log.created|since:task.created }}">{{ log.created|datetime_relative:task.created }}</span></td>
     <td>{{ log }}</td>
 </tr>
 {% endfor %}
