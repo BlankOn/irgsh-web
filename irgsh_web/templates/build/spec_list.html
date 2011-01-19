@@ -1,0 +1,29 @@
+{% extends "build/base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="block">
+<h1>{% trans "Build List" %}</h1>
+<table id="builds">
+<tr><th>{% trans "ID" %}</th>
+    <th>{% trans "Submitter" %}</th>
+    <th>{% trans "Date" %}</th>
+    <th>{% trans "Package" %}</th>
+    <th>{% trans "Version" %}</th>
+    <th>{% trans "Status" %}</th>
+</tr>
+{% for build in builds.object_list %}
+<tr><td><a href="{{ build.get_absolute_url }}">{{ build.id }}</a></td>
+    <td><a href="{{ build.submitter.get_absolute_url }}">{{ build.submitter }}</a></td>
+    <td>{{ build.created|date:"d/m/y H:i" }}</td>
+    <td>{% if build.package %}{{ build.package.name }}{% endif %}</td>
+    <td>{% if build.version %}{{ build.version }}{% endif %}</td>
+    <td>{{ build.get_status_display }}</td>
+</tr>
+{% endfor %}
+</table>
+{% with builds as items %}
+{% include "paginator.html" %}
+{% endwith %}
+{% endblock %}
+

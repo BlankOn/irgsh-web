@@ -148,3 +148,10 @@ th {
     font-size: .8em;
 }
 
+div.paginator {
+    text-align: right;
+}
+div.paginator a.nav {
+    text-decoration: none;
+}
+

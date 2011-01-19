@@ -15,6 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 try:
     from debian.deb822 import Packages
@@ -52,6 +53,22 @@ def _rebuild_repo(spec):
             # Successfully updated the spec => got token
             specification = Specification.objects.get(pk=spec.id)
             utils.rebuild_repo(specification)
+
+def _paginate(queryset, total, page):
+    try:
+        page = int(page)
+        if page < 0: page = 1
+    except ValueError:
+        page = 1
+
+    paginator = Paginator(queryset, total)
+
+    try:
+        items = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        items = paginator.page(paginator.num_pages)
+
+    return items
 
 def _task_id_required(func):
     def _func(request, task_id, *args, **kwargs):
@@ -299,7 +316,8 @@ def spec_status(request, spec):
     return {'status': 'ok', 'code': status, 'msg': spec.get_status_display()}
 
 def spec_list(request):
-    builds = Specification.objects.all().select_related()
+    build_list = Specification.objects.all().select_related()
+    builds = _paginate(build_list, 50, request.GET.get('page', 1))
     context = {'builds': builds}
     return render_to_response('build/spec_list.html', context,
                               context_instance=RequestContext(request))

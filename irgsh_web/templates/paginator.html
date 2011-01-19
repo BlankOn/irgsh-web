@@ -1,0 +1,7 @@
+<div class="paginator span-20">
+<p>{% if items.has_previous %}<a class="nav" href="?page={{ items.previous_page_number }}">&larr;</a>{% endif %}
+    {{ items.number }} / {{ items.paginator.num_pages }}
+    {% if items.has_next %}<a class="nav" href="?page={{ items.next_page_number }}">&rarr;</a>{% endif %}
+    </p>
+</div>
+
