@@ -22,10 +22,10 @@ from django.views.static import was_modified_since
 from django.utils.http import http_date
 
 try:
-    from debian.deb822 import Packages
+    from debian.deb822 import Packages, Sources
     from debian.changelog import Changelog
 except ImportError:
-    from debian_bundle.deb822 import Packages
+    from debian_bundle.deb822 import Packages, Sources
     from debian_bundle.changelog import Changelog
 
 from . import utils, models, tasks
@@ -270,6 +270,7 @@ def spec_show(request, spec):
     tasks = BuildTask.objects.filter(specification=spec).select_related()
     packages = Package.objects.filter(specification=spec)
 
+    # Combined build and task logs
     logs = []
     logs += [(log.created, '', str(log), 'spec', log)
              for log in SpecificationLog.objects.filter(spec=spec)]
@@ -280,10 +281,30 @@ def spec_show(request, spec):
 
     task_logs = BuildTaskLog.objects.filter(task__specification=spec)
 
+    # Source files
+    sources = []
+    dsc = spec.dsc()
+    if dsc is not None:
+        dsc_path = os.path.join(settings.DOWNLOAD_TARGET,
+                                str(spec.id), dsc)
+        if os.path.exists(dsc_path):
+            sources.append((reverse('build_spec_source',
+                                    args=[spec.id, dsc]), dsc))
+
+            src = Sources(open(dsc_path))
+            for info in src['Files']:
+                fname = info['name']
+                path = os.path.join(settings.DOWNLOAD_TARGET,
+                                    str(spec.id), fname)
+                if os.path.exists(path):
+                    sources.append((reverse('build_spec_source',
+                                            args=[spec.id, fname]), fname))
+
     context = {'build': spec,
                'tasks': tasks,
                'packages': packages,
-               'logs': logs}
+               'logs': logs,
+               'sources': sources}
     return render_to_response('build/spec_show.html', context,
                               context_instance=RequestContext(request))
 
@@ -344,6 +365,25 @@ def spec_list(request):
     context = {'builds': builds}
     return render_to_response('build/spec_list.html', context,
                               context_instance=RequestContext(request))
+
+@_spec_id_required
+def spec_source(request, spec, path):
+    fullpath = os.path.join(settings.DOWNLOAD_TARGET,
+                            str(spec.id), path)
+    if not os.path.exists(fullpath):
+        raise Http404()
+
+    # From Django source code: django/views/static.py
+    statobj = os.stat(fullpath)
+    mimetype = mimetypes.guess_type(fullpath)[0] or 'application/octet-stream'
+    if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
+                              statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
+        return HttpResponseNotModified(mimetype=mimetype)
+    contents = open(fullpath, 'rb').read()
+    response = HttpResponse(contents, mimetype=mimetype)
+    response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
+    response["Content-Length"] = len(contents)
+    return response
 
 @_spec_id_required
 @_json_result

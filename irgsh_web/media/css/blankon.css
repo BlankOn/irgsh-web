@@ -101,6 +101,9 @@ th {
 #spec-page #spec-logs tr > td + td + td {
     width: 100%;
 }
+#spec-page #spec-sources {
+    padding-left: 2em;
+}
 
 #summary-page #builders td:nth-child(3) {
     white-space: nowrap;

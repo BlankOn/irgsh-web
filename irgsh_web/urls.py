@@ -18,6 +18,7 @@ TASK_ID = r'(?P<task_id>[0-9a-zA-Z]{10})'
 urlpatterns += patterns('irgsh_web.build.views',
     # build spec
     url(r'^build/(?P<spec_id>\d+)/$', 'spec_show', name='build_spec_show'),
+    url(r'^build/(?P<spec_id>\d+)/sources/(?P<path>.*)$', 'spec_source', name='build_spec_source'),
     url(r'^build/(?P<spec_id>\d+)/description/$', 'spec_description', name='build_spec_description'),
     url(r'^build/(?P<spec_id>\d+)/status/$', 'spec_status', name='build_spec_status'),
     url(r'^build/(?P<spec_id>\d+)/repo/status/$', 'repo_status', name='build_repo_status'),
