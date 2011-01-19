@@ -178,8 +178,12 @@ def task_status(request, task):
             task.add_log(_('Task picked up by %(builder)s') % \
                            {'builder': task.builder})
         except Builder.DoesNotExist:
-            # TODO: fatal error
-            pass
+            task.status = -1
+            task.save()
+            _set_spec_status(spec.specification.id, -1)
+            task.add_log(_('Failed. Unregistered builder tried to pick the task: %(name)s') % \
+                         {'name': builder_name})
+            return HttpResponse(status=400)
 
     BuildTask.objects.filter(pk=task.id).update(status=status)
 
