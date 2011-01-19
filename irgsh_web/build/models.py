@@ -214,6 +214,7 @@ class BuildTask(models.Model):
 
     task_id = models.CharField(max_length=255) # celery task_id
     builder = models.ForeignKey(Builder, null=True, default=None)
+    assigned = models.DateTimeField(null=True, default=None)
 
     status = models.IntegerField(choices=BUILD_TASK_STATUS, default=0)
     build_log = models.DateTimeField(null=True, default=None)

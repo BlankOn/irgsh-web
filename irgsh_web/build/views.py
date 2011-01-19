@@ -165,6 +165,7 @@ def task_status(request, task):
     if task.builder is None:
         try:
             task.builder = Builder.objects.get(name=builder_name)
+            task.assigned = datetime.now()
             task.add_log(_('Task picked up by %(builder)s') % \
                            {'builder': task.builder})
         except Builder.DoesNotExist:
