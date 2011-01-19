@@ -261,8 +261,8 @@ class BuildTaskLog(models.Model):
         ordering = ('-created',)
 
     def __unicode__(self):
-        if len(self.log) > 50:
-            return '%s...' % self.log[:50]
+        if len(self.log) > 100:
+            return '%s...' % self.log[:100]
         else:
             return self.log
 
@@ -276,8 +276,8 @@ class SpecificationLog(models.Model):
         ordering = ('-created',)
 
     def __unicode__(self):
-        if len(self.log) > 50:
-            return '%s...' % self.log[:50]
+        if len(self.log) > 100:
+            return '%s...' % self.log[:100]
         else:
             return self.log
 
