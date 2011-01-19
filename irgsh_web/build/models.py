@@ -80,7 +80,7 @@ class Builder(models.Model):
     '''
     List of package builders
     '''
-    name = models.CharField(max_length=50)
+    name = models.SlugField(max_length=50)
     active = models.BooleanField(default=True)
     last_activity = models.DateTimeField(null=True, default=None, blank=True)
 
