@@ -1,9 +1,15 @@
 {% extends "build/base.html" %}
+{% load i18n %}
 
 {% block content %}
+<div id="submit-page">
+<h1>{% trans "Submit Task" %}</h1>
+
 <form method="post" action="">
 {{ form.as_p }}
 <p><input type="submit"/></p>
 </form>
+
+</div>
 {% endblock %}
 
