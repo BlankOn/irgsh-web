@@ -99,6 +99,23 @@ class Builder(models.Model):
     def get_absolute_url(self):
         return reverse('build_builder_show', args=[self.name])
 
+    def status(self):
+        if self.last_activity is None:
+            return _('Unknown')
+
+        delta = datetime.now() - self.last_activity
+
+        if not self.active:
+            status = _('Dormant')
+        elif delta.days > 1:
+            status = _('Unreachable')
+        elif delta.seconds > 3600:
+            status = _('Active (but almost unresponsive)')
+        else:
+            status = _('Active')
+
+        return status
+
 class Specification(models.Model):
     '''
     List of submitted package specifications
