@@ -86,6 +86,7 @@
     <th>{% trans "Builder" %}</th>
     <th>{% trans "Status" %}</th>
     <th>{% trans "Updated" %}</th>
+    <th>{% trans "Build Log" %}</th>
 </tr>
 {% for task in tasks %}
 <tr><td>{{ task.architecture }}</td>
@@ -95,6 +96,7 @@
     <td>{% if task.builder %}<a href="{{ task.builder.get_absolute_url }}">{{ task.builder.name }}</a>{% endif %}</td>
     <td>{{ task.get_status_display }}</td>
     <td>{{ task.updated|datetime_relative:task.created }}</td>
+    <td>{% if task.has_build_log %}<a href="{{ task.build_log_url }}">{{ task.build_log_name }}</a>{% endif %}</td>
 </tr>
 {% endfor %}
 </table>

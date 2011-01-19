@@ -36,6 +36,13 @@
 
 {% if logs %}
 <h2>{% trans "Logs" %}</h2>
+{% if task.has_build_log %}
+<table class="vertical" id="task-buildlog">
+<tr><th>Build log</th>
+    <td><a href="{{ task.build_log_url }}">{{ task.build_log_name }}</a></td>
+</tr>
+</table>
+{% endif %}
 <table id="task-logs">
 <tr><th>{% trans "Timestamp" %}</th>
     <th>{% trans "Message" %}</th>
