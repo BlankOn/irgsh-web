@@ -182,7 +182,7 @@ def task_log(request, task):
 
     fin = request.FILES['log']
 
-    logdir = os.path.join(settings.LOG_PATH, task.task_id)
+    logdir = os.path.join(settings.LOG_PATH, 'task', task.task_id)
     if not os.path.exists(logdir):
         os.makedirs(logdir)
     target = os.path.join(logdir, 'build.log.gz')
