@@ -1,0 +1,110 @@
+{% extends "build/base.html" %}
+{% load i18n %}
+{% load irgsh_tags %}
+
+{% block content %}
+<div id="spec-page">
+<h1>Build #{{ build.id }}</h1>
+
+<table class="vertical" id="spec-info">
+<tr><th>{% trans "Build ID" %}</th>
+    <td>{{ build.id }}</td>
+</tr>
+<tr><th>{% trans "Status" %}</th>
+    <td>{{ build.get_status_display }}</td>
+</tr>
+<tr><th>{% trans "Submitter" %}</th>
+    <td><a href="{{ build.submitter.get_absolute_url }}">{{ build.submitter }}</a></td>
+</tr>
+<tr><th>{% trans "Submission date" %}</th>
+    <td>{{ build.created|full_datetime_or_age }}</td>
+</tr>
+<tr><th>{% trans "Last Update" %}</th>
+    <td>{{ build.updated|full_datetime_or_age }}</td>
+</tr>
+<tr><th>{% trans "Distribution" %}</th>
+    <td>{{ build.distribution.repo.name }}</td>
+</tr>
+<tr><th>{% trans "Source" %}</th>
+    <td><a href="{{ build.source }}">{{ build.source }}</a></td>
+</tr>
+<tr><th>{% trans "Source type" %}</th>
+    <td>{{ build.source_type }}</td>
+</tr>
+<tr><th>{% trans "Source options" %}</th>
+    <td>{{ build.source_opts }}</td>
+</tr>
+<tr><th>{% trans "Orig" %}</th>
+    <td><a href="{{ build.orig }}">{{ build.orig }}</a></td>
+</tr>
+</table>
+
+<h2>{% trans "Packages" %}</h2>
+<table class="vertical" id="spec-pkg">
+<tr><th>{% trans "Source Package" %}</th>
+    <td>{{ build.package.name }}</td>
+</tr>
+<tr><th>{% trans "Version" %}</th>
+    <td>{{ build.version }}</td>
+</tr>
+</table>
+{% if packages %}
+<table id="spec-pkglist">
+<tr><th>{% trans "Name" %}</th>
+    <th>{% trans "Type" %}</th>
+    <th>{% trans "Arch" %}</th>
+    <th>{% trans "Description" %}</th>
+</tr>
+{% for pkg in packages %}
+<tr><td>{{ pkg.name }}</td>
+    <td>{{ pkg.get_type_display }}</td>
+    <td>{{ pkg.architecture }}</td>
+    <td>{{ pkg.description }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+
+{% if tasks %}
+<h2>{% trans "Build Tasks" %}</h2>
+<table id="spec-tasks">
+<tr><th>{% trans "Arch" %}</th>
+    <th>{% trans "Task ID" %}</th>
+    <th>{% trans "Builder" %}</th>
+    <th>{% trans "Status" %}</th>
+    <th>{% trans "Created" %}</th>
+    <th>{% trans "Assigned" %}</th>
+    <th>{% trans "Updated" %}</th>
+</tr>
+{% for task in tasks %}
+<tr><td>{{ task.architecture }}</td>
+    <td class="code"><a href="{{ task.get_absolute_url }}">{{ task.task_id }}</a></td>
+    <td><a href="{{ task.builder.get_absolute_url }}">{{ task.builder.name }}</a></td>
+    <td>{{ task.get_status_display }}</td>
+    <td>{{ task.created|datetime_or_age }}</td>
+    <td>{{ task.assigned|datetime_or_age }}</td>
+    <td>{{ task.updated|datetime_or_age }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+
+{% if logs %}
+<h2>{% trans "Build Logs" %}</h2>
+<table id="spec-logs">
+<tr><th>{% trans "Timestamp" %}</th>
+    <th>{% trans "Source" %}</th>
+    <th>{% trans "Message" %}</th>
+</tr>
+{% for log in logs %}
+<tr><td>{{ log.0|datetime_or_age }}</td>
+    <td>{% if log.3 == 'spec' %}{% trans "build" %}{% else %}{% if log.1 %}<a href="{{ log.4.task.builder.get_absolute_url }}">{{ log.4.task.builder.name }}</a>{% else %}{{ log.1 }}{% endif %}{% endif %}</td>
+    <td>{{ log.2 }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+
+</div>
+{% endblock %}
+

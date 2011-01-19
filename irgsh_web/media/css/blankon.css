@@ -5,15 +5,8 @@
 body {
 margin: 0px;
 padding: 0px;
-background: url(/site-media/images/bg.png);
 font-family: arial, sans;
 font-size: 13px;
-}
-
-div#content {
-padding: 20px 30px 20px 30px;
-margin: 0px 70px 0px 70px;
-background-color: white;
 }
 
 div#b-bar-menu {
@@ -71,7 +64,85 @@ a#submenu:hover {
 background-color: #73d216;
 }
 
-div#copyright {
-color: #73d216;
-text-align: center;
+#copyright {
+    color: #73d216;
+    text-align: center;
 }
+table.vertical {
+    width: auto; 
+}
+table.vertical th {
+    padding-right: 30px;
+    white-space: nowrap;
+}
+table.vertical td {
+    width: 100%;
+}
+table.vertical tbody tr:nth-child(odd) , 
+table.vertical tbody tr.odd {
+    background:#e5ecf9;
+}
+table.vertical tbody tr:nth-child(even) td, 
+table.vertical tbody tr.even td {
+    background: inherit;
+}
+
+th {
+    white-space: nowrap;
+}
+
+.code {
+    font-family: monospace;
+}
+
+#task-page #task-logs tr > td {
+    white-space: nowrap;
+}
+#task-page #task-logs tr > td + td {
+    width: 100%;
+}
+
+#spec-page #spec-pkglist tr > td,
+#spec-page #spec-pkglist tr > td + td + td {
+    white-space: nowrap;
+}
+#spec-page #spec-pkglist tr > td:nth-child(4) {
+    width: 100%;
+}
+#spec-page #spec-tasks tr > td + td + td + td {
+    width: 100%;
+}
+#spec-page #spec-tasks tr > td:nth-child(5),
+#spec-page #spec-tasks tr > td:nth-child(6),
+#spec-page #spec-tasks tr > td:nth-child(7) {
+    white-space: nowrap;
+}
+#spec-page #spec-logs tr > td {
+    white-space: nowrap;
+}
+#spec-page #spec-logs tr > td + td + td {
+    width: 100%;
+}
+
+#summary-page #builders td:nth-child(3) {
+    white-space: nowrap;
+}
+#summary-page #builders td:nth-child(4) {
+    width: 100%;
+}
+#summary-page #builds td {
+    white-space: nowrap;
+}
+#summary-page #builds td:nth-child(6) {
+    width: 100%;
+    white-space: normal;
+}
+#builder-page #builder-tasks td {
+    white-space: nowrap;
+}
+#builder-page #builder-tasks td:nth-child(6),
+#builder-page #builder-tasks td:nth-child(7) {
+    width: 50%;
+    white-space: normal;
+}
+

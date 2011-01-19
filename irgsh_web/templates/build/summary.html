@@ -1,0 +1,52 @@
+{% extends "build/base.html" %}
+{% load i18n %}
+{% load irgsh_tags %}
+
+{% block content %}
+<div id="summary-page">
+<h1>{% trans "Summary" %}</h1>
+
+<div class="block">
+<h2>{% trans "Builders" %}</h2>
+<table id="builders">
+<tr><th>{% trans "Name" %}</th>
+    <th>{% trans "Arch" %}</th>
+    <th>{% trans "Location" %}</th>
+    <th>{% trans "Status" %}</th>
+</tr>
+{% for builder in builders %}
+<tr><td><a href="{{ builder.get_absolute_url }}">{{ builder.name }}</a></td>
+    <td>{{ builder.architecture }}</td>
+    <td>{{ builder.location }}</td>
+    <td>{{ builder.status }}</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+
+<div class="block">
+<h2>Latest Builds</h2>
+<table id="builds">
+<tr><th>{% trans "ID" %}</th>
+    <th>{% trans "Submitter" %}</th>
+    <th>{% trans "Date" %}</th>
+    <th>{% trans "Package" %}</th>
+    <th>{% trans "Version" %}</th>
+    <th>{% trans "Status" %}</th>
+</tr>
+{% for build in builds %}
+<tr><td><a href="{{ build.get_absolute_url }}">{{ build.id }}</a></td>
+    <td><a href="{{ build.submitter.get_absolute_url }}">{{ build.submitter }}</a></td>
+    <td>{{ build.created|datetime_or_age }}</td>
+    <td>{{ build.package.name }}</td>
+    <td>{{ build.version }}</td>
+    <td>{{ build.get_status_display }}</td>
+</tr>
+{% endfor %}
+</table>
+<p><a href="{% url build_spec_list %}">{% trans "Complete List" %}</a></p>
+</div>
+
+</div>
+{% endblock %}
+

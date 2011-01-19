@@ -25,7 +25,7 @@ except ImportError:
 
 from . import utils, models, tasks
 from .models import BuildTask, Distribution, Specification, BuildTaskLog, \
-                    Builder
+                    Builder, Package, SpecificationLog
 from .forms import SpecificationForm
 from irgsh_web.repo.models import Package as RepoPackage
 
@@ -213,11 +213,34 @@ def task_show(request, task):
     - status
     - logs
     '''
-    pass
+    logs = BuildTaskLog.objects.filter(task=task)
+    context = {'task': task,
+               'build': task.specification,
+               'logs': logs}
+    return render_to_response('build/task_show.html', context,
+                              context_instance=RequestContext(request))
 
 @_spec_id_required
 def spec_show(request, spec):
-    return HttpResponse('show spec: %s' % spec)
+    tasks = BuildTask.objects.filter(specification=spec).select_related()
+    packages = Package.objects.filter(specification=spec)
+
+    logs = []
+    logs += [(log.created, '', str(log), 'spec', log)
+             for log in SpecificationLog.objects.filter(spec=spec)]
+    logs += [(log.created, getattr(log.task.builder, 'name', None), str(log), 'task', log)
+             for log in BuildTaskLog.objects.filter(task__specification=spec) \
+                                            .select_related(depth=3)]
+    logs = reversed(sorted(logs))
+
+    task_logs = BuildTaskLog.objects.filter(task__specification=spec)
+
+    context = {'build': spec,
+               'tasks': tasks,
+               'packages': packages,
+               'logs': logs}
+    return render_to_response('build/spec_show.html', context,
+                              context_instance=RequestContext(request))
 
 @_post_required
 @_spec_id_required
@@ -267,6 +290,12 @@ def spec_status(request, spec):
         status = spec.status
 
     return {'status': 'ok', 'code': status, 'msg': spec.get_status_display()}
+
+def spec_list(request):
+    builds = Specification.objects.all().select_related()
+    context = {'builds': builds}
+    return render_to_response('build/spec_list.html', context,
+                              context_instance=RequestContext(request))
 
 @_spec_id_required
 @_json_result
@@ -339,9 +368,30 @@ def submit(request):
     return render_to_response('build/submit.html', context,
                               context_instance=RequestContext(request))
 
+def summary(request):
+    '''
+    Show summary
+    '''
+    builders = Builder.objects.all().select_related()
+    specs = Specification.objects.all().select_related()[:15]
+    context = {'builders': builders,
+               'builds': specs}
+    return render_to_response('build/summary.html', context,
+                              context_instance=RequestContext(request))
+
 def index(request):
-    '''
-    Show list of build tasks
-    '''
+    return HttpResponse()
+
+def builder_list(request):
     pass
+
+def builder_show(request, name):
+    builder = get_object_or_404(Builder, name=name)
+    tasks = BuildTask.objects.filter(builder=builder) \
+                             .order_by('-created') \
+                             .select_related(depth=2)[:10]
+    context = {'builder': builder,
+               'tasks': tasks}
+    return render_to_response('build/builder_show.html', context,
+                              context_instance=RequestContext(request))
 

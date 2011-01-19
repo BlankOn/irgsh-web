@@ -11,6 +11,9 @@ urlpatterns = patterns('irgsh_web.build.views',
     url(r'^task/%s/status/' % TASK_ID, 'task_status', name='build_task_status'),
     url(r'^task/%s/' % TASK_ID, 'task_show', name='build_task_show'),
     url(r'^submit/$', 'submit', name='build_submit'),
+    url(r'^summary/$', 'summary', name='build_summary'),
+    url(r'^builder/(?P<builder_name>[a-z0-9_-]+)/$', 'builder_show', name='build_builder_show'),
+    url(r'^builder/$', 'builder_list', name='build_builder_list'),
     url(r'^$', 'index', name='build_index'),
 )
 

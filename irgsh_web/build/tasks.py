@@ -59,6 +59,7 @@ class UploadSource(Task):
         self.upload(files)
 
         self.set_status(spec_id, 105)
+        spec.add_log('Source package uploaded')
 
     def upload(self, files):
         target = '%s@%s:%s' % (settings.SOURCE_UPLOAD_USER,
