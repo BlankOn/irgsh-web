@@ -69,7 +69,7 @@
 <tr><td>{{ pkg.name }}</td>
     <td>{{ pkg.get_type_display }}</td>
     <td>{{ pkg.architecture }}</td>
-    <td>{{ pkg.description }}</td>
+    <td>{% if pkg.description %}{{ pkg.description }}{% endif %}</td>
 </tr>
 {% endfor %}
 </table>
