@@ -154,6 +154,7 @@ class SpecInit(object):
         from .models import Specification
 
         self.log.debug('[%s] Initializing specification' % self.spec_id)
+        self.spec.add_log(_('Initializing build specification'))
 
         try:
             self.init()
@@ -194,12 +195,15 @@ class SpecInit(object):
             source_dir = tempfile.mkdtemp()
 
             self.set_status(101)
+            self.spec.add_log(_('Downloading source'))
             packager.export_source(source_dir)
 
             self.set_status(102)
+            self.spec.add_log(_('Downloading orig'))
             orig_path = packager.retrieve_orig()
 
             self.set_status(103)
+            self.spec.add_log(_('Building source package'))
             self.dsc = packager.generate_dsc(build_dir, source_dir, orig_path)
 
             # Copy source packages
@@ -349,6 +353,7 @@ class SpecInit(object):
             subtasks.append(s)
 
         self.set_status(104)
+        self.spec.add_log(_('Distributing build tasks'))
 
         for s in subtasks:
             s.apply_async()

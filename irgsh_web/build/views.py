@@ -93,6 +93,7 @@ def _set_description(spec, fcontrol, fchangelog):
     # The package must have a name
     if name is None:
         _set_spec_status(spec.id, -2)
+        spec.add_log(_('Package rejected (package name not found)'))
         return {'status': 'fail', 'code': 406, 'msg': _('Package name not found')}
 
     # Check if this package is registered
@@ -101,6 +102,8 @@ def _set_description(spec, fcontrol, fchangelog):
                                       distribution=spec.distribution.repo)
     except RepoPackage.DoesNotExist:
         _set_spec_status(spec.id, -2)
+        spec.add_log(_('Package rejected (unregistered package: %(name)s)') % \
+                     {'name': name})
         return {'status': 'fail', 'code': 406,
                 'msg': _('Unregistered package: %(name)s') % {'name': name}}
 
@@ -354,6 +357,7 @@ def submit(request):
             spec.source_type = data['source_type']
             spec.source_opts = data['source_opts']
             spec.save()
+            spec.add_log('Build specification created')
 
             tasks.InitSpecification.apply_async(args=(spec.id,))
             print 'task init:', data
