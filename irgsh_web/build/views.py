@@ -373,7 +373,19 @@ def submit(request):
             url = reverse('build_spec_show', args=[spec.id])
             return HttpResponseRedirect(url)
     else:
-        form = SpecificationForm()
+        initial = {}
+        if request.GET.has_key('copy'):
+            try:
+                spec_id = int(request.GET['copy'])
+                spec = Specification.objects.get(pk=spec_id)
+                initial = {'distribution': spec.distribution.id,
+                           'source': spec.source,
+                           'source_opts': spec.source_opts_raw,
+                           'source_type': spec.source_type,
+                           'orig': spec.orig}
+            except (ValueError, Specification.DoesNotExist):
+                return HttpResponseRedirect(reverse(submit))
+        form = SpecificationForm(initial=initial)
 
     context = {'form': form}
     return render_to_response('build/submit.html', context,
