@@ -294,10 +294,7 @@ class BuildTaskLog(models.Model):
         ordering = ('-created',)
 
     def __unicode__(self):
-        if len(self.log) > 100:
-            return '%s...' % self.log[:100]
-        else:
-            return self.log
+        return self.log
 
 class SpecificationLog(models.Model):
     spec = models.ForeignKey(Specification)
@@ -309,8 +306,5 @@ class SpecificationLog(models.Model):
         ordering = ('-created',)
 
     def __unicode__(self):
-        if len(self.log) > 100:
-            return '%s...' % self.log[:100]
-        else:
-            return self.log
+        return self.log
 
