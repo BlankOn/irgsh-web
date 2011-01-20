@@ -196,6 +196,8 @@ def task_log(request, task):
 
     task.add_log(_('Build log added'))
 
+    task.update_builder()
+
     return {'status': 'ok'}
 
 @_post_required
@@ -251,6 +253,8 @@ def task_status(request, task):
         spec.add_log(_('Builder %(builder)s failed') % \
                        {'builder': task.builder})
         _set_spec_status(spec.id, -1)
+
+    task.update_builder()
 
     return {'status': 'ok'}
 
