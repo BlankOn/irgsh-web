@@ -147,5 +147,6 @@ div.paginator {
 }
 div.paginator a.nav {
     text-decoration: none;
+    padding: 0 5px;
 }
 
