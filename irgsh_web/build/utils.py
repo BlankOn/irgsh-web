@@ -8,6 +8,7 @@ import tarfile
 import logging
 import random
 import time
+from subprocess import Popen, PIPE
 from datetime import datetime
 
 from django.db import IntegrityError
@@ -15,22 +16,22 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 
 try:
-    from debian.deb822 import Packages
+    from debian.deb822 import Packages, Sources
     from debian.changelog import Changelog
 except ImportError:
-    from debian_bundle.deb822 import Packages
+    from debian_bundle.deb822 import Packages, Sources
     from debian_bundle.changelog import Changelog
 
 from bzrlib.branch import Branch
 from bzrlib.export import export
 
 def create_build_task_param(spec):
-    from irgsh.specification import Specification as BuildSpecification
-    from irgsh.distribution import Distribution as BuildDistribution
+    from irgsh.data import Specification as BuildSpecification
+    from irgsh.data import Distribution as BuildDistribution
 
     spec_id = spec.id
-    build_spec = BuildSpecification(spec.source, spec.orig,
-                                    spec.source_type, spec.source_opts)
+    build_spec = BuildSpecification(spec.source, spec.source_type,
+                                    spec.source_opts, spec.orig)
 
     dist = spec.distribution
     build_dist = BuildDistribution(dist.name, dist.mirror, dist.dist,
@@ -178,14 +179,11 @@ class SpecInit(object):
 
     def download(self):
         # Prepare source package builder
-        from irgsh.packager import Packager
-        from irgsh.utils import find_changelog
-        from irgsh.specification import Specification as BuildSpecification
+        from irgsh.source import SourcePackageBuilder
 
         spec = self.spec
-        build_spec = BuildSpecification(spec.source, spec.orig,
-                                        spec.source_type, spec.source_opts)
-        packager = Packager(build_spec, None, None)
+        srcpkg = SourcePackageBuilder(spec.source, spec.source_type,
+                                      spec.source_opts, spec.orig)
 
         orig_path = None
 
@@ -194,47 +192,36 @@ class SpecInit(object):
             build_dir = tempfile.mkdtemp()
             source_dir = tempfile.mkdtemp()
 
+            # Build source package
             self.set_status(101)
-            self.spec.add_log(_('Downloading source'))
-            packager.export_source(source_dir)
+            self.dsc = srcpkg.build(build_dir)
 
-            self.set_status(102)
-            self.spec.add_log(_('Downloading orig'))
-            orig_path = packager.retrieve_orig()
+            # Extract source package and send package description
+            dsc_file = os.path.join(build_dir, self.dsc)
+            source = os.path.join(source_dir, 'source')
 
-            self.set_status(103)
-            self.spec.add_log(_('Building source package'))
-            self.dsc = packager.generate_dsc(build_dir, source_dir, orig_path)
+            cmd = 'dpkg-source -x %s %s' % (dsc_file, source)
+            p = Popen(cmd.split(), stdout=PIPE, stderr=PIPE)
+            p.communicate()
+
+            changelog = os.path.join(source, 'debian', 'changelog')
+            control = os.path.join(source, 'debian', 'control')
+            self.send_description(changelog, control)
 
             # Copy source packages
-            dsc_file = os.path.join(build_dir, self.dsc)
-            started = False
-            files = [self.dsc]
-            for line in open(dsc_file):
-                if line.startswith('Files:'):
-                    started = True
-                elif started:
-                    if not line.startswith(' '):
-                        break
-                    p = line.strip().split()
-                    files.append(p[2])
+            src = Sources(open(dsc_file))
+            files = [self.dsc] + [info['name'] for info in src['Files']]
             for fname in files:
-                shutil.copyfile(os.path.join(build_dir, fname),
-                                os.path.join(self.target, fname))
-
-            # Send description
-            dirname = find_changelog(source_dir)
-            changelog = os.path.join(dirname, 'debian', 'changelog')
-            control = os.path.join(dirname, 'debian', 'control')
-            self.send_description(changelog, control)
+                target = os.path.join(self.target, fname)
+                if os.path.exists(target):
+                    os.unlink(target)
+                shutil.move(os.path.join(build_dir, fname), target)
 
             return files
 
         finally:
             shutil.rmtree(build_dir)
             shutil.rmtree(source_dir)
-            if orig_path is not None:
-                os.unlink(orig_path)
 
     def send_description(self, changelog, control):
         '''
@@ -301,8 +288,8 @@ class SpecInit(object):
 
         from .models import BuildTask
         from irgsh_node.tasks import BuildPackage
-        from irgsh.specification import Specification as BuildSpecification
-        from irgsh.distribution import Distribution as BuildDistribution
+        from irgsh.data import Specification as BuildSpecification
+        from irgsh.data import Distribution as BuildDistribution
 
         if self.distributed:
             return
@@ -314,8 +301,8 @@ class SpecInit(object):
         task_name = BuildPackage.name
         args = create_build_task_param(spec)
 
-        build_spec = BuildSpecification(spec.source, spec.orig,
-                                        spec.source_type, spec.source_opts)
+        build_spec = BuildSpecification(spec.source, spec.source_type,
+                                        spec.source_opts, spec.orig)
 
         dist = spec.distribution
         build_dist = BuildDistribution(dist.name(), dist.mirror, dist.dist,
@@ -363,12 +350,6 @@ class SpecInit(object):
     def set_status(self, status):
         from .models import Specification
         Specification.objects.filter(pk=self.spec.id).update(status=status)
-
-    def build_source(self):
-        from irgsh.packages.source import SourcePackage
-
-        pkg = SourcePackage(source_dir, orig_path)
-        return pkg.generate_dsc(target)
 
     def upload(self, files):
         self.log.debug('[%s] Scheduling source package upload' % self.spec_id)
