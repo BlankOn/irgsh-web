@@ -155,7 +155,7 @@ class SpecInit(object):
         from .models import Specification
 
         self.log.debug('[%s] Initializing specification' % self.spec_id)
-        self.spec.add_log(_('Initializing build specification'))
+        self.set_status(100)
 
         try:
             self.init()
