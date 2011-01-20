@@ -104,22 +104,31 @@ class Builder(models.Model):
     def get_absolute_url(self):
         return reverse('build_builder_show', args=[self.name])
 
-    def status(self):
+    def status_code(self):
         if self.last_activity is None:
-            return _('Unknown')
+            return 'unknown'
 
         delta = datetime.now() - self.last_activity
 
         if not self.active:
-            status = _('Dormant')
+            status = 'dormant'
         elif delta.days > 1:
-            status = _('Unreachable')
+            status = 'unreachable'
         elif delta.seconds > 3600:
-            status = _('Active (but almost unresponsive)')
+            status = 'unresponsive'
         else:
-            status = _('Active')
+            status = 'active'
 
         return status
+
+    def status(self):
+        status_list = {'unknown': _('Unknown'),
+                       'dormant': _('Dormant'),
+                       'unreachable': _('Unreachable'),
+                       'unresponsive': _('Active (but almost unresponsive)'),
+                       'active': _('Active')}
+        code = self.status_code()
+        return status_list.get(code, _('Unknown'))
 
 class Specification(models.Model):
     '''
