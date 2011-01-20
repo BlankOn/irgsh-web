@@ -249,6 +249,11 @@ class BuildTask(models.Model):
         log.save()
         return log
 
+    def update_builder(self):
+        if self.builder is not None:
+            Builder.objects.filter(pk=self.builder.id) \
+                           .update(last_activity=datetime.now())
+
     def changes(self):
         if self.specification.package is None:
             return None
