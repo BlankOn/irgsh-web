@@ -86,6 +86,12 @@ def _spec_id_required(func):
         return func(request, spec, *args, **kwargs)
     return _func
 
+def _builder_name_required(func):
+    def _func(request, name, *args, **kwargs):
+        builder = get_object_or_404(Builder, name=name)
+        return func(request, builder, *args, **kwargs)
+    return _func
+
 def _post_required(func):
     def _func(request, *args, **kwargs):
         if request.method != 'POST':
@@ -503,7 +509,8 @@ def index(request):
 def builder_list(request):
     pass
 
-def builder_show(request, name):
+@_builder_name_required
+def builder_show(request, builder):
     builder = get_object_or_404(Builder, name=name)
     tasks = BuildTask.objects.filter(builder=builder) \
                              .order_by('-created') \
