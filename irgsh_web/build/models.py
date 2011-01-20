@@ -23,7 +23,8 @@ PATCH = 'patch'
 SPECIFICATION_STATUS = (
     ( -2, _('Rejected')),
     ( -1, _('Failed')),
-    (100, _('Waiting for initialization')),
+    (  0, _('Waiting for initialization')),
+    (100, _('Initializing build specification')),
     (101, _('Downloading source file')),
     (102, _('Downloading orig file')),
     (103, _('Building source package')),
