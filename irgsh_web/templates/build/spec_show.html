@@ -80,7 +80,8 @@
 <tr><td>{{ pkg.name }}</td>
     <td>{{ pkg.get_type_display }}</td>
     <td>{{ pkg.architecture }}</td>
-    <td>{% if pkg.description %}{{ pkg.description }}{% endif %}</td>
+    <td class="desc">{% if pkg.description %}<p>{% if pkg.long_description %}<span onclick="toggle_long_desc({{ pkg.id }});">{% endif %}{{ pkg.description }}{% if pkg.long_description %}</span>{% endif %}</p>{% endif %}
+        {% if pkg.long_description %}<pre id="spec-pkglist-{{ pkg.id }}" style="display:none">{{ pkg.long_description }}</pre>{% endif %}</td>
 </tr>
 {% endfor %}
 </table>
@@ -130,5 +131,14 @@
 {% endif %}
 
 </div>
+{% endblock %}
+
+{% block extrahead %}
+<script type="text/javascript">
+function toggle_long_desc(pkg_id) {
+    var target = $('#spec-pkglist-' + pkg_id);
+    target.slideToggle();
+}
+</script>
 {% endblock %}
 
