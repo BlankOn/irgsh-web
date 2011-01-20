@@ -97,6 +97,10 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+ABSOLUTE_URL_OVERRIDES = {
+    'auth.user': lambda o: '/user/%s/' % o.username
+}
+
 OPENID_CREATE_USERS = True
 OPENID_UPDATE_DETAILS_FROM_SREG = True
 LOGIN_URL = '/account/login'

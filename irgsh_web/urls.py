@@ -38,6 +38,9 @@ urlpatterns += patterns('irgsh_web.build.views',
     url(r'^builder/(?P<name>[a-z0-9_-]+)/$', 'builder_show', name='build_builder_show'),
     url(r'^builder/$', 'builder_list', name='build_builder_list'),
 
+    # users
+    url(r'^user/(?P<name>[a-z0-9_-]+)/$', 'user_show', name='build_user_show'),
+
     # summary
     url(r'^$', 'summary', name='build_summary'),
 )

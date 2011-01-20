@@ -1,0 +1,42 @@
+{% extends "build/base.html" %}
+{% load i18n %}
+{% load irgsh_tags %}
+
+{% block content %}
+<div id="user-page">
+<h1>{{ packager }}</h1>
+
+<table class="vertical">
+<tr><th>{% trans "Total builds" %}</th>
+    <td>{% blocktrans with stat.total as total and stat.finished as finished and stat.failed as failed and stat.running as running %}{{ total }} &mdash; {{ finished }} finished, {{ failed }} failed, {{ running }} still running{% endblocktrans %}</td>
+</tr>
+<tr><th>{% trans "First build" %}</th>
+    <td>{% if first %}<a href="{{ first.get_absolute_url }}">{{ first.id }}</a> &rarr; {{ first.created|datetime_and_age }} &rarr; {{ first.get_status_display }}{% endif %}</td>
+</tr>
+<tr><th>{% trans "Last build" %}</th>
+    <td>{% if last %}<a href="{{ last.get_absolute_url }}">{{ last.id }}</a> &rarr; {{ last.created|datetime_and_age }} &rarr; {{ last.get_status_display }}{% endif %}</td>
+</tr>
+</table>
+
+<h2>{% trans "Latest Builds" %}</h2>
+<table id="builds">
+<tr><th>{% trans "ID" %}</th>
+    <th>{% trans "Date" %}</th>
+    <th>{% trans "Package" %}</th>
+    <th>{% trans "Version" %}</th>
+    <th>{% trans "Status" %}</th>
+</tr>
+{% for build in builds %}
+<tr><td><a href="{{ build.get_absolute_url }}">{{ build.id }}</a></td>
+    <td>{{ build.created|date:"d/m/y H:i" }}</td>
+    <td>{% if build.package %}{{ build.package.name }}{% endif %}</td>
+    <td>{% if build.version %}{{ build.version }}{% endif %}</td>
+    <td>{{ build.get_status_display }}</td>
+</tr>
+{% endfor %}
+</table>
+
+
+</div>
+{% endblock %}
+

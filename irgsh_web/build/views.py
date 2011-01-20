@@ -14,6 +14,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -90,6 +91,12 @@ def _builder_name_required(func):
     def _func(request, name, *args, **kwargs):
         builder = get_object_or_404(Builder, name=name)
         return func(request, builder, *args, **kwargs)
+    return _func
+
+def _username_required(func):
+    def _func(request, name, *args, **kwargs):
+        user = get_object_or_404(User, username=name)
+        return func(request, user, *args, **kwargs)
     return _func
 
 def _post_required(func):
@@ -533,5 +540,41 @@ def builder_task(request, builder):
     context = {'builder': builder,
                'tasks': tasks}
     return render_to_response('build/builder_task.html', context,
+                              context_instance=RequestContext(request))
+
+@_username_required
+def user_show(request, user):
+    builds = Specification.objects.filter(submitter=user)
+
+    # Last build
+    last_build = None
+    if len(builds) > 0:
+        last_build = builds[0]
+
+    # First
+    first_build = None
+    builds_reversed = builds.order_by('created')
+    if len(builds_reversed):
+        first_build = builds_reversed[0]
+
+    # Recent builds
+    recent = builds[:10]
+
+    # Statistics
+    stat = {'running': len(builds.filter(status__gte=0, status__lt=999)),
+            'failed': len(builds.filter(status__lt=0)),
+            'finished': len(builds.filter(status=999))}
+    stat['done'] = stat['failed'] + stat['finished']
+    stat['total'] = stat['done'] + stat['running']
+    if stat['done'] > 0:
+        stat['ratio'] = stat['finished'] / float(stat['done']) * 100
+
+
+    context = {'packager': user,
+               'first': first_build,
+               'last': last_build,
+               'builds': recent,
+               'stat': stat}
+    return render_to_response('build/user_show.html', context,
                               context_instance=RequestContext(request))
 
