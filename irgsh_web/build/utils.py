@@ -180,6 +180,7 @@ class SpecInit(object):
 
     def start(self):
         from .models import Specification
+        from irgsh.source.error import SourcePackageBuilderException
 
         self.log.debug('[%s] Initializing specification' % self.spec_id)
         self.set_status(100)
@@ -189,10 +190,11 @@ class SpecInit(object):
             files = self.download()
             self.distribute()
             self.upload(files)
-        except (ValueError, AssertionError, TypeError, IOError), e:
+        except (ValueError, AssertionError, TypeError, IOError, \
+                SourcePackageBuilderException), e:
             self.log.error('[%s] Error! %s' % (self.spec_id, e))
+            self.spec.add_log('Specification intialization failed: %s' % str(e))
             current_status = Specification.objects.get(pk=self.spec_id).status
-            print 'current status: %s' % current_status
             if current_status >= 0:
                 self.set_status(-1)
 
