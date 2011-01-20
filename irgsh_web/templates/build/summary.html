@@ -44,7 +44,9 @@
 </tr>
 {% endfor %}
 </table>
-<p><a href="{% url build_spec_list %}">{% trans "Complete List" %}</a></p>
+{% if more_builds %}
+<p><a href="{% url build_spec_list %}">{% trans "show all builds" %}</a></p>
+{% endif %}
 </div>
 
 </div>

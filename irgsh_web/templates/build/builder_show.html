@@ -52,6 +52,9 @@
 </tr>
 {% endfor %}
 </table>
+{% if more_tasks %}
+<p><a href="{% url build_builder_task builder.name %}">{% trans "show all build tasks" %}</a></p>
+{% endif %}
 {% else %}
 <p>{% trans "This builder never handled build tasks" %}</p>
 {% endif %}

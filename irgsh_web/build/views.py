@@ -497,9 +497,14 @@ def summary(request):
     Show summary
     '''
     builders = Builder.objects.all().select_related()
-    specs = Specification.objects.all().select_related()[:15]
+
+    spec_limit = 15
+    all_specs = Specification.objects.all()
+    specs = all_specs.select_related()[:spec_limit]
+
     context = {'builders': builders,
-               'builds': specs}
+               'builds': specs,
+               'more_builds': len(all_specs) > spec_limit}
     return render_to_response('build/summary.html', context,
                               context_instance=RequestContext(request))
 
@@ -511,12 +516,12 @@ def builder_list(request):
 
 @_builder_name_required
 def builder_show(request, builder):
-    builder = get_object_or_404(Builder, name=name)
-    tasks = BuildTask.objects.filter(builder=builder) \
-                             .order_by('-created') \
-                             .select_related(depth=2)[:10]
+    limit = 10
+    all_tasks = BuildTask.objects.filter(builder=builder)
+    tasks = all_tasks.select_related(depth=2)[:limit]
     context = {'builder': builder,
-               'tasks': tasks}
+               'tasks': tasks,
+               'more_tasks': len(all_tasks) > limit}
     return render_to_response('build/builder_show.html', context,
                               context_instance=RequestContext(request))
 
