@@ -243,6 +243,20 @@ class BuildTask(models.Model):
     def __unicode__(self):
         return '%s (%s)' % (self.task_id, self.id)
 
+    def save(self):
+        if self.task_id is None or self.task_id == '':
+            # Create temporary task id
+            import uuid
+            self.task_id = str(uuid.uuid4())
+            super(BuildTask, self).save()
+
+            # Update the task id again to a simpler one
+            task_id = '%s.%s.%s' % (self.specification.id,
+                                    self.architecture.id,
+                                    self.id)
+            self.task_id = task_id
+            super(BuildTask, self).save()
+
     def add_log(self, message):
         log = BuildTaskLog(task=self)
         log.log = message

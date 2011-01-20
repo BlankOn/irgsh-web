@@ -39,32 +39,6 @@ def create_build_task_param(spec):
 
     return spec_id, build_spec, build_dist
 
-def baseN(num, base):
-    res = []
-    while True:
-        res.append('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'[num%base])
-        num = num // base
-        if num == 0:
-            break
-    return ''.join(reversed(res))
-
-def create_task_id():
-    '''
-    Generate task id
-
-    The task id is a ten digits alphanumeric characters that is
-    made of a random number concatenated with a timestamp.
-
-        >>> digits = 10
-        >>> min_random = (62 ** (digits-1)) >> 32
-        3151848
-        >>> max_random = (((62 ** digits) - 1) >> 32) - 1
-        195414610
-    '''
-    num = random.randint(3151848, 195414610)
-    num = (num << 32) + (int(time.time()) & 0xFFFFFFFF)
-    return baseN(num, 62)
-
 def get_package_description(text):
     lines = text.splitlines()
     if len(lines) == 0:
@@ -346,11 +320,8 @@ class SpecInit(object):
         subtasks = []
         archs = self.get_archs(spec)
         for arch in archs:
-            task_id = create_task_id()
-
             # store task info
             task = BuildTask()
-            task.task_id = task_id
             task.specification = spec
             task.architecture = arch
             task.save()
@@ -362,7 +333,7 @@ class SpecInit(object):
             opts = {'exchange': 'builder',
                     'exchange_type': 'topic',
                     'routing_key': routing_key,
-                    'task_id': task_id}
+                    'task_id': task.task_id}
 
             # execute build task asynchronously
             s = subtask(task_name, args, kwargs, opts)

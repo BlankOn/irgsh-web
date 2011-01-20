@@ -13,7 +13,7 @@ urlpatterns = patterns('',
     (r'^account/', include('irgsh_web.account.urls')),
 )
 
-TASK_ID = r'(?P<task_id>[0-9a-zA-Z]{10})'
+TASK_ID = r'(?P<task_id>\d+\.\d+\.\d+)'
 
 urlpatterns += patterns('irgsh_web.build.views',
     # build spec
