@@ -25,7 +25,7 @@ class SpecificationForm(forms.Form):
     def clean_orig(self):
         value = self.cleaned_data['orig']
 
-        if type(value) == str:
+        if type(value) in [str, unicode]:
             value = value.strip()
             if len(value) == 0:
                 value = None
