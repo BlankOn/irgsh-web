@@ -18,6 +18,7 @@ BINARY = 1
 
 TARBALL = 'tarball'
 BZR = 'bzr'
+PATCH = 'patch'
 
 SPECIFICATION_STATUS = (
     ( -2, _('Rejected')),
@@ -53,7 +54,8 @@ PACKAGE_CONTENT_TYPE = (
 
 SOURCE_TYPE = (
     (TARBALL, _('Tarball')),
-    (BZR, _('Bazaar')),
+    (BZR, _('Bazaar Repository')),
+    (PATCH, _('Diff/Patch')),
 )
 
 class Distribution(models.Model):
