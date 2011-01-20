@@ -80,12 +80,24 @@ th {
     width: 100%;
 }
 
+#spec-page #spec-pkglist tr td {
+    vertical-align: top;
+}
 #spec-page #spec-pkglist tr > td,
 #spec-page #spec-pkglist tr > td + td + td {
     white-space: nowrap;
 }
 #spec-page #spec-pkglist tr > td:nth-child(4) {
     width: 100%;
+}
+#spec-page #spec-pkglist td.desc p {
+    margin: 0px;
+}
+#spec-page #spec-pkglist td.desc p span {
+    cursor: pointer;
+}
+#spec-page #spec-pkglist td.desc pre {
+    margin: 0.5em 0;
 }
 #spec-page #spec-tasks tr > td:nth-child(6) {
     width: 100%;
@@ -100,6 +112,7 @@ th {
 }
 #spec-page #spec-logs tr > td + td + td {
     width: 100%;
+    white-space: normal;
 }
 #spec-page #spec-sources {
     padding-left: 2em;
