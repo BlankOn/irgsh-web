@@ -65,6 +65,25 @@ def create_task_id():
     num = (num << 32) + (int(time.time()) & 0xFFFFFFFF)
     return baseN(num, 62)
 
+def get_package_description(text):
+    lines = text.splitlines()
+    if len(lines) == 0:
+        return None, None
+
+    desc = lines[0]
+
+    long_desc = None
+    long_list = []
+    for line in lines[1:]:
+        line = line.strip()
+        if line == '.':
+            line = ''
+        long_list.append(line)
+    if len(long_list) > 0:
+        long_desc = '\n'.join(long_list)
+
+    return desc, long_desc
+
 def get_package_info(packages):
     from .models import Package, SOURCE, BINARY
 
@@ -81,6 +100,12 @@ def get_package_info(packages):
             pkg['type'] = BINARY
             pkg['architecture'] = info['Architecture']
 
+        desc, long_desc = None, None
+        if info.has_key('Description'):
+            desc, long_desc = get_package_description(info['Description'])
+        pkg['desc'] = desc
+        pkg['long_desc'] = long_desc
+
         items.append(pkg)
 
     result = {'name': name,
@@ -96,6 +121,8 @@ def store_package_info(spec, info):
         pkg.specification = spec
         pkg.name = data['name']
         pkg.type = data['type']
+        pkg.description = data['desc']
+        pkg.long_description = data['long_desc']
         if pkg.type == BINARY:
             pkg.architecture = data['architecture']
         try:
