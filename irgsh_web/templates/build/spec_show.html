@@ -34,7 +34,7 @@
     <td><a href="{{ build.source }}">{{ build.source }}</a></td>
 </tr>
 <tr><th>{% trans "Source type" %}</th>
-    <td>{{ build.source_type }}</td>
+    <td>{{ build.get_source_type_display }}</td>
 </tr>
 <tr><th>{% trans "Source options" %}</th>
     <td>{% if build.source_opts_raw %}{{ build.source_opts_raw }}{% endif %}</td>
