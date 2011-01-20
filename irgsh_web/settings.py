@@ -70,6 +70,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 TEMPLATE_DIRS = (
@@ -90,6 +91,7 @@ INSTALLED_APPS = (
     'irgsh_web.repo',
     'irgsh_web.build',
     'djcelery',
+    'debug_toolbar',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -100,6 +102,8 @@ AUTHENTICATION_BACKENDS = (
 ABSOLUTE_URL_OVERRIDES = {
     'auth.user': lambda o: '/user/%s/' % o.username
 }
+
+INTERNAL_IPS = ('127.0.0.1', '192.168.56.1',)
 
 OPENID_CREATE_USERS = True
 OPENID_UPDATE_DETAILS_FROM_SREG = True
