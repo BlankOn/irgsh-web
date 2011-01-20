@@ -227,7 +227,7 @@ class BuildTask(models.Model):
     specification = models.ForeignKey(Specification)
     architecture = models.ForeignKey(Architecture)
 
-    task_id = models.CharField(max_length=255) # celery task_id
+    task_id = models.CharField(max_length=255, unique=True) # celery task_id
     builder = models.ForeignKey(Builder, null=True, default=None)
     assigned = models.DateTimeField(null=True, default=None)
 
