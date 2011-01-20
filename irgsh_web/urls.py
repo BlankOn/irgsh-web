@@ -34,6 +34,7 @@ urlpatterns += patterns('irgsh_web.build.views',
     url(r'^submit/$', 'submit', name='build_submit'),
 
     # builder
+    url(r'^builder/(?P<name>[a-z0-9_-]+)/task/$', 'builder_task', name='build_builder_task'),
     url(r'^builder/(?P<name>[a-z0-9_-]+)/$', 'builder_show', name='build_builder_show'),
     url(r'^builder/$', 'builder_list', name='build_builder_list'),
 

@@ -525,3 +525,13 @@ def builder_show(request, builder):
     return render_to_response('build/builder_show.html', context,
                               context_instance=RequestContext(request))
 
+@_builder_name_required
+def builder_task(request, builder):
+    task_list = BuildTask.objects.filter(builder=builder)
+    tasks = _paginate(task_list, 50, request.GET.get('page', 1))
+
+    context = {'builder': builder,
+               'tasks': tasks}
+    return render_to_response('build/builder_task.html', context,
+                              context_instance=RequestContext(request))
+

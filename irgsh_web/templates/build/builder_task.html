@@ -1,0 +1,64 @@
+{% extends "build/base.html" %}
+{% load i18n %}
+{% load irgsh_tags %}
+
+{% block content %}
+<div id="builder-page">
+<h1>{{ builder.name }}</h1>
+
+{% if builder.remark %}
+<p>{{ builder.remark }}</p>
+{% endif %}
+
+<table class="vertical">
+<tr><th>{% trans "Architecture" %}</th>
+    <td>{{ builder.architecture }}</td>
+</tr>
+<tr><th>{% trans "Location" %}</th>
+    <td>{{ builder.location }}</td>
+</tr>
+<tr><th>{% trans "Status" %}</th>
+    <td>{{ builder.status }}</td>
+</tr>
+<tr><th>{% trans "Active" %}</th>
+    <td>{{ builder.active }}</td>
+</tr>
+<tr><th>{% trans "Last activity" %}</th>
+    <td>{% if builder.last_activity %}{{ builder.last_activity|datetime_and_age }}{% else %}{% trans "Unknown" %}{% endif %}</td>
+</tr>
+</table>
+
+{% if tasks %}
+<h2>Handled build tasks</h2>
+<table id="builder-tasks">
+<tr><th>{% trans "Build" %}</th>
+    <th>{% trans "Task" %}</th>
+    <th>{% trans "Assigned" %}</th>
+    <th>{% trans "Submitter" %}</th>
+    <th>{% trans "Package" %}</th>
+    <th>{% trans "Version" %}</th>
+    <th>{% trans "Task Status" %}</th>
+    <th>{% trans "Build Status" %}</th>
+</tr>
+{% for task in tasks.object_list %}
+<tr><td><a href="{{ task.specification.get_absolute_url }}">{{ task.specification.id }}</a></td>
+    <td class="code"><a href="{{ task.get_absolute_url }}">{{ task.task_id }}</a></td>
+    <td>{{ task.assigned|date:"d/m/y H:i" }}</td>
+    <td><a href="{{ task.specification.submitter.get_absolute_url }}">{{ task.specification.submitter }}</a></td>
+    <td>{{ task.specification.package.name }}</td>
+    <td>{{ task.specification.version }}</td>
+    <td>{{ task.get_status_display }}</td>
+    <td>{{ task.specification.get_status_display }}</td>
+</tr>
+{% endfor %}
+</table>
+{% with tasks as items %}
+{% include "paginator.html" %}
+{% endwith %}
+{% else %}
+<p>{% trans "This builder never handled build tasks" %}</p>
+{% endif %}
+
+</div>
+{% endblock %}
+
