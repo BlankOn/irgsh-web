@@ -238,6 +238,7 @@ class BuildTask(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
+        ordering = ('-created',)
         unique_together = ('specification', 'architecture',)
 
     def __unicode__(self):
