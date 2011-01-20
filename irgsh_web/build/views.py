@@ -241,11 +241,15 @@ def task_status(request, task):
     if status == 999:
         # Finished
         spec = task.specification
+        spec.add_log(_('Builder %(builder)s finished') % \
+                       {'builder': task.builder})
         _rebuild_repo(task.specification)
 
     elif status == -1:
         # Task failed
         spec = task.specification
+        spec.add_log(_('Builder %(builder)s failed') % \
+                       {'builder': task.builder})
         _set_spec_status(spec.id, -1)
 
     return {'status': 'ok'}
