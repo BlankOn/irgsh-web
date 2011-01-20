@@ -352,10 +352,16 @@ def spec_status(request, spec):
     if request.method == 'POST':
         try:
             status = int(request.POST['status'])
+
+            status_list = dict(models.SPECIFICATION_STATUS)
+            assert status in status_list
+
             _set_spec_status(spec.id, status)
+            spec.add_log(status_list[status])
+
             if status == 104:
                 _rebuild_repo(spec)
-        except ValueError:
+        except (ValueError, AssertionError):
             return HttpResponse(status=400)
 
     else:
