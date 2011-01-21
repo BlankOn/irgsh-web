@@ -90,7 +90,7 @@
 {% if sources %}
 <ul id="spec-sources">
 {% for src in sources %}
-<li><a href="{{ src.0 }}">{{ src.1 }}</a></li>
+<li><a href="{{ src.0 }}">{{ src.1 }}</a> ({{ src.2|filesize }})</li>
 {% endfor %}
 </ul>
 {% endif %}

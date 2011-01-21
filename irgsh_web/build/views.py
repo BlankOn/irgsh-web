@@ -369,17 +369,21 @@ def spec_show(request, spec):
         dsc_path = os.path.join(settings.DOWNLOAD_TARGET,
                                 str(spec.id), dsc)
         if os.path.exists(dsc_path):
+            dsc_size = os.stat(dsc_path).st_size
             sources.append((reverse('build_spec_source',
-                                    args=[spec.id, dsc]), dsc))
+                                    args=[spec.id, dsc]),
+                           dsc, dsc_size))
 
             src = Sources(open(dsc_path))
             for info in src['Files']:
                 fname = info['name']
+                size = int(info['size'])
                 path = os.path.join(settings.DOWNLOAD_TARGET,
                                     str(spec.id), fname)
                 if os.path.exists(path):
                     sources.append((reverse('build_spec_source',
-                                            args=[spec.id, fname]), fname))
+                                            args=[spec.id, fname]),
+                                   fname, size))
 
     context = {'build': spec,
                'tasks': tasks,

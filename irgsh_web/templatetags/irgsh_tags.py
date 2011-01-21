@@ -116,6 +116,20 @@ def collapsible_changelog(changelog):
             (first, rest)
     return mark_safe(html)
 
+def filesize(size):
+    try:
+        size = float(size)
+    except ValueError:
+        return size
+
+    units = ['B', 'KiB', 'MiB', 'GiB']
+    for unit in units:
+        if size < 1024:
+            break
+        size = size / 1024
+    return '%.2f %s' % (size, unit)
+
+
 register = template.Library()
 register.filter('datetime_or_age', datetime_or_age)
 register.filter('full_datetime_or_age', full_datetime_or_age)
@@ -124,4 +138,5 @@ register.filter('datetime_and_since', datetime_and_since)
 register.filter('since', since)
 register.filter('datetime_relative', datetime_relative)
 register.filter('collapsible_changelog', collapsible_changelog)
+register.filter('filesize', filesize)
 
