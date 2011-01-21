@@ -151,6 +151,7 @@ class Specification(models.Model):
 
     created = models.DateTimeField(default=datetime.now)
     updated = models.DateTimeField(auto_now=True)
+    finished = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ('-created',)
@@ -162,6 +163,12 @@ class Specification(models.Model):
         else:
             param.update({'package': self.package})
             return _('%(package)s (%(dist)s)') % param
+
+    def save(self):
+        if self.finished is None and \
+           (self.status < 0 or self.status == 999):
+            self.finished = datetime.now()
+        super(Specification, self).save()
 
     def dsc(self):
         if self.package is None:
@@ -238,6 +245,7 @@ class BuildTask(models.Model):
 
     created = models.DateTimeField(default=datetime.now)
     updated = models.DateTimeField(auto_now=True)
+    finished = models.DateTimeField(null=True, default=None)
 
     class Meta:
         ordering = ('-created',)
@@ -258,6 +266,11 @@ class BuildTask(models.Model):
                                     self.architecture.id,
                                     self.id)
             self.task_id = task_id
+
+        if self.finished is None and \
+           (self.status < 0 or self.status == 999):
+            self.finished = datetime.now()
+
         super(BuildTask, self).save()
 
     def add_log(self, message):
