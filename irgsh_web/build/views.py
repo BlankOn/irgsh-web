@@ -222,6 +222,42 @@ def task_log(request, task):
 @_post_required
 @_task_id_required
 @_json_result
+def task_changes(request, task):
+    # TODO access should be limited from client authenticated HTTPS only
+    '''
+    [API] Set changes
+    '''
+    if not request.FILES.has_key('changes'):
+        return HttpResponse(status=400)
+
+    fin = request.FILES['changes']
+
+    logdir = os.path.join(settings.LOG_PATH, 'task', task.task_id)
+    if not os.path.exists(logdir):
+        os.makedirs(logdir)
+
+    package = task.specification.package.name
+    version = task.specification.version
+    arch = task.architecture.name
+    changes = '%s_%s_%s.changes' % (package, version, arch)
+    target = os.path.join(logdir, changes)
+
+    fout = open(target, 'wb')
+    fout.write(fin.read())
+    fout.close()
+
+    task.changes = datetime.now()
+    task.save()
+
+    task.add_log(_('Changes file added'))
+
+    task.update_builder()
+
+    return {'status': 'ok'}
+
+@_post_required
+@_task_id_required
+@_json_result
 def task_status(request, task):
     # TODO access should be limited from client authenticated HTTPS only
     '''

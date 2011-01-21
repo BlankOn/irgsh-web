@@ -234,6 +234,7 @@ class BuildTask(models.Model):
 
     status = models.IntegerField(choices=BUILD_TASK_STATUS, default=0)
     build_log = models.DateTimeField(null=True, default=None)
+    changes = models.DateTimeField(null=True, default=None)
 
     created = models.DateTimeField(default=datetime.now)
     updated = models.DateTimeField(auto_now=True)

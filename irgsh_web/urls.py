@@ -27,6 +27,7 @@ urlpatterns += patterns('irgsh_web.build.views',
     # build task
     url(r'^task/%s/build.log.gz' % TASK_ID, 'task_build_log', name='build_task_build_log'),
     url(r'^task/%s/log/' % TASK_ID, 'task_log', name='build_task_log'),
+    url(r'^task/%s/changes/' % TASK_ID, 'task_changes', name='build_task_changes'),
     url(r'^task/%s/status/' % TASK_ID, 'task_status', name='build_task_status'),
     url(r'^task/%s/' % TASK_ID, 'task_show', name='build_task_show'),
 
