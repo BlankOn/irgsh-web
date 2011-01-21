@@ -20,23 +20,29 @@
 <tr><th>{% trans "Created" %}</th>
     <td>{{ task.created|datetime_and_age }}</td>
 </tr>
-<tr><th>{% trans "Last update" %}</th>
-    <td>{{ task.updated|datetime_and_since:task.created }}</td>
-</tr>
 <tr><th>{% trans "Architecture" %}</th>
     <td>{{ task.architecture.name }}</td>
 </tr>
 <tr><th>{% trans "Builder" %}</th>
-    <td>{% if task.builder %}<a href="{{ task.builder.get_absolute_url }}">{{ task.builder.name }}</a>{% endif %}</td>
+    <td>{% if task.builder %}<a href="{{ task.builder.get_absolute_url }}">{{ task.builder.name }}</a>{% else %}<em>{% trans "This task is not taken yet" %}</em>{% endif %}</td>
 </tr>
+{% if task.assigned %}
 <tr><th>{% trans "Assigned" %}</th>
     <td>{% if task.assigned %}{{ task.assigned|datetime_and_since:task.created }}{% endif %}</td>
 </tr>
+{% endif %}
+{% if task.finished %}
+<tr><th>{% trans "Finished" %}</th>
+    <td>{% if task.finished %}{{ task.finished|datetime_and_since:task.created }}{% endif %}</td>
+</tr>
+{% endif %}
 </table>
 
 {% if changes %}
+<div id="task-changes">
 <h2>{% trans "Changes" %}</h2>
 <pre>{{ changes }}</pre>
+</div>
 {% endif %}
 
 {% if logs %}

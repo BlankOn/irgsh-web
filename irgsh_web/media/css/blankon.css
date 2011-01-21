@@ -79,6 +79,10 @@ th {
 #task-page #task-logs tr > td + td {
     width: 100%;
 }
+#task-page #task-changes pre {
+    font-size: 0.9em;
+    line-height: 1.3em;
+}
 
 #spec-page #spec-pkg tr th {
     vertical-align: top;
