@@ -8,6 +8,7 @@
 
 <div class="block">
 <h2>{% trans "Builders" %}</h2>
+{% if builders %}
 <table id="builders">
 <tr><th>{% trans "Name" %}</th>
     <th>{% trans "Arch" %}</th>
@@ -22,10 +23,14 @@
 </tr>
 {% endfor %}
 </table>
+{% else %}
+<p>{% trans "No builders" %}</p>
+{% endif %}
 </div>
 
 <div class="block">
 <h2>{% trans "Latest Builds" %}</h2>
+{% if builds %}
 <table id="builds">
 <tr><th>{% trans "ID" %}</th>
     <th>{% trans "Submitter" %}</th>
@@ -46,6 +51,9 @@
 </table>
 {% if more_builds %}
 <p><a href="{% url build_spec_list %}">{% trans "show all builds" %}</a></p>
+{% endif %}
+{% else %}
+<p>{% trans "No builds" %}</p>
 {% endif %}
 </div>
 

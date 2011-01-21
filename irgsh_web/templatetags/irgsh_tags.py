@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 
 from django import template
 from django.utils.translation import ugettext as _
+from django.utils.safestring import mark_safe
+from django.utils.html import conditional_escape
 
 def datetime_and_age(value):
     if not isinstance(value, datetime):
@@ -106,6 +108,14 @@ def datetime_relative(value, target):
         return value.strftime('%d/%m %H:%M')
     return value.strftime('%d/%m/%y %H:%M')
 
+def collapsible_changelog(changelog):
+    lines = changelog.splitlines()
+    first = conditional_escape(lines[0])
+    rest = conditional_escape('\n'.join(lines[1:]))
+    html = '<pre onclick="toggle_next(this);">%s</pre><pre style="display:none">\n%s</pre>' % \
+            (first, rest)
+    return mark_safe(html)
+
 register = template.Library()
 register.filter('datetime_or_age', datetime_or_age)
 register.filter('full_datetime_or_age', full_datetime_or_age)
@@ -113,4 +123,5 @@ register.filter('datetime_and_age', datetime_and_age)
 register.filter('datetime_and_since', datetime_and_since)
 register.filter('since', since)
 register.filter('datetime_relative', datetime_relative)
+register.filter('collapsible_changelog', collapsible_changelog)
 

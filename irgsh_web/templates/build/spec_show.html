@@ -40,7 +40,7 @@
     <td>{% if build.source_opts_raw %}{{ build.source_opts_raw }}{% endif %}</td>
 </tr>
 <tr><th>{% trans "Orig" %}</th>
-    <td><a href="{{ build.orig }}">{{ build.orig }}</a></td>
+    <td>{% if build.orig %}<a href="{{ build.orig }}">{{ build.orig }}</a>{% endif %}</td>
 </tr>
 </table>
 
@@ -83,7 +83,7 @@
     <td>{{ build.version }}</td>
 </tr>
 <tr><th>{% trans "Changelog" %}</th>
-    <td><pre>{{ build.changelog }}</pre></td>
+    <td>{{ build.changelog|collapsible_changelog }}</td>
 </tr>
 </table>
 {% endif %}
@@ -98,7 +98,6 @@
 
 {% if packages %}
 <h2>{% trans "Packages" %}</h2>
-{% if packages %}
 <table id="spec-pkglist">
 <tr><th>{% trans "Name" %}</th>
     <th>{% trans "Type" %}</th>
@@ -115,8 +114,6 @@
 {% endfor %}
 </table>
 {% endif %}
-{% endif %}
-
 
 {% if logs %}
 <h2>{% trans "Build Logs" %}</h2>
@@ -142,6 +139,9 @@
 function toggle_long_desc(pkg_id) {
     var target = $('#spec-pkglist-' + pkg_id);
     target.slideToggle();
+}
+function toggle_next(curr) {
+    $(curr).next().slideToggle();
 }
 </script>
 {% endblock %}
