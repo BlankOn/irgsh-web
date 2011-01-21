@@ -46,7 +46,33 @@
 
 <p><a href="{% url build_submit %}?copy={{ build.id }}">{% trans "Resubmit Build Job" %}</a></p>
 
-{% if sources or build.package%}
+{% if tasks %}
+<h2>{% trans "Build Tasks" %}</h2>
+<table id="spec-tasks">
+<tr><th>{% trans "Arch" %}</th>
+    <th>{% trans "Task ID" %}</th>
+    <th>{% trans "Created" %}</th>
+    <th>{% trans "Assigned" %}</th>
+    <th>{% trans "Builder" %}</th>
+    <th>{% trans "Status" %}</th>
+    <th>{% trans "Updated" %}</th>
+    <th>{% trans "Build Log" %}</th>
+</tr>
+{% for task in tasks %}
+<tr><td>{{ task.architecture }}</td>
+    <td class="code"><a href="{{ task.get_absolute_url }}">{{ task.task_id }}</a></td>
+    <td>{{ task.created|date:"d/m/y H:i" }}</td>
+    <td>{% if task.assigned %}{{ task.assigned|datetime_relative:task.created }}{% endif %}</td>
+    <td>{% if task.builder %}<a href="{{ task.builder.get_absolute_url }}">{{ task.builder.name }}</a>{% endif %}</td>
+    <td>{{ task.get_status_display }}</td>
+    <td>{{ task.updated|datetime_relative:task.created }}</td>
+    <td>{% if task.has_build_log %}<a href="{{ task.build_log_url }}">{{ task.build_log_name }}</a>{% endif %}</td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+
+{% if sources or build.package %}
 <h2>{% trans "Sources" %}</h2>
 {% if build.package %}
 <table class="vertical" id="spec-pkg">
@@ -91,31 +117,6 @@
 {% endif %}
 {% endif %}
 
-{% if tasks %}
-<h2>{% trans "Build Tasks" %}</h2>
-<table id="spec-tasks">
-<tr><th>{% trans "Arch" %}</th>
-    <th>{% trans "Task ID" %}</th>
-    <th>{% trans "Created" %}</th>
-    <th>{% trans "Assigned" %}</th>
-    <th>{% trans "Builder" %}</th>
-    <th>{% trans "Status" %}</th>
-    <th>{% trans "Updated" %}</th>
-    <th>{% trans "Build Log" %}</th>
-</tr>
-{% for task in tasks %}
-<tr><td>{{ task.architecture }}</td>
-    <td class="code"><a href="{{ task.get_absolute_url }}">{{ task.task_id }}</a></td>
-    <td>{{ task.created|date:"d/m/y H:i" }}</td>
-    <td>{% if task.assigned %}{{ task.assigned|datetime_relative:task.created }}{% endif %}</td>
-    <td>{% if task.builder %}<a href="{{ task.builder.get_absolute_url }}">{{ task.builder.name }}</a>{% endif %}</td>
-    <td>{{ task.get_status_display }}</td>
-    <td>{{ task.updated|datetime_relative:task.created }}</td>
-    <td>{% if task.has_build_log %}<a href="{{ task.build_log_url }}">{{ task.build_log_name }}</a>{% endif %}</td>
-</tr>
-{% endfor %}
-</table>
-{% endif %}
 
 {% if logs %}
 <h2>{% trans "Build Logs" %}</h2>
