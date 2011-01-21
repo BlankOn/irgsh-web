@@ -56,6 +56,9 @@
 <tr><th>{% trans "Version" %}</th>
     <td>{{ build.version }}</td>
 </tr>
+<tr><th>{% trans "Changelog" %}</th>
+    <td><pre>{{ build.changelog }}</pre></td>
+</tr>
 </table>
 {% endif %}
 {% if sources %}

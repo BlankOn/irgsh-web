@@ -147,6 +147,7 @@ class Specification(models.Model):
 
     package = models.ForeignKey(RepoPackage, null=True, default=None)
     version = models.CharField(max_length=255, null=True, default=None)
+    changelog = models.TextField(null=True, default=None)
 
     created = models.DateTimeField(default=datetime.now)
     updated = models.DateTimeField(auto_now=True)

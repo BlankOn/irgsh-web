@@ -154,9 +154,15 @@ def _set_description(spec, fcontrol, fchangelog):
         return {'status': 'fail', 'code': 406,
                 'msg': _('Distribution mismatch: %(dist)s') % {'dist': dist}}
 
+    # Get last changelog content
+    last_changelog = None
+    if len(c._blocks) > 0:
+        last_changelog = str(c._blocks[0]).replace('\n\n', '\n').strip()
+
     # Save packages info
     spec.package = pkg
     spec.version = version
+    spec.changelog = last_changelog
     spec.save()
 
     utils.store_package_info(spec, info)

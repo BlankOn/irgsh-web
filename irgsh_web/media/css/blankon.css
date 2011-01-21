@@ -80,6 +80,13 @@ th {
     width: 100%;
 }
 
+#spec-page #spec-pkg tr th {
+    vertical-align: top;
+}
+#spec-page #spec-pkg tr td pre {
+    margin: 0px;
+    font-size: .8em;
+}
 #spec-page #spec-pkglist tr td {
     vertical-align: top;
 }
