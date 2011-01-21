@@ -257,7 +257,7 @@ class BuildTask(models.Model):
                                     self.architecture.id,
                                     self.id)
             self.task_id = task_id
-            super(BuildTask, self).save()
+        super(BuildTask, self).save()
 
     def add_log(self, message):
         log = BuildTaskLog(task=self)
