@@ -321,10 +321,28 @@ def task_show(request, task):
     - status
     - logs
     '''
+    # Logs
     logs = BuildTaskLog.objects.filter(task=task)
+
+    # Changes
+    logdir = os.path.join(settings.LOG_PATH, 'task', task.task_id)
+    if not os.path.exists(logdir):
+        os.makedirs(logdir)
+
+    package = task.specification.package.name
+    version = task.specification.version
+    arch = task.architecture.name
+    changes = '%s_%s_%s.changes' % (package, version, arch)
+    changes_path = os.path.join(logdir, changes)
+
+    changes_content = None
+    if os.path.exists(changes_path):
+        changes_content = open(changes_path).read()
+
     context = {'task': task,
                'build': task.specification,
-               'logs': logs}
+               'logs': logs,
+               'changes': changes_content}
     return render_to_response('build/task_show.html', context,
                               context_instance=RequestContext(request))
 

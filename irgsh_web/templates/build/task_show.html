@@ -34,6 +34,11 @@
 </tr>
 </table>
 
+{% if changes %}
+<h2>{% trans "Changes" %}</h2>
+<pre>{{ changes }}</pre>
+{% endif %}
+
 {% if logs %}
 <h2>{% trans "Logs" %}</h2>
 {% if task.has_build_log %}
