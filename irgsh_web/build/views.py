@@ -318,7 +318,7 @@ def task_status(request, task):
         except Builder.DoesNotExist:
             task.status = -1
             task.save()
-            _set_spec_status(spec.specification.id, -1)
+            _set_spec_status(task.specification.id, -1)
             task.add_log(_('Failed. Unregistered builder tried to pick the task: %(name)s') % \
                          {'name': builder_name})
             return HttpResponse(status=400)
