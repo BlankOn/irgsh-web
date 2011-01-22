@@ -269,9 +269,8 @@ def task_log(request, task):
 
 @_task_id_required
 def task_changes_file(request, task, path):
-    logdir = os.path.join(settings.LOG_PATH, 'task', task.task_id)
     changes = task.changes_name()
-    changes_path = os.path.join(logdir, changes)
+    changes_path = task.changes_file_path()
 
     if path != changes or not os.path.exists(changes_path):
         raise Http404()
@@ -286,10 +285,10 @@ def _task_changes_set(request, task):
 
     fin = request.FILES['changes']
 
-    logdir = os.path.join(settings.LOG_PATH, 'task', task.task_id)
+    target = task.changes_file_path()
+    logdir = os.path.dirname(target)
     if not os.path.exists(logdir):
         os.makedirs(logdir)
-    target = os.path.join(logdir, task.changes_name())
 
     fout = open(target, 'wb')
     fout.write(fin.read())
@@ -305,9 +304,7 @@ def _task_changes_set(request, task):
     return {'status': 'ok'}
 
 def _task_changes_get(request, task):
-    changes = task.changes_name()
-    return HttpResponseRedirect(reverse(task_changes_file,
-                                        args=[task.task_id, changes]))
+    return HttpResponseRedirect(task.changes_file_url())
 
 @_task_id_required
 def task_changes(request, task):
@@ -389,18 +386,9 @@ def task_show(request, task):
     logs = BuildTaskLog.objects.filter(task=task)
 
     # Changes
-    logdir = os.path.join(settings.LOG_PATH, 'task', task.task_id)
-    if not os.path.exists(logdir):
-        os.makedirs(logdir)
-
-    package = task.specification.package.name
-    version = task.specification.version
-    arch = task.architecture.name
-    changes = '%s_%s_%s.changes' % (package, version, arch)
-    changes_path = os.path.join(logdir, changes)
-
     changes_content = None
-    if os.path.exists(changes_path):
+    if task.has_changes_file():
+        changes_path = task.changes_file_path()
         changes_content = open(changes_path).read()
 
     context = {'task': task,
