@@ -291,7 +291,7 @@ class BuildTask(models.Model):
     def changes_name(self):
         if self.specification.package is None:
             return None
-        return '%s_%s_%s.changes' % (self.specification.package,
+        return '%s_%s_%s.changes' % (self.specification.package.name,
                                      self.specification.version,
                                      self.architecture.name)
 
