@@ -388,3 +388,25 @@ def make_canonical(cert_subject):
     # TODO
     return cert_subject
 
+def verify_builder_certificate(builder, cert_subject):
+    cert_subject = make_canonical(cert_subject)
+    return builder.cert_subject == cert_subject
+
+WORKER_CERTS = set(list(settings.WORKER_TASK_INIT_CERTS) + \
+                   list(settings.WORKER_REPO_CERTS))
+WORKER_CERTS = set(map(make_canonical, WORKER_CERTS))
+
+def verify_certificate(cert_subject):
+    '''
+    Verify a certificate subject
+    '''
+    from .models import Builder
+
+    cert_subject = make_canonical(cert_subject)
+    if cert_subject in WORKER_CERTS:
+        return True
+
+    builders = Builder.objects.filter(active=True,
+                                      cert_subject=cert_subject)
+    return len(builders) == 1
+
