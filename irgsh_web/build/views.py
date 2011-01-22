@@ -284,12 +284,7 @@ def task_changes(request, task):
     logdir = os.path.join(settings.LOG_PATH, 'task', task.task_id)
     if not os.path.exists(logdir):
         os.makedirs(logdir)
-
-    package = task.specification.package.name
-    version = task.specification.version
-    arch = task.architecture.name
-    changes = task.changes_name()
-    target = os.path.join(logdir, changes)
+    target = os.path.join(logdir, task.changes_name())
 
     fout = open(target, 'wb')
     fout.write(fin.read())
