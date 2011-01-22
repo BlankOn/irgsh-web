@@ -140,6 +140,19 @@ def _verify_builder(func):
         return func(request, *args, **kwargs)
     return _func
 
+def _serve_static(request, fullpath):
+    # From Django source code: django/views/static.py
+    statobj = os.stat(fullpath)
+    mimetype = mimetypes.guess_type(fullpath)[0] or 'application/octet-stream'
+    if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
+                              statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
+        return HttpResponseNotModified(mimetype=mimetype)
+    contents = open(fullpath, 'rb').read()
+    response = HttpResponse(contents, mimetype=mimetype)
+    response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
+    response["Content-Length"] = len(contents)
+    return response
+
 def _client_cert_required(func):
     def _func(request, *args, **kwargs):
         try:
@@ -500,17 +513,7 @@ def spec_source(request, spec, path):
     if not os.path.exists(fullpath):
         raise Http404()
 
-    # From Django source code: django/views/static.py
-    statobj = os.stat(fullpath)
-    mimetype = mimetypes.guess_type(fullpath)[0] or 'application/octet-stream'
-    if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
-                              statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
-        return HttpResponseNotModified(mimetype=mimetype)
-    contents = open(fullpath, 'rb').read()
-    response = HttpResponse(contents, mimetype=mimetype)
-    response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
-    response["Content-Length"] = len(contents)
-    return response
+    return _serve_static(request, fullpath)
 
 @_client_cert_required
 @_spec_id_required
