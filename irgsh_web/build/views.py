@@ -220,8 +220,7 @@ def _set_description(spec, fcontrol, fchangelog):
 
 @_task_id_required
 def task_build_log(request, task):
-    fullpath = os.path.join(settings.LOG_PATH, 'task',
-                            task.task_id, 'build.log.gz')
+    fullpath = task.build_log_path()
     if not os.path.exists(fullpath):
         raise Http404()
 
@@ -250,10 +249,10 @@ def task_log(request, task):
 
     fin = request.FILES['log']
 
-    logdir = os.path.join(settings.LOG_PATH, 'task', task.task_id)
+    target = task.build_log_path()
+    logdir = os.path.dirname(target)
     if not os.path.exists(logdir):
         os.makedirs(logdir)
-    target = os.path.join(logdir, 'build.log.gz')
 
     fout = open(target, 'wb')
     fout.write(fin.read())
