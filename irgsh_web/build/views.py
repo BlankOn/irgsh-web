@@ -118,6 +118,41 @@ def _json_result(func):
         return res
     return _func
 
+def _verify_builder(func):
+    def _func(request, *args, **kwargs):
+        try:
+            assert request.META.get('SSL', None) == 'on'
+            assert request.META.has_key('SSL_CLIENT_S_DN')
+            assert request.POST.has_key('builder')
+
+            name = request.POST['builder']
+            cert_subject = request.META['SSL_CLIENT_S_DN']
+
+            builders = Builder.objects.filter(name=name)
+            assert len(builders) == 1
+            builder = builders[0]
+
+            assert utils.verify_builder_certificate(builder, cert_subject)
+
+        except AssertionError:
+            return HttpResponse(status=403)
+        return func(request, *args, **kwargs)
+    return _func
+
+def _client_cert_required(func):
+    def _func(request, *args, **kwargs):
+        try:
+            assert request.META.get('SSL', None) == 'on'
+            assert request.META.has_key('SSL_CLIENT_S_DN')
+            cert_subject = request.META['SSL_CLIENT_S_DN']
+
+            assert utils.verify_certificate(cert_subject)
+
+        except AssertionError:
+            return HttpResponse(status=403)
+        return func(request, *args, **kwargs)
+    return _func
+
 def _set_description(spec, fcontrol, fchangelog):
     # Get packages info
     packages = Packages.iter_paragraphs(fcontrol)
@@ -188,11 +223,11 @@ def task_build_log(request, task):
     response["Content-Length"] = len(contents)
     return response
 
+@_client_cert_required
 @_post_required
 @_task_id_required
 @_json_result
 def task_log(request, task):
-    # TODO access should be limited from client authenticated HTTPS only
     '''
     [API] Set build log
     '''
@@ -219,11 +254,11 @@ def task_log(request, task):
 
     return {'status': 'ok'}
 
+@_client_cert_required
 @_post_required
 @_task_id_required
 @_json_result
 def task_changes(request, task):
-    # TODO access should be limited from client authenticated HTTPS only
     '''
     [API] Set changes
     '''
@@ -256,10 +291,10 @@ def task_changes(request, task):
     return {'status': 'ok'}
 
 @_post_required
+@_verify_builder
 @_task_id_required
 @_json_result
 def task_status(request, task):
-    # TODO access should be limited from client authenticated HTTPS only
     '''
     [API] Update task status
     '''
@@ -393,11 +428,11 @@ def spec_show(request, spec):
     return render_to_response('build/spec_show.html', context,
                               context_instance=RequestContext(request))
 
+@_client_cert_required
 @_post_required
 @_spec_id_required
 @_json_result
 def spec_description(request, spec):
-    # TODO access should be limited from client authenticated HTTPS only
     '''
     [API] Update package information
 
@@ -426,10 +461,10 @@ def spec_description(request, spec):
     finally:
         shutil.rmtree(tmpdir)
 
+@_client_cert_required
 @_spec_id_required
 @_json_result
 def spec_status(request, spec):
-    # TODO access should be limited from client authenticated HTTPS only
     if request.method == 'POST':
         try:
             status = int(request.POST['status'])
@@ -476,11 +511,11 @@ def spec_source(request, spec, path):
     response["Content-Length"] = len(contents)
     return response
 
+@_client_cert_required
 @_spec_id_required
 @_json_result
 @_post_required
 def repo_status(request, spec):
-    # TODO access should be limited from client authenticated HTTPS only
     arch = request.POST.get('arch', None)
     status = request.POST.get('status', None)
 
