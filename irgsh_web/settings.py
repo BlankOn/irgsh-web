@@ -138,6 +138,9 @@ BROKER_USER = 'irgsh'
 BROKER_PASSWORD = 'irgsh'
 BROKER_VHOST = 'irgsh'
 
+WORKER_TASK_INIT_CERTS = ()
+WORKER_REPO_CERTS = ()
+
 SOURCE_UPLOAD_PATH = 'incoming/source/'
 SOURCE_UPLOAD_HOST = 'yeyen.blankonlinux.or.id'
 SOURCE_UPLOAD_USER = 'incoming'
