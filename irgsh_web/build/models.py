@@ -295,6 +295,17 @@ class BuildTask(models.Model):
                                      self.specification.version,
                                      self.architecture.name)
 
+    def changes_file_path(self):
+        return os.path.join(settings.LOG_PATH, 'task',
+                            self.task_id, self.changes_name())
+
+    def has_changes_file(self):
+        return os.path.exists(self.changes_file_path())
+
+    def changes_file_url(self):
+        changes = self.changes_name()
+        return reverse('build_task_changes_file', args=[self.task_id, changes])
+
     def upload_path(self):
         return str(self.architecture.name)
 
