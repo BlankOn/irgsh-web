@@ -274,7 +274,7 @@ def task_changes(request, task):
     package = task.specification.package.name
     version = task.specification.version
     arch = task.architecture.name
-    changes = '%s_%s_%s.changes' % (package, version, arch)
+    changes = task.changes_name()
     target = os.path.join(logdir, changes)
 
     fout = open(target, 'wb')

@@ -288,7 +288,7 @@ class BuildTask(models.Model):
             Builder.objects.filter(pk=self.builder.id) \
                            .update(last_activity=datetime.now())
 
-    def changes(self):
+    def changes_name(self):
         if self.specification.package is None:
             return None
         return '%s_%s_%s.changes' % (self.specification.package,
