@@ -381,3 +381,10 @@ def rebuild_repo(spec):
     s = subtask(task_name, args, kwargs, opts)
     return s.apply_async()
 
+def make_canonical(cert_subject):
+    '''
+    Create canonical version of a certificate subject
+    '''
+    # TODO
+    return cert_subject
+
