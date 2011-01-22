@@ -268,14 +268,20 @@ def task_log(request, task):
 
     return {'status': 'ok'}
 
-@_client_cert_required
-@_post_required
 @_task_id_required
+def task_changes_file(request, task, path):
+    logdir = os.path.join(settings.LOG_PATH, 'task', task.task_id)
+    changes = task.changes_name()
+    changes_path = os.path.join(logdir, changes)
+
+    if path != changes or not os.path.exists(changes_path):
+        raise Http404()
+
+    return _serve_static(request, changes_path)
+
+@_client_cert_required
 @_json_result
-def task_changes(request, task):
-    '''
-    [API] Set changes
-    '''
+def _task_changes_set(request, task):
     if not request.FILES.has_key('changes'):
         return HttpResponse(status=400)
 
@@ -298,6 +304,21 @@ def task_changes(request, task):
     task.update_builder()
 
     return {'status': 'ok'}
+
+def _task_changes_get(request, task):
+    changes = task.changes_name()
+    return HttpResponseRedirect(reverse(task_changes_file,
+                                        args=[task.task_id, changes]))
+
+@_task_id_required
+def task_changes(request, task):
+    '''
+    [API] Set changes
+    '''
+    if request.method == 'POST':
+        return _task_changes_set(request, task)
+    else:
+        return _task_changes_get(request, task)
 
 @_post_required
 @_verify_builder
