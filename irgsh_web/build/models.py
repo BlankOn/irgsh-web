@@ -95,6 +95,10 @@ class Builder(models.Model):
                                 blank=True)
     remark = models.TextField(default='', blank=True)
 
+    cert_subject = models.CharField(max_length=1024, unique=True,
+                                    verbose_name=_('Certificate subject'),
+                                    help_text=_('e.g. /C=ID/ST=Jakarta/L=Jakarta/O=BlankOn/OU=IrgshBuilder/CN=Cendrawasih/emailAddress=cendrawasih@example.com'))
+
     class Meta:
         ordering = ('-active', 'name')
 
