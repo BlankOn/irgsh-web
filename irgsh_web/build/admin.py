@@ -1,7 +1,9 @@
 from django.contrib import admin
+from django import forms
 from django.utils.translation import ugettext as _
 
 from .models import Distribution, Builder, Specification, BuildTask
+from . import utils
 
 class DistributionAdmin(admin.ModelAdmin):
     list_display = ('repo', 'active', 'mirror', 'dist', 'components',)
@@ -11,6 +13,14 @@ class DistributionAdmin(admin.ModelAdmin):
             'fields': ('repo', 'mirror', 'dist', 'components', 'active', 'extra',)
         }),
     )
+
+class BuilderAdminForm(forms.ModelForm):
+    class Meta:
+        model = Builder
+
+    def clean_cert_subject(self):
+        cert_subject = self.cleaned_data['cert_subject']
+        return utils.make_canonical(cert_subject)
 
 class BuilderAdmin(admin.ModelAdmin):
     def last_activity(obj):
@@ -23,9 +33,12 @@ class BuilderAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'architecture', 'active', 'last_activity', 'location', 'remark',),
+            'fields': ('name', 'architecture', 'cert_subject',
+                       'active', 'location', 'remark', 'last_activity',),
         }),
     )
+
+    form = BuilderAdminForm
 
 class SpecificationAdmin(admin.ModelAdmin):
     def specification_id(obj):
