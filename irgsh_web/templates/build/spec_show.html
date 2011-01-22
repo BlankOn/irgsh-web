@@ -57,6 +57,7 @@
     <th>{% trans "Status" %}</th>
     <th>{% trans "Updated" %}</th>
     <th>{% trans "Build Log" %}</th>
+    <th>{% trans "Changes" %}</th>
 </tr>
 {% for task in tasks %}
 <tr><td>{{ task.architecture }}</td>
@@ -67,6 +68,7 @@
     <td>{{ task.get_status_display }}</td>
     <td>{{ task.updated|datetime_relative:task.created }}</td>
     <td>{% if task.has_build_log %}<a href="{{ task.build_log_url }}">{{ task.build_log_name }}</a>{% endif %}</td>
+    <td>{% if task.has_changes_file %}<a href="{{ task.changes_file_url }}">changes</a>{% endif %}</td>
 </tr>
 {% endfor %}
 </table>
