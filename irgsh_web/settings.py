@@ -150,6 +150,10 @@ DOWNLOAD_TARGET = 'static/source/'
 
 SERVER = 'http://localhost:8000/'
 
+LOCAL_SETTINGS = os.path.join(PROJECT_PATH, 'localsettings.py')
+if os.path.exists(LOCAL_SETTINGS):
+    execfile(LOCAL_SETTINGS)
+
 EXTRA_SETTINGS = '/etc/irgsh/web/settings.py'
 if EXTRA_SETTINGS is not None and os.path.exists(EXTRA_SETTINGS):
     execfile(EXTRA_SETTINGS)
