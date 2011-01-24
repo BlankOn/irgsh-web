@@ -167,7 +167,7 @@ class SpecInit(object):
         except (ValueError, AssertionError, TypeError, IOError, \
                 SourcePackageBuilderException), e:
             self.log.error('[%s] Error! %s' % (self.spec_id, e))
-            self.spec.add_log('Specification intialization failed: %s' % str(e))
+            self.spec.add_log('Specification initialization failed: %s' % str(e))
             current_status = Specification.objects.get(pk=self.spec_id).status
             if current_status >= 0:
                 self.set_status(-1)
