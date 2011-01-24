@@ -17,11 +17,11 @@
 <tr><th>{% trans "Location" %}</th>
     <td>{{ builder.location }}</td>
 </tr>
+<tr><th>{% trans "Enabled" %}</th>
+    <td>{{ builder.active }}</td>
+</tr>
 <tr><th>{% trans "Status" %}</th>
     <td>{{ builder.status }}</td>
-</tr>
-<tr><th>{% trans "Active" %}</th>
-    <td>{{ builder.active }}</td>
 </tr>
 <tr><th>{% trans "Last activity" %}</th>
     <td>{% if builder.last_activity %}{{ builder.last_activity|datetime_and_age }}{% else %}{% trans "Unknown" %}{% endif %}</td>
