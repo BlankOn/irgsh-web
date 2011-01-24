@@ -246,17 +246,11 @@ class SpecInit(object):
             gzcontrol = os.path.join(tmpdir, 'control.gz')
 
             gz = gzip.GzipFile(gzchangelog, 'wb')
-            if hasattr(changelog, 'read'):
-                gz.write(changelog.read())
-            else:
-                gz.write(open(changelog, 'rb').read())
+            gz.write(open(changelog, 'rb').read())
             gz.close()
 
             gz = gzip.GzipFile(gzcontrol, 'wb')
-            if hasattr(control, 'read'):
-                gz.write(control.read())
-            else:
-                gz.write(open(control, 'rb').read())
+            gz.write(open(control, 'rb').read())
             gz.close()
 
             res = manager.send_spec_description(self.spec.id,
