@@ -648,6 +648,18 @@ def builder_task(request, builder):
     return render_to_response('build/builder_task.html', context,
                               context_instance=RequestContext(request))
 
+@_post_required
+@_verify_builder
+@_builder_name_required
+@_json_result
+def builder_ping(request, builder):
+    name = request.POST['builder']
+    if name != builder.name:
+        return HttpResponse(status=400)
+
+    Builder.objects.filter(pk=builder.id).update(last_activity=datetime.now())
+    return {'status': 'ok'}
+
 @_username_required
 def user_show(request, user):
     builds = Specification.objects.filter(submitter=user)
