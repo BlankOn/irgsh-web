@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timedelta
 
 from django import template
@@ -129,6 +130,58 @@ def filesize(size):
         size = size / 1024
     return '%.2f %s' % (size, unit)
 
+# From http://djangosnippets.org/snippets/1475/
+def obfuscate_email(email, linktext=None, autoescape=None):
+    """
+    Given a string representing an email address,
+	returns a mailto link with rot13 JavaScript obfuscation.
+
+    Accepts an optional argument to use as the link text;
+	otherwise uses the email address itself.
+    """
+    if autoescape:
+        esc = conditional_escape
+    else:
+        esc = lambda x: x
+
+    # email = re.sub('@','\\\\100', re.sub('\.', '\\\\056', \
+    #     esc(email))).encode('rot13')
+    email = esc(email).encode('rot13')
+
+    if linktext:
+        linktext = esc(linktext).encode('rot13')
+    else:
+        linktext = email
+
+    rotten_link = """<span class="irgsh-e" title='<n uers="znvygb:%s">%s</n>'>email@address</span>""" % (email, linktext)
+    '''
+    <script type="text/javascript">document.write \
+        ("<n uers=\\\"znvygb:%s\\\">%s<\\057n>".replace(/[a-zA-Z]/g, \
+        function(c){return String.fromCharCode((c<="Z"?90:122)>=\
+        (c=c.charCodeAt(0)+13)?c:c-26);}));</script><noscript>email@address</noscript>""" % (email, linktext)
+        '''
+    return mark_safe(rotten_link)
+obfuscate_email.needs_autoescape = True
+
+# From http://www.regular-expressions.info/email.html
+re_email = re.compile(r'[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}', re.I)
+
+def _interleave(a, b):
+    length = len(a) < len(b) and len(b) or len(a)
+    for i in xrange(length):
+        if i < len(a):
+            yield a[i]
+        if i < len(b):
+            yield b[i]
+
+def _filter_email(email):
+    return obfuscate_email(email)
+    return '<span style="color:red">%s</span>' % email
+
+def filter_email(text):
+    tt = map(conditional_escape, re_email.split(text))
+    te = map(mark_safe, map(_filter_email, re_email.findall(text)))
+    return mark_safe(''.join(_interleave(tt, te)))
 
 register = template.Library()
 register.filter('datetime_or_age', datetime_or_age)
@@ -139,4 +192,6 @@ register.filter('since', since)
 register.filter('datetime_relative', datetime_relative)
 register.filter('collapsible_changelog', collapsible_changelog)
 register.filter('filesize', filesize)
+register.filter('filter_email', filter_email)
+register.filter('obfuscate_email', obfuscate_email)
 

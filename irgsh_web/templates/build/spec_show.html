@@ -85,7 +85,7 @@
     <td>{{ build.version }}</td>
 </tr>
 <tr><th>{% trans "Changelog" %}</th>
-    <td>{{ build.changelog|collapsible_changelog }}</td>
+    <td id="spec-changelog"><pre>{{ build.changelog|filter_email }}</pre></td>
 </tr>
 </table>
 {% endif %}
@@ -142,9 +142,10 @@ function toggle_long_desc(pkg_id) {
     var target = $('#spec-pkglist-' + pkg_id);
     target.slideToggle();
 }
-function toggle_next(curr) {
-    $(curr).next().slideToggle();
-}
+$(document).ready(function() {
+    collapse_changelog($('#spec-changelog pre'));
+    fix_email($('.irgsh-e'));
+});
 </script>
 {% endblock %}
 

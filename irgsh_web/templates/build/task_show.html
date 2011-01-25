@@ -42,7 +42,7 @@
 <div id="task-changes">
 <h2>{% trans "Changes" %}</h2>
 <p><a href="{{ task.changes_file_url }}">{{ task.changes_name }}</a></p>
-<pre>{{ changes }}</pre>
+<pre>{{ changes|filter_email }}</pre>
 </div>
 {% endif %}
 
@@ -70,3 +70,10 @@
 </div>
 {% endblock %}
 
+{% block extrahead %}
+<script type="text/javascript">
+$(document).ready(function() {
+    fix_email($('.irgsh-e'));
+});
+</script>
+{% endblock %}
