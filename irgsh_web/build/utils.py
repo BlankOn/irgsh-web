@@ -404,3 +404,7 @@ def verify_certificate(cert_subject):
                                       cert_subject=cert_subject)
     return len(builders) == 1
 
+def ping_workers():
+    from celery.task.control import broadcast
+    broadcast('report_alive')
+

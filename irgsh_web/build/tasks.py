@@ -1,11 +1,12 @@
 import tempfile
 import shutil
 import os
+from datetime import timedelta
 from subprocess import Popen, PIPE
 
 from django.conf import settings
 
-from celery.task import Task
+from celery.task import Task, PeriodicTask
 
 from . import utils
 from .models import Specification
@@ -80,4 +81,14 @@ class UploadSource(Task):
 
     def set_status(self, spec_id, status):
         Specification.objects.filter(pk=spec_id).update(status=status)
+
+class PingWorkers(PeriodicTask):
+    '''Periodically send ping message to all workers
+    '''
+
+    ignore_result = True
+    run_every = timedelta(minutes=15)
+
+    def run(self):
+        utils.ping_workers()
 
