@@ -380,7 +380,7 @@ def make_canonical(cert_subject):
     Create canonical version of a certificate subject
     '''
     # TODO
-    return cert_subject
+    return cert_subject.strip()
 
 def verify_builder_certificate(builder, cert_subject):
     cert_subject = make_canonical(cert_subject)
