@@ -2,7 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.utils.translation import ugettext as _
 
-from .models import Distribution, Builder, Specification, BuildTask
+from .models import Distribution, Builder, Specification, BuildTask, Worker
 from . import utils
 
 class DistributionAdmin(admin.ModelAdmin):
@@ -40,6 +40,31 @@ class BuilderAdmin(admin.ModelAdmin):
 
     form = BuilderAdminForm
 
+class WorkerAdminForm(forms.ModelForm):
+    class Meta:
+        model = Worker
+
+    def clean_cert_subject(self):
+        cert_subject = self.cleaned_data['cert_subject']
+        return utils.make_canonical(cert_subject)
+
+class WorkerAdmin(admin.ModelAdmin):
+    def last_activity(obj):
+        if obj.last_activity is None:
+            return _('Unknown')
+        return obj.last_activity
+    last_activity.short_description = _('Last Activity')
+
+    list_display = ('name', 'type', 'active', last_activity,)
+
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'type', 'cert_subject', 'active', 'last_activity',),
+        }),
+    )
+
+    form = WorkerAdminForm
+
 class SpecificationAdmin(admin.ModelAdmin):
     def specification_id(obj):
         return str(obj.id)
@@ -74,6 +99,7 @@ class BuildTaskAdmin(admin.ModelAdmin):
 
 admin.site.register(Distribution, DistributionAdmin)
 admin.site.register(Builder, BuilderAdmin)
+admin.site.register(Worker, WorkerAdmin)
 admin.site.register(Specification, SpecificationAdmin)
 admin.site.register(BuildTask, BuildTaskAdmin)
 

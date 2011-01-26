@@ -59,6 +59,11 @@ SOURCE_TYPE = (
     (PATCH, _('Diff/Patch')),
 )
 
+WORKER_TYPES = (
+    (1, _('Task Init Worker')),
+    (2, _('Repository Builder')),
+)
+
 class Distribution(models.Model):
     '''
     List of distributions, e.g. ombilin, ombilin-updates, pattimura, etc
@@ -82,31 +87,19 @@ class Distribution(models.Model):
     def name(self):
         return self.repo.name
 
-class Builder(models.Model):
+class WorkerBase(models.Model):
     '''
-    List of package builders
+    Base class for all workers
     '''
     name = models.SlugField(max_length=50, unique=True)
     active = models.BooleanField(default=True)
     last_activity = models.DateTimeField(null=True, default=None, blank=True)
-
-    architecture = models.ForeignKey(Architecture)
-    location = models.CharField(max_length=255, null=True, default=None,
-                                blank=True)
-    remark = models.TextField(default='', blank=True)
-
     cert_subject = models.CharField(max_length=1024, unique=True,
                                     verbose_name=_('Certificate subject'),
                                     help_text=_('e.g. /C=ID/ST=Jakarta/L=Jakarta/O=BlankOn/OU=IrgshBuilder/CN=Cendrawasih/emailAddress=cendrawasih@example.com'))
 
     class Meta:
-        ordering = ('-active', 'name')
-
-    def __unicode__(self):
-        return '%s (%s)' % (self.name, self.architecture)
-
-    def get_absolute_url(self):
-        return reverse('build_builder_show', args=[self.name])
+        abstract = True
 
     def status_code(self):
         if self.last_activity is None:
@@ -133,6 +126,30 @@ class Builder(models.Model):
                        'active': _('Active')}
         code = self.status_code()
         return status_list.get(code, _('Unknown'))
+
+class Worker(WorkerBase):
+    '''
+    List of workers that are not package builder
+    '''
+    type = models.IntegerField(choices=WORKER_TYPES)
+
+class Builder(WorkerBase):
+    '''
+    List of package builders
+    '''
+    architecture = models.ForeignKey(Architecture)
+    location = models.CharField(max_length=255, null=True, default=None,
+                                blank=True)
+    remark = models.TextField(default='', blank=True)
+
+    class Meta:
+        ordering = ('-active', 'name')
+
+    def __unicode__(self):
+        return '%s (%s)' % (self.name, self.architecture)
+
+    def get_absolute_url(self):
+        return reverse('build_builder_show', args=[self.name])
 
 class Specification(models.Model):
     '''
