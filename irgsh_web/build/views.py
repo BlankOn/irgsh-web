@@ -32,7 +32,7 @@ except ImportError:
 
 from . import utils, models, tasks
 from .models import BuildTask, Distribution, Specification, BuildTaskLog, \
-                    Builder, Package, SpecificationLog
+                    Builder, Package, SpecificationLog, Worker
 from .forms import SpecificationForm
 from irgsh_web.repo.models import Package as RepoPackage
 
@@ -623,6 +623,22 @@ def summary(request):
 
 def index(request):
     return HttpResponse()
+
+@_post_required
+@_client_cert_required
+@_json_result
+def worker_ping(request):
+    cert_subject = request.META['SSL_CLIENT_S_DN']
+    cert_subject = utils.make_canonical(cert_subject)
+
+    workers = Worker.objects.filter(active=True, cert_subject=cert_subject)
+    if len(workers) != 1:
+        return HttpResponse(status=400)
+
+    worker = workers[0]
+    Worker.objects.filter(pk=worker.id).update(last_activity=datetime.now())
+
+    return {'status': 'ok'}
 
 def builder_list(request):
     pass
