@@ -138,7 +138,11 @@ BROKER_USER = 'irgsh'
 BROKER_PASSWORD = 'irgsh'
 BROKER_VHOST = 'irgsh'
 
-WORKER_TASK_INIT_CERTS = ()
+# Certificate for web app and task init worker
+SSL_KEY = None
+SSL_CERT = None
+CERT_SUBJECT = None
+
 WORKER_REPO_CERTS = ()
 
 SOURCE_UPLOAD_PATH = 'incoming/source/'

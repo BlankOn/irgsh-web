@@ -386,7 +386,7 @@ def verify_builder_certificate(builder, cert_subject):
     cert_subject = make_canonical(cert_subject)
     return builder.cert_subject == cert_subject
 
-WORKER_CERTS = set(list(settings.WORKER_TASK_INIT_CERTS) + \
+WORKER_CERTS = set([settings.CERT_SUBJECT] + \
                    list(settings.WORKER_REPO_CERTS))
 WORKER_CERTS = set(map(make_canonical, WORKER_CERTS))
 
