@@ -7,6 +7,7 @@ from subprocess import Popen, PIPE
 from django.conf import settings
 
 from celery.task import Task, PeriodicTask
+from celery.worker.control import Panel
 
 from . import utils
 from .models import Specification
@@ -91,4 +92,8 @@ class PingWorkers(PeriodicTask):
 
     def run(self):
         utils.ping_workers()
+
+@Panel.register
+def report_alive(panel):
+    return {'status': 'ok'}
 
