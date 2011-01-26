@@ -138,12 +138,9 @@ BROKER_USER = 'irgsh'
 BROKER_PASSWORD = 'irgsh'
 BROKER_VHOST = 'irgsh'
 
-# Certificate for web app and task init worker
+# Certificate for task init worker
 SSL_KEY = None
 SSL_CERT = None
-CERT_SUBJECT = None
-
-WORKER_REPO_CERTS = ()
 
 SOURCE_UPLOAD_PATH = 'incoming/source/'
 SOURCE_UPLOAD_HOST = 'yeyen.blankonlinux.or.id'

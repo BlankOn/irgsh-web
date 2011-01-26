@@ -386,18 +386,17 @@ def verify_builder_certificate(builder, cert_subject):
     cert_subject = make_canonical(cert_subject)
     return builder.cert_subject == cert_subject
 
-WORKER_CERTS = set([settings.CERT_SUBJECT] + \
-                   list(settings.WORKER_REPO_CERTS))
-WORKER_CERTS = set(map(make_canonical, WORKER_CERTS))
-
 def verify_certificate(cert_subject):
     '''
     Verify a certificate subject
     '''
-    from .models import Builder
+    from .models import Builder, Worker
 
     cert_subject = make_canonical(cert_subject)
-    if cert_subject in WORKER_CERTS:
+
+    workers = Worker.objects.filter(active=True,
+                                    cert_subject=cert_subject)
+    if len(workers) == 1:
         return True
 
     builders = Builder.objects.filter(active=True,
