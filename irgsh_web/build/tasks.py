@@ -1,7 +1,7 @@
 import tempfile
 import shutil
 import os
-from datetime import timedelta
+from datetime import datetime, timedelta
 from subprocess import Popen, PIPE
 
 from django.conf import settings
@@ -93,8 +93,17 @@ class PingWorkers(PeriodicTask):
     def run(self):
         utils.ping_workers()
 
+_ping_threshold = timedelta(minutes=5)
+_last_ping = None
+
 @Panel.register
 def report_alive(panel):
-    manager.ping()
+    global _last_ping
+
+    now = datetime.now()
+    if _last_ping is None or now - _last_ping >= _ping_threshold:
+        _last_ping = now
+        manager.ping()
+
     return {'status': 'ok'}
 
