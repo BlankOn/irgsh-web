@@ -14,3 +14,11 @@ def send_spec_description(spec_id, changelog, control):
              'control': open(control, 'rb')}
     return json.loads(utils.send_message(url, param))
 
+def ping():
+    host = settings.SERVER.rstrip('/')
+    path = reverse('build_worker_ping')
+    url = '%s%s' % (host, path)
+
+    param = {}
+    utils.send_message(url, param)
+

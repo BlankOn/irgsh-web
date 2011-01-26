@@ -9,7 +9,7 @@ from django.conf import settings
 from celery.task import Task, PeriodicTask
 from celery.worker.control import Panel
 
-from . import utils
+from . import utils, manager
 from .models import Specification
 
 class InitSpecification(Task):
@@ -95,5 +95,6 @@ class PingWorkers(PeriodicTask):
 
 @Panel.register
 def report_alive(panel):
+    manager.ping()
     return {'status': 'ok'}
 
