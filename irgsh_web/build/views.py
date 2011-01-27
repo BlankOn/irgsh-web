@@ -375,6 +375,22 @@ def task_status(request, task):
     return {'status': 'ok'}
 
 @_task_id_required
+@_json_result
+def task_info(request, task):
+    spec_id = task.specification.id
+    builder = None
+    builder_id = None
+    if task.builder is not None:
+        builder = task.builder.name
+        builder_id = task.builder.id
+
+    return {'status': 'ok',
+            'task_id': task.task_id,
+            'spec_id': spec_id,
+            'builder': builder,
+            'builder_id': builder_id}
+
+@_task_id_required
 def task_show(request, task):
     '''
     Show build task information
@@ -501,6 +517,20 @@ def spec_status(request, spec):
         status = spec.status
 
     return {'status': 'ok', 'code': status, 'msg': spec.get_status_display()}
+
+@_spec_id_required
+@_json_result
+def spec_info(request, spec):
+    package = None
+    version = None
+    if spec.package is not None:
+        package = spec.package.name
+        version = spec.version
+
+    return {'status': 'ok',
+            'spec_id': spec.id,
+            'package': package,
+            'version': version}
 
 def spec_list(request):
     build_list = Specification.objects.all().select_related()

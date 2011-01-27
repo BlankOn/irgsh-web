@@ -21,6 +21,7 @@ urlpatterns += patterns('irgsh_web.build.views',
     url(r'^build/(?P<spec_id>\d+)/sources/(?P<path>.*)$', 'spec_source', name='build_spec_source'),
     url(r'^build/(?P<spec_id>\d+)/description/$', 'spec_description', name='build_spec_description'),
     url(r'^build/(?P<spec_id>\d+)/status/$', 'spec_status', name='build_spec_status'),
+    url(r'^build/(?P<spec_id>\d+)/info/$', 'spec_info', name='build_spec_info'),
     url(r'^build/(?P<spec_id>\d+)/repo/status/$', 'repo_status', name='build_repo_status'),
     url(r'^build/$', 'spec_list', name='build_spec_list'),
 
@@ -30,6 +31,7 @@ urlpatterns += patterns('irgsh_web.build.views',
     url(r'^task/%s/log/$' % TASK_ID, 'task_log', name='build_task_log'),
     url(r'^task/%s/changes/$' % TASK_ID, 'task_changes', name='build_task_changes'),
     url(r'^task/%s/status/$' % TASK_ID, 'task_status', name='build_task_status'),
+    url(r'^task/%s/info/$' % TASK_ID, 'task_info', name='build_task_info'),
     url(r'^task/%s/$' % TASK_ID, 'task_show', name='build_task_show'),
 
     # submit
