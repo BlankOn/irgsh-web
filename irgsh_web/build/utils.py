@@ -14,6 +14,8 @@ from datetime import datetime
 from django.db import IntegrityError
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.contrib.sites.models import Site
 
 try:
     from debian.deb822 import Packages, Sources
@@ -298,8 +300,11 @@ class SpecInit(object):
         task_name = BuildPackage.name
         args = create_build_task_param(spec)
 
-        build_spec = BuildSpecification(spec.source, spec.source_type,
-                                        spec.source_opts, spec.orig)
+        # build_spec = BuildSpecification(spec.source, spec.source_type,
+        #                                 spec.source_opts, spec.orig)
+        path = reverse('build_spec_source', args=[self.spec_id, self.dsc])
+        url_dsc = 'http://%s%s' % (Site.objects.get_current().domain, path)
+        build_spec = BuildSpecification(url_dsc, 'dsc')
 
         dist = spec.distribution
         build_dist = BuildDistribution(dist.name(), dist.mirror, dist.dist,
