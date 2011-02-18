@@ -150,6 +150,7 @@ SOURCE_UPLOAD_PORT = 22
 DOWNLOAD_TARGET = 'static/source/'
 
 SERVER = 'http://localhost:8000/'
+REPO_UPLOAD_SERVE = 'irgsh-upload-serve'
 
 LOCAL_SETTINGS = os.path.join(PROJECT_PATH, 'localsettings.py')
 if os.path.exists(LOCAL_SETTINGS):

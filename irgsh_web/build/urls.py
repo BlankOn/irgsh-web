@@ -24,6 +24,7 @@ urlpatterns = patterns('irgsh_web.build.views',
     url(r'^builder/(?P<name>[a-z0-9_-]+)/ping/$', 'builder_ping', name='build_builder_ping'),
     url(r'^builder/(?P<name>[a-z0-9_-]+)/$', 'builder_show', name='build_builder_show'),
     url(r'^builder/$', 'builder_list', name='build_builder_list'),
+    url(r'^data/authorized_keys$', 'authorized_keys', name='build_authorized_keys'),
     url(r'^$', 'index', name='build_index'),
 )
 
