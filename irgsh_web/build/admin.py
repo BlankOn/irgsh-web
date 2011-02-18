@@ -33,7 +33,7 @@ class BuilderAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'architecture', 'cert_subject',
+            'fields': ('name', 'architecture', 'cert_subject', 'ssh_public_key',
                        'active', 'location', 'remark', 'last_activity',),
         }),
     )
@@ -59,7 +59,8 @@ class WorkerAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'type', 'cert_subject', 'active', 'last_activity',),
+            'fields': ('name', 'type', 'cert_subject', 'ssh_public_key',
+                       'active', 'last_activity',),
         }),
     )
 
