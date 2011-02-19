@@ -590,6 +590,35 @@ def repo_status(request, spec):
 
     return {'status': 'ok', 'code': status}
 
+@_client_cert_required
+@_spec_id_required
+@_json_result
+@_post_required
+def repo_log_submit(request, spec):
+    if not request.FILES.has_key('log'):
+        return HttpResponse(status=400)
+
+    target = task.build_log_path()
+    logdir = os.path.dirname(target)
+    if not os.path.exists(logdir):
+        os.makedirs(logdir)
+
+    fout = open(target, 'wb')
+    fout.write(fin.read())
+    fout.close()
+
+    spec.add_log(_('Repository log added'))
+
+    return {'status': 'ok'}
+
+@_spec_id_required
+def repo_log(request, spec):
+    path = spec.repo_log_path()
+    if not os.path.exists(path):
+        raise Http404()
+
+    return _serve_static(request, path)
+
 @login_required
 def submit(request):
     if request.method == 'POST':

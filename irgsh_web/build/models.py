@@ -207,6 +207,19 @@ class Specification(models.Model):
     def get_absolute_url(self):
         return reverse('build_spec_show', args=[self.id])
 
+    def repo_log_path(self):
+        return os.path.join(settings.LOG_PATH, 'build',
+                            self.id, 'repo.log.gz')
+
+    def has_repo_log(self):
+        return os.path.exists(self.repo_log_path())
+
+    def repo_log_url(self):
+        return reverse('build_repo_log', args=[self.id])
+
+    def repo_log_name(self):
+        return 'repo.log.gz'
+
 class SpecificationResource(models.Model):
     '''
     List of files needed by a specification

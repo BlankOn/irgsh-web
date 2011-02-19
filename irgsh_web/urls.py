@@ -23,6 +23,8 @@ urlpatterns += patterns('irgsh_web.build.views',
     url(r'^build/(?P<spec_id>\d+)/status/$', 'spec_status', name='build_spec_status'),
     url(r'^build/(?P<spec_id>\d+)/info/$', 'spec_info', name='build_spec_info'),
     url(r'^build/(?P<spec_id>\d+)/repo/status/$', 'repo_status', name='build_repo_status'),
+    url(r'^build/(?P<spec_id>\d+)/repo/log/$', 'repo_log_submit', name='build_repo_log_submit'),
+    url(r'^build/(?P<spec_id>\d+)/repo\.log\.gz$', 'repo_log', name='build_repo_log'),
     url(r'^build/$', 'spec_list', name='build_spec_list'),
 
     # build task
