@@ -68,9 +68,17 @@ class UploadSource(Task):
         target = '%s@%s:%s' % (settings.SOURCE_UPLOAD_USER,
                                settings.SOURCE_UPLOAD_HOST,
                                path)
-        cmd = 'scp -P %s %s %s' % (settings.SOURCE_UPLOAD_PORT,
-                                   ' '.join(files),
-                                   target)
+        cmd = ['scp']
+        if hasattr(settings, 'SOURCE_UPLOAD_PORT') and \
+           settings.SOURCE_UPLOAD_PORT is not None:
+            cmd.append('-P %s' % settings.SOURCE_UPLOAD_PORT)
+        if hasattr(settings, 'SOURCE_UPLOAD_KEY') and \
+           settings.SOURCE_UPLOAD_KEY is not None:
+            cmd.append('-i %s' % settings.SOURCE_UPLOAD_KEY)
+        cmd += files
+        cmd.append(target)
+
+        cmd = ' '.join(cmd)
 
         p = Popen(cmd.split(), stdout=PIPE, stderr=PIPE)
         p.communicate()
