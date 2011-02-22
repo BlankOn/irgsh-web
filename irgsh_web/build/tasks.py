@@ -58,15 +58,16 @@ class UploadSource(Task):
         path = os.path.join(settings.DOWNLOAD_TARGET, str(spec_id))
         files = [os.path.join(path, fname) for fname in files]
 
-        self.upload(files)
+        self.upload(spec_id, files)
 
         self.set_status(spec_id, 105)
         spec.add_log('Source package uploaded')
 
-    def upload(self, files):
+    def upload(self, spec_id, files):
+        path = os.path.join(settings.SOURCE_UPLOAD_PATH, str(spec_id))
         target = '%s@%s:%s' % (settings.SOURCE_UPLOAD_USER,
                                settings.SOURCE_UPLOAD_HOST,
-                               settings.SOURCE_UPLOAD_PATH)
+                               path)
         cmd = 'scp -P %s %s %s' % (settings.SOURCE_UPLOAD_PORT,
                                    ' '.join(files),
                                    target)
