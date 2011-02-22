@@ -131,24 +131,25 @@ CELERY_DEFAULT_QUEUE = 'celery'
 CELERY_DEFAULT_EXCHANGE = 'celery'
 CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
 
-BROKER_HOST = '192.168.56.180'
+BROKER_HOST = 'irgsh.dahsy.at'
 BROKER_PORT = 5672
 BROKER_USER = 'irgsh'
 BROKER_PASSWORD = 'irgsh'
 BROKER_VHOST = 'irgsh'
 
 # Certificate for task init worker
-SSL_KEY = None
-SSL_CERT = None
+SSL_KEY = 'taskinit-ssl.key'
+SSL_CERT = 'taskinit-ssl.pem'
 
-SOURCE_UPLOAD_PATH = 'incoming/source/'
-SOURCE_UPLOAD_HOST = 'yeyen.blankonlinux.or.id'
-SOURCE_UPLOAD_USER = 'incoming'
-SOURCE_UPLOAD_PORT = 22
+SOURCE_UPLOAD_PATH = 'incoming/'
+SOURCE_UPLOAD_HOST = 'upload.irgsh.dahsy.at'
+SOURCE_UPLOAD_USER = 'upload'
+SOURCE_UPLOAD_PORT = 2222
+SOURCE_UPLOAD_KEY = 'taskinit-ssh.key'
 
 DOWNLOAD_TARGET = 'static/source/'
 
-SERVER = 'http://localhost:8000/'
+SERVER = 'https://irgsh.dahsy.at:9443/'
 REPO_UPLOAD_SERVE = 'irgsh-upload-serve'
 
 LOCAL_SETTINGS = os.path.join(PROJECT_PATH, 'localsettings.py')
