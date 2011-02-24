@@ -11,7 +11,7 @@ setup(
     author = 'BlankOn Developers',
     packages = packages,
     install_requires = ['setuptools', 'django-openid-auth', 'django-xmlrpc',
-                        'python-openid', 'celery<2.2', 'django-celery',
+                        'python-openid', 'celery<2.2', 'django-celery<2.2',
                         'django-picklefield', 'poster',
                         'django-debug-toolbar']
 )
