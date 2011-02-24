@@ -111,7 +111,8 @@ LOGIN_REDIRECT_URL = '/'
 OPENID_SSO_SERVER_URL = "http://82.181.46.34:8081/o/"
 FULL_LOGOUT_URL = "http://82.181.46.34:8081/logout"
 OPENID_USE_AS_ADMIN_LOGIN = True
-LOG_PATH = os.path.join(PROJECT_PATH, 'run', 'logs')
+
+LOG_PATH = 'run/logs'
 
 
 ROOT_URLCONF = 'irgsh_web.urls'
