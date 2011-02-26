@@ -37,7 +37,7 @@ from .forms import SpecificationForm
 from irgsh_web.repo.models import Package as RepoPackage
 
 JSON_MIME = 'application/json'
-JSON_MIME = 'plain/text'
+JSON_MIME = 'text/plain'
 
 def _set_spec_status(spec_id, status):
     Specification.objects.filter(pk=spec_id).update(status=status)
