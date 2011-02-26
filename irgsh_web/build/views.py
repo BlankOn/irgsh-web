@@ -156,13 +156,16 @@ def _serve_static(request, fullpath):
 def _client_cert_required(func):
     def _func(request, *args, **kwargs):
         try:
-            assert request.META.get('SSL', None) == 'on'
-            assert request.META.has_key('SSL_CLIENT_S_DN')
+            assert request.META.get('SSL', None) == 'on', \
+                   'Not in secure connection'
+            assert request.META.has_key('SSL_CLIENT_S_DN'), \
+                   'Certificate subject is unknown'
             cert_subject = request.META['SSL_CLIENT_S_DN']
 
-            assert utils.verify_certificate(cert_subject)
+            assert utils.verify_certificate(cert_subject), \
+                   'Certificate not found'
 
-        except AssertionError:
+        except AssertionError, e:
             return HttpResponse(status=403)
         return func(request, *args, **kwargs)
     return _func
