@@ -58,10 +58,17 @@ class UploadSource(Task):
         path = os.path.join(settings.DOWNLOAD_TARGET, str(spec_id))
         files = [os.path.join(path, fname) for fname in files]
 
-        self.upload(spec_id, files)
+        spec.add_log('Uploading source package')
 
-        self.set_status(spec_id, 105)
-        spec.add_log('Source package uploaded')
+        try:
+            self.upload(spec_id, files)
+
+            self.set_status(spec_id, 105)
+            spec.add_log('Source package uploaded')
+
+        except StandardError, e:
+            spec.set_status(spec_id, -1)
+            spec.add_log('Source package upload failed: %s' % e)
 
     def upload(self, spec_id, files):
         path = os.path.join(settings.SOURCE_UPLOAD_PATH, str(spec_id))
