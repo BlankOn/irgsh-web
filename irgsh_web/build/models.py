@@ -62,6 +62,7 @@ SOURCE_TYPE = (
 WORKER_TYPES = (
     (1, _('Task Init Worker')),
     (2, _('Repository Builder')),
+    (3, _('Upload Handler')),
 )
 
 class Distribution(models.Model):
