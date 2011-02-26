@@ -49,7 +49,7 @@ urlpatterns += patterns('irgsh_web.build.views',
     url(r'^builder/$', 'builder_list', name='build_builder_list'),
 
     # authorized keys
-    url(r'^data/authorized_keys$', 'authorized_keys', name='build_authorized_keys'),
+    url(r'^data/authorized_keys.json$', 'authorized_keys', name='build_authorized_keys'),
 
     # users
     url(r'^user/(?P<name>[a-z0-9_-]+)/$', 'user_show', name='build_user_show'),
