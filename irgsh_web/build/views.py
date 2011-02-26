@@ -702,6 +702,7 @@ def authorized_keys(request):
         res.append('command="%s taskinit %s" %s' % \
                    (settings.REPO_UPLOAD_SERVE, name, key))
 
+    res.append('')
     content = '\n'.join(res)
     return HttpResponse(content, mimetype='text/plain')
 
