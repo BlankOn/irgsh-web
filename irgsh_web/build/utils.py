@@ -24,9 +24,6 @@ except ImportError:
     from debian_bundle.deb822 import Packages, Sources
     from debian_bundle.changelog import Changelog
 
-from bzrlib.branch import Branch
-from bzrlib.export import export
-
 def create_build_task_param(spec):
     from irgsh.data import Specification as BuildSpecification
     from irgsh.data import Distribution as BuildDistribution
