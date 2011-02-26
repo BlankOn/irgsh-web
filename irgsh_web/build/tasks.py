@@ -67,7 +67,7 @@ class UploadSource(Task):
             spec.add_log('Source package uploaded')
 
         except StandardError, e:
-            spec.set_status(spec_id, -1)
+            self.set_status(spec_id, -1)
             spec.add_log('Source package upload failed: %s' % e)
 
     def upload(self, spec_id, files):
