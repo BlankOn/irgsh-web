@@ -601,7 +601,7 @@ def repo_log_submit(request, spec):
     if not request.FILES.has_key('log'):
         return HttpResponse(status=400)
 
-    target = task.build_log_path()
+    target = spec.repo_log_path()
     logdir = os.path.dirname(target)
     if not os.path.exists(logdir):
         os.makedirs(logdir)
