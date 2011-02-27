@@ -119,10 +119,10 @@
 
 {% if logs %}
 <h2>{% trans "Build Logs" %}</h2>
-{% if spec.has_repo_log %}
+{% if build.has_repo_log %}
 <table class="vertical">
 <tr><th>Repository build log</th>
-    <td><a href="{{ spec.repo_log_url }}">{{ spec.repo_log_name }}</a></td>
+    <td><a href="{{ build.repo_log_url }}">{{ build.repo_log_name }}</a></td>
 </tr>
 </table>
 {% endif %}
