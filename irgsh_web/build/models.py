@@ -210,7 +210,7 @@ class Specification(models.Model):
 
     def repo_log_path(self):
         return os.path.join(settings.LOG_PATH, 'build',
-                            self.id, 'repo.log.gz')
+                            str(self.id), 'repo.log.gz')
 
     def has_repo_log(self):
         return os.path.exists(self.repo_log_path())
