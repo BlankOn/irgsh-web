@@ -133,7 +133,7 @@ class Worker(WorkerBase):
     List of workers that are not package builder
     '''
     type = models.IntegerField(choices=WORKER_TYPES)
-    ssh_public_key = models.CharField(max_length=2048, null=True, default=None)
+    ssh_public_key = models.CharField(max_length=2048, null=True, default=None, blank=True)
 
 class Builder(WorkerBase):
     '''
