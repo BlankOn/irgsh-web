@@ -1,11 +1,15 @@
 from setuptools import setup, find_packages
 
+def get_version():
+    import irgsh_web
+    return irgsh_web.__version__
+
 packages = ['irgsh_web']
 packages += ['irgsh_web.%s' % pkg for pkg in find_packages('irgsh_web')]
 
 setup(
     name = "irgsh-web",
-    version = "0.2",
+    version = get_version(),
     url = 'http://irgsh.blankonlinux.or.id/',
     description = 'Ir. Robot Gedek, SH',
     author = 'BlankOn Developers',
