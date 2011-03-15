@@ -218,6 +218,7 @@ class SpecInit(object):
                 if os.path.exists(target):
                     os.unlink(target)
                 shutil.move(os.path.join(build_dir, fname), target)
+                os.chmod(target, 0644)
 
             return files
 
