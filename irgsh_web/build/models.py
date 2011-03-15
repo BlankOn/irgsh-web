@@ -221,6 +221,10 @@ class Specification(models.Model):
     def repo_log_name(self):
         return 'repo.log.gz'
 
+    def is_arch_independent(self):
+        return all([pkg.architecture == 'all'
+                    for pkg in Package.objects.filter(speficiation=self)])
+
 class SpecificationResource(models.Model):
     '''
     List of files needed by a specification
