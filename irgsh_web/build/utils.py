@@ -273,7 +273,18 @@ class SpecInit(object):
         '''
         List all architectures associated to this specification
         '''
-        return spec.distribution.repo.architectures.all()
+        available_archs = spec.distribution.repo.architectures.all()
+
+        archs = set()
+        packages = spec.content.all()
+        for package in packages:
+            archs = archs | set(package.architecture.split())
+
+        if 'any' in archs or 'all' in archs:
+            return available_archs
+
+        return [arch for arch in available_archs
+                     if arch.name in archs]
 
     def distribute(self):
         '''
