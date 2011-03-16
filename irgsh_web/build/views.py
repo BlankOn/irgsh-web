@@ -367,6 +367,9 @@ def task_status(request, task):
                        {'builder': task.builder})
         _set_spec_status(spec.id, -1)
 
+        # Cancel other tasks
+        utils.cancel_other_tasks(spec, task)
+
     task.update_builder()
 
     return {'status': 'ok'}
