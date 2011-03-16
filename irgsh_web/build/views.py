@@ -398,14 +398,14 @@ def task_info(request, task):
 @_task_id_required
 @_json_result
 def task_claim(request, task):
-    builder_name = request.META['IRGSH_BUILDER']
+    builder_name = request.META['IRGSH_BUILDER_NAME']
     if task.builder is not None:
         # Task is already claimed
         # If this happens, there should be something wrong with the queueing
         return HttpResponse(status=400)
 
-    independent = task.spec.is_arch_independent()
-    total = Specification.objects.filter(pk=task.spec.id) \
+    independent = task.specification.is_arch_independent()
+    total = Specification.objects.filter(pk=task.specification.id) \
                                  .filter(status=104) \
                                  .update(status=105)
     if independent and total == 0:
@@ -417,7 +417,7 @@ def task_claim(request, task):
 
     if independent:
         # Cancel other tasks
-        utils.cancel_other_tasks(task.spec, task)
+        utils.cancel_other_tasks(task.specification, task)
 
     # At this point, the builder name has been verified.
     # Unless between the verification and this point the builder is deleted,
