@@ -274,13 +274,15 @@ class SpecInit(object):
         List all architectures associated to this specification
         '''
         available_archs = spec.distribution.repo.architectures.all()
+        if spec.is_arch_independent():
+            return available_archs
 
         archs = set()
         packages = spec.content.all()
         for package in packages:
             archs = archs | set(package.architecture.split())
 
-        if 'any' in archs or 'all' in archs:
+        if 'any' in archs:
             return available_archs
 
         return [arch for arch in available_archs
