@@ -341,18 +341,8 @@ def task_status(request, task):
         return HttpResponse(status=400)
 
     if task.builder is None:
-        try:
-            task.builder = Builder.objects.get(name=builder_name)
-            task.assigned = datetime.now()
-            task.add_log(_('Task picked up by %(builder)s') % \
-                           {'builder': task.builder})
-        except Builder.DoesNotExist:
-            task.status = -1
-            task.save()
-            _set_spec_status(task.specification.id, -1)
-            task.add_log(_('Failed. Unregistered builder tried to pick the task: %(name)s') % \
-                         {'name': builder_name})
-            return HttpResponse(status=400)
+        # Task has not been claimed
+        return HttpResponse(status=400)
 
     if task.status >= 0 and (status > task.status or status < 0):
         # Only update when the new status is larger (showing progression)
@@ -395,6 +385,34 @@ def task_info(request, task):
             'spec_id': spec_id,
             'builder': builder,
             'builder_id': builder_id}
+
+@_post_required
+@_verify_builder
+@_task_id_required
+@_json_result
+def task_claim(request, task):
+    builder_name = request.META['IRGSH_BUILDER']
+    if task.builder is not None:
+        # Task is already claimed
+        # If this happens, there should be something wrong with the queueing
+        return HttpResponse(status=400)
+
+    try:
+        task.builder = Builder.objects.get(name=builder_name)
+    except Builder.DoesNotExist:
+        task.status = -1
+        task.save()
+        _set_spec_status(task.specification.id, -1)
+        task.add_log(_('Failed. Unregistered builder tried to pick the task: %(name)s') % \
+                     {'name': builder_name})
+        return HttpResponse(status=400)
+
+    task.assigned = datetime.now()
+    task.add_log(_('Task picked up by %(builder)s') % \
+                   {'builder': task.builder})
+    task.save()
+
+    return {'status': 'ok', 'code': 200}
 
 @_task_id_required
 def task_show(request, task):
