@@ -135,6 +135,9 @@ def _verify_builder(func):
 
             assert utils.verify_builder_certificate(builder, cert_subject)
 
+            request.META['IRGSH_BUILDER_ID'] = builder.id
+            request.META['IRGSH_BUILDER_NAME'] = builder.name
+
         except AssertionError:
             return HttpResponse(status=403)
         return func(request, *args, **kwargs)
