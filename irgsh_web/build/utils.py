@@ -195,8 +195,14 @@ class SpecInit(object):
             source_dir = tempfile.mkdtemp()
 
             # Build source package
+            spec.add_log(_('Downloading source code'))
+            self.log.debug('[%s] Downloading source code' % (self.spec_id,))
+
             self.set_status(101)
             self.dsc = srcpkg.build(build_dir)
+
+            spec.add_log(_('Source code downloaded'))
+            self.log.debug('[%s] Source code downloaded' % (self.spec_id,))
 
             # Extract source package and send package description
             dsc_file = os.path.join(build_dir, self.dsc)
@@ -355,7 +361,8 @@ class SpecInit(object):
             subtasks.append(s)
 
         self.set_status(104)
-        self.spec.add_log(_('Distributing build tasks'))
+        self.spec.add_log(_('Distributing build tasks to %(archs)s') % \
+                          {'archs': ' '.join([arch.name for arch in archs])})
 
         for s in subtasks:
             s.apply_async()

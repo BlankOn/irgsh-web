@@ -58,6 +58,7 @@ def _rebuild_repo(spec):
         if total > 0:
             # Successfully updated the spec => got token
             specification = Specification.objects.get(pk=spec.id)
+            specification.add_log(_('Scheduling repository rebuild task'))
             utils.rebuild_repo(specification)
 
 def _paginate(queryset, total, page):
