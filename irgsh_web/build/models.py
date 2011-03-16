@@ -225,7 +225,8 @@ class Specification(models.Model):
 
     def is_arch_independent(self):
         return all([pkg.architecture == 'all'
-                    for pkg in Package.objects.filter(speficiation=self)])
+                    for pkg in Package.objects.filter(specification=self,
+                                                      type=BINARY)])
 
 class SpecificationResource(models.Model):
     '''

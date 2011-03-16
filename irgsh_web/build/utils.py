@@ -273,12 +273,14 @@ class SpecInit(object):
         '''
         List all architectures associated to this specification
         '''
+        from .models import BINARY
+
         available_archs = spec.distribution.repo.architectures.all()
         if spec.is_arch_independent():
             return available_archs
 
         archs = set()
-        packages = spec.content.all()
+        packages = spec.content.filter(type=BINARY)
         for package in packages:
             archs = archs | set(package.architecture.split())
 
