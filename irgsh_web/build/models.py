@@ -29,7 +29,7 @@ SPECIFICATION_STATUS = (
     (102, _('Downloading orig file')),
     (103, _('Building source package')),
     (104, _('Build task distributed')),
-    (105, _('Source package uploaded')),
+    (105, _('Building packages')),
     (200, _('Building repository')),
     (999, _('Finished')),
 )
@@ -172,6 +172,8 @@ class Specification(models.Model):
     package = models.ForeignKey(RepoPackage, null=True, default=None)
     version = models.CharField(max_length=255, null=True, default=None)
     changelog = models.TextField(null=True, default=None)
+
+    source_uploaded = models.DateTimeField(null=True, default=None)
 
     created = models.DateTimeField(default=datetime.now)
     updated = models.DateTimeField(auto_now=True)

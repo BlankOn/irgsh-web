@@ -63,7 +63,7 @@ class UploadSource(Task):
         try:
             self.upload(spec_id, files)
 
-            self.set_status(spec_id, 105)
+            self.set_source_uploaded(spec_id)
             spec.add_log('Source package uploaded')
 
         except StandardError, e:
@@ -99,6 +99,10 @@ class UploadSource(Task):
 
     def set_status(self, spec_id, status):
         Specification.objects.filter(pk=spec_id).update(status=status)
+
+    def set_source_uploaded(self, spec_id):
+        Specification.objects.filter(pk=spec_id) \
+                             .update(source_uploaded=datetime.now())
 
 class PingWorkers(PeriodicTask):
     '''Periodically send ping message to all workers

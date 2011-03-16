@@ -52,7 +52,7 @@ def _rebuild_repo(spec):
     if all_uploaded:
         # Atomicaly update spec status to building repository.
         total = Specification.objects.filter(pk=spec.id) \
-                                     .filter(status=105) \
+                                     .exclude(source_uploaded=None) \
                                      .update(status=200)
 
         if total > 0:
