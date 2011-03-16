@@ -423,3 +423,15 @@ def ping_workers():
     from celery.task.control import broadcast
     broadcast('report_alive')
 
+def remove_redundant_tasks(spec, exception):
+    from celery.task.control import revoke
+    from .models import BuildTask
+
+    tasks = BuildTask.objects.filter(specification=spec) \
+                             .exclude(pk=exception.id)
+    for task in tasks:
+        BuildTask.objects.filter(pk=task.id).update(status=-2)
+        task.add_log(_('Task is cancelled by task %(task_id)s') % \
+                     {'task_id': exception.task_id})
+        revoke(task.task_id)
+
