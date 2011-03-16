@@ -336,7 +336,7 @@ def task_status(request, task):
     '''
     try:
         status = int(request.POST['status'])
-        builder_name = request.POST['builder']
+        builder_name = request.META['IRGSH_BUILDER_NAME']
     except (ValueError, KeyError):
         return HttpResponse(status=400)
 
