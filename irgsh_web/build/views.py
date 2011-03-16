@@ -397,6 +397,17 @@ def task_claim(request, task):
         # If this happens, there should be something wrong with the queueing
         return HttpResponse(status=400)
 
+    independent = task.spec.is_arch_independent()
+    total = Specification.objects.filter(pk=task.spec.id) \
+                                 .filter(status=104) \
+                                 .update(status=105)
+    if independent and total == 0:
+        # Spec status has been changed by another builder,
+        # or in other words the package is being built right now.
+        # Since this spec produces architecture independent packages (all),
+        # no need to fire up another builder because that would be redundant.
+        return {'status': 'ok', 'code': -2}
+
     # At this point, the builder name has been verified.
     # Unless between the verification and this point the builder is deleted,
     # the object retrieval below should be always ok
@@ -405,8 +416,6 @@ def task_claim(request, task):
     task.add_log(_('Task picked up by %(builder)s') % \
                    {'builder': task.builder})
     task.save()
-
-    _set_spec_status(task.specification.id, 105)
 
     return {'status': 'ok', 'code': 200}
 
