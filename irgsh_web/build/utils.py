@@ -443,7 +443,10 @@ def cancel_other_tasks(spec, exception):
                              .exclude(pk=exception.id)
     for task in tasks:
         BuildTask.objects.filter(pk=task.id).update(status=-2)
-        task.add_log(_('Task is cancelled by task %(task_id)s') % \
-                     {'task_id': exception.task_id})
+
+        spec.add_log(_('Task %(cancelled_task_id)s ' \
+                       'is cancelled by task %(task_id)s') % \
+                     {'cancelled_task_id': task.task_id,
+                      'task_id': exception.task_id})
         revoke(task.task_id)
 
