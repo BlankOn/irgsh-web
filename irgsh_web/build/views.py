@@ -410,8 +410,8 @@ def task_claim(request, task):
         return {'status': 'ok', 'code': -2}
 
     if independent:
-        # Revoke other tasks
-        utils.remove_redundant_tasks(task.spec, task)
+        # Cancel other tasks
+        utils.cancel_other_tasks(task.spec, task)
 
     # At this point, the builder name has been verified.
     # Unless between the verification and this point the builder is deleted,
