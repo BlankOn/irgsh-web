@@ -397,16 +397,10 @@ def task_claim(request, task):
         # If this happens, there should be something wrong with the queueing
         return HttpResponse(status=400)
 
-    try:
-        task.builder = Builder.objects.get(name=builder_name)
-    except Builder.DoesNotExist:
-        task.status = -1
-        task.save()
-        _set_spec_status(task.specification.id, -1)
-        task.add_log(_('Failed. Unregistered builder tried to pick the task: %(name)s') % \
-                     {'name': builder_name})
-        return HttpResponse(status=400)
-
+    # At this point, the builder name has been verified.
+    # Unless between the verification and this point the builder is deleted,
+    # the object retrieval below should be always ok
+    task.builder = Builder.objects.get(name=builder_name)
     task.assigned = datetime.now()
     task.add_log(_('Task picked up by %(builder)s') % \
                    {'builder': task.builder})
