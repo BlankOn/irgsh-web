@@ -406,6 +406,8 @@ def task_claim(request, task):
                    {'builder': task.builder})
     task.save()
 
+    _set_spec_status(task.specification.id, 105)
+
     return {'status': 'ok', 'code': 200}
 
 @_task_id_required
