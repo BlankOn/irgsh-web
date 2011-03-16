@@ -331,6 +331,9 @@ class SpecInit(object):
         # Distribute to builder of each architecture
         subtasks = []
         archs = self.get_archs(spec)
+
+        assert len(archs) > 0, _('No suitable builders found.')
+
         for arch in archs:
             # store task info
             task = BuildTask()
