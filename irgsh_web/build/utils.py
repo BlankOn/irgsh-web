@@ -386,6 +386,7 @@ def rebuild_repo(spec):
     from irgsh_repo.tasks import RebuildRepo
 
     tasks = BuildTask.objects.filter(specification=spec) \
+                             .filter(status=999) \
                              .select_related()
     task_arch_list = [(task.task_id, task.architecture.name)
                       for task in tasks]
