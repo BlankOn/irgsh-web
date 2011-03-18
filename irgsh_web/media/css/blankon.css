@@ -174,3 +174,35 @@ div.paginator a.nav {
     white-space: normal;
 }
 
+#submit-page label {
+    display: block;
+    padding: 0px;
+    margin: 0px;
+}
+#submit-page select {
+    min-width: 20%;
+    padding: 3px;
+    margin: 0px;
+}
+#submit-page input[type=text] {
+    width: 100%;
+    margin: 0px;
+    padding: 4px;
+}
+#submit-page li input[type=text] {
+    width: 30%;
+}
+#submit-page #id_source_opts_bzr li {
+    list-style: none;
+    margin: 0 0 10px 0;
+    padding: 0px;
+}
+#submit-page #id_source_opts_bzr li input[type="text"] {
+    float: right;
+    clear: right;
+    width: 80%;
+}
+#submit-page #id_source_opts_bzr li label {
+    display: inline;
+}
+
