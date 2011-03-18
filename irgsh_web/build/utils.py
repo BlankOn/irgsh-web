@@ -91,6 +91,8 @@ def get_package_info(packages):
     return result
 
 def validate_packages(packages):
+    from .models import Package, SOURCE, BINARY
+
     has_source = any([pkg['type'] == SOURCE for pkg in packages])
     has_binary = any([pkg['type'] == BINARY for pkg in packages])
     return has_source and has_binary
