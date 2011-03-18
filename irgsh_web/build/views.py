@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.views.static import was_modified_since
 from django.utils.http import http_date
+from django.db.models import Q
 
 try:
     from debian.deb822 import Packages, Sources
@@ -353,11 +354,12 @@ def task_status(request, task):
         # Task has not been claimed
         return HttpResponse(status=400)
 
-    if task.status >= 0 and (status > task.status or status < 0):
-        # Only update when the new status is larger (showing progression)
-        # or failed/cancelled
-        task.status = status
-    task.save()
+    # Only update when the new status is larger (showing progression)
+    # or failed/cancelled
+    rule = Q(status__gte=0)
+    if status >= 0:
+        rule = rule & Q(status__lt=status)
+    BuildTask.objects.filter(rule).update(status=status)
 
     task.add_log(status_list[status])
 
