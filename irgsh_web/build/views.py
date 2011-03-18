@@ -359,7 +359,8 @@ def task_status(request, task):
     rule = Q(status__gte=0)
     if status >= 0:
         rule = rule & Q(status__lt=status)
-    BuildTask.objects.filter(rule).update(status=status)
+    BuildTask.objects.filter(pk=task.id) \
+                     .filter(rule).update(status=status)
 
     task.add_log(status_list[status])
 
