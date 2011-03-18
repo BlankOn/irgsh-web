@@ -63,28 +63,37 @@ def get_package_info(packages):
     items = []
     name = None
     for info in packages:
-        pkg = {}
-        if info.has_key('Source'):
-            pkg['name'] = info['Source']
-            pkg['type'] = SOURCE
-            name = info['Source']
-        else:
-            pkg['name'] = info['Package']
-            pkg['type'] = BINARY
-            pkg['architecture'] = info['Architecture']
+        try:
+            pkg = {}
+            if info.has_key('Source'):
+                pkg['name'] = info['Source']
+                pkg['type'] = SOURCE
+                name = info['Source']
+            else:
+                pkg['name'] = info['Package']
+                pkg['type'] = BINARY
+                pkg['architecture'] = info['Architecture']
 
-        desc, long_desc = None, None
-        if info.has_key('Description'):
-            desc, long_desc = get_package_description(info['Description'])
-        pkg['desc'] = desc
-        pkg['long_desc'] = long_desc
+            desc, long_desc = None, None
+            if info.has_key('Description'):
+                desc, long_desc = get_package_description(info['Description'])
+            pkg['desc'] = desc
+            pkg['long_desc'] = long_desc
 
-        items.append(pkg)
+            items.append(pkg)
+
+        except KeyError:
+            pass
 
     result = {'name': name,
               'packages': items}
 
     return result
+
+def validate_packages(packages):
+    has_source = any([pkg['type'] == SOURCE for pkg in packages])
+    has_binary = any([pkg['type'] == BINARY for pkg in packages])
+    return has_source and has_binary
 
 def store_package_info(spec, info):
     from .models import Package, BINARY

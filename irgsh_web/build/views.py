@@ -181,6 +181,11 @@ def _set_description(spec, fcontrol, fchangelog):
     # Get packages info
     packages = Packages.iter_paragraphs(fcontrol)
     info = utils.get_package_info(packages)
+    if not utils.validate_packages(info['packages']):
+        _set_spec_status(spec.id, -2)
+        spec.add_log(_('Package rejected (incomplete package)'))
+        return {'status': 'fail', 'code': 406, 'msg': _('Incomplete package')}
+
     name = info['name']
 
     # The package must have a name
