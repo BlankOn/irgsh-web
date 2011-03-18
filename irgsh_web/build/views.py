@@ -129,16 +129,12 @@ def _verify_builder(func):
         try:
             assert request.META.get('SSL', None) == 'on'
             assert request.META.has_key('SSL_CLIENT_S_DN')
-            assert request.POST.has_key('builder')
 
-            name = request.POST['builder']
-            cert_subject = request.META['SSL_CLIENT_S_DN']
+            cert_subject = utils.make_canonical(request.META['SSL_CLIENT_S_DN'])
 
-            builders = Builder.objects.filter(name=name)
+            builders = Builder.objects.filter(cert_subject=cert_subject)
             assert len(builders) == 1
             builder = builders[0]
-
-            assert utils.verify_builder_certificate(builder, cert_subject)
 
             request.META['IRGSH_BUILDER_ID'] = builder.id
             request.META['IRGSH_BUILDER_NAME'] = builder.name

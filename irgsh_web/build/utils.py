@@ -422,10 +422,6 @@ def make_canonical(cert_subject):
     # TODO
     return cert_subject.strip()
 
-def verify_builder_certificate(builder, cert_subject):
-    cert_subject = make_canonical(cert_subject)
-    return builder.cert_subject == cert_subject
-
 def verify_certificate(cert_subject):
     '''
     Verify a certificate subject
