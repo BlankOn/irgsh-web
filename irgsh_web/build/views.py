@@ -132,7 +132,8 @@ def _verify_builder(func):
 
             cert_subject = utils.make_canonical(request.META['SSL_CLIENT_S_DN'])
 
-            builders = Builder.objects.filter(cert_subject=cert_subject)
+            builders = Builder.objects.filter(active=True,
+                                              cert_subject=cert_subject)
             assert len(builders) == 1
             builder = builders[0]
 
