@@ -454,11 +454,14 @@ def cancel_other_tasks(spec, exception):
     tasks = BuildTask.objects.filter(specification=spec) \
                              .exclude(pk=exception.id)
     for task in tasks:
-        BuildTask.objects.filter(pk=task.id).update(status=-2)
+        total = BuildTask.objects.filter(pk=task.id) \
+                                 .filter(status__gte=0) \
+                                 .update(status=-2)
 
-        spec.add_log(_('Task %(cancelled_task_id)s ' \
-                       'is cancelled by task %(task_id)s') % \
-                     {'cancelled_task_id': task.task_id,
-                      'task_id': exception.task_id})
-        revoke(task.task_id)
+        if total > 0:
+            spec.add_log(_('Task %(cancelled_task_id)s ' \
+                           'is cancelled by task %(task_id)s') % \
+                         {'cancelled_task_id': task.task_id,
+                          'task_id': exception.task_id})
+            revoke(task.task_id)
 
