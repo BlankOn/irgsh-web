@@ -41,7 +41,8 @@ JSON_MIME = 'application/json'
 JSON_MIME = 'text/plain'
 
 def _set_spec_status(spec_id, status):
-    Specification.objects.filter(pk=spec_id).update(status=status)
+    Specification.objects.filter(pk=spec_id).update(status=status,
+                                                    updated=datetime.now())
 
 def _rebuild_repo(spec):
     # Start rebuilding repo if
@@ -57,7 +58,8 @@ def _rebuild_repo(spec):
         # Atomicaly update spec status to building repository.
         total = Specification.objects.filter(pk=spec.id) \
                                      .exclude(source_uploaded=None) \
-                                     .update(status=200)
+                                     .update(status=200,
+                                             updated=datetime.now())
 
         if total > 0:
             # Successfully updated the spec => got token
@@ -357,7 +359,8 @@ def task_status(request, task):
     if status >= 0:
         rule = rule & Q(status__lt=status)
     BuildTask.objects.filter(pk=task.id) \
-                     .filter(rule).update(status=status)
+                     .filter(rule).update(status=status,
+                                          updated=datetime.now())
 
     task.add_log(status_list[status])
 
@@ -412,7 +415,8 @@ def task_claim(request, task):
     independent = task.specification.is_arch_independent()
     total = Specification.objects.filter(pk=task.specification.id) \
                                  .filter(status=104) \
-                                 .update(status=105)
+                                 .update(status=105,
+                                         updated=datetime.now())
     if independent and total == 0:
         # Spec status has been changed by another builder,
         # or in other words the package is being built right now.
