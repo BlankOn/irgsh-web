@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from django.core.urlresolvers import reverse
+from django.views.generic.simple import redirect_to
 from django.conf import settings
 
 from django.contrib import admin
@@ -54,6 +54,12 @@ urlpatterns += patterns('irgsh_web.build.views',
 
     # users
     url(r'^user/(?P<name>[a-z0-9_-]+)/$', 'user_show', name='build_user_show'),
+
+    # shortcuts
+    (r'^(?P<spec_id>\d+)/$', redirect_to, {'url': '/build/%(spec_id)s/',
+                                           'permanent': True}),
+    (r'^%s/$' % TASK_ID, redirect_to, {'url': '/task/%(task_id)s/',
+                                       'permanent': True}),
 
     # summary
     url(r'^$', 'summary', name='build_summary'),
