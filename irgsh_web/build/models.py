@@ -177,7 +177,7 @@ class Specification(models.Model):
 
     created = models.DateTimeField(default=datetime.now)
     updated = models.DateTimeField(auto_now=True)
-    finished = models.DateTimeField(auto_now=True)
+    finished = models.DateTimeField(null=True, default=None)
 
     class Meta:
         ordering = ('-created',)
