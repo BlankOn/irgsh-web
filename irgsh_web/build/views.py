@@ -19,7 +19,6 @@ from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.views.static import was_modified_since
 from django.utils.http import http_date
 from django.db.models import Q
@@ -35,6 +34,7 @@ from . import utils, models, tasks
 from .models import BuildTask, Distribution, Specification, BuildTaskLog, \
                     Builder, Package, SpecificationLog, Worker
 from .forms import SpecificationForm
+from irgsh_web.utils import paginate
 from irgsh_web.repo.models import Package as RepoPackage
 
 JSON_MIME = 'application/json'
@@ -66,22 +66,6 @@ def _rebuild_repo(spec):
             specification = Specification.objects.get(pk=spec.id)
             specification.add_log(_('Scheduling repository rebuild task'))
             utils.rebuild_repo(specification)
-
-def _paginate(queryset, total, page):
-    try:
-        page = int(page)
-        if page < 0: page = 1
-    except ValueError:
-        page = 1
-
-    paginator = Paginator(queryset, total)
-
-    try:
-        items = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        items = paginator.page(paginator.num_pages)
-
-    return items
 
 def _task_id_required(func):
     def _func(request, task_id, *args, **kwargs):
@@ -583,7 +567,7 @@ def spec_info(request, spec):
 
 def spec_list(request):
     build_list = Specification.objects.all().select_related()
-    builds = _paginate(build_list, 50, request.GET.get('page', 1))
+    builds = paginate(build_list, 50, request.GET.get('page', 1))
     context = {'builds': builds}
     return render_to_response('build/spec_list.html', context,
                               context_instance=RequestContext(request))
@@ -787,7 +771,7 @@ def builder_show(request, builder):
 @_builder_name_required
 def builder_task(request, builder):
     task_list = BuildTask.objects.filter(builder=builder)
-    tasks = _paginate(task_list, 50, request.GET.get('page', 1))
+    tasks = paginate(task_list, 50, request.GET.get('page', 1))
 
     context = {'builder': builder,
                'tasks': tasks}

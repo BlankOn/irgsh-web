@@ -2,6 +2,7 @@ import urllib2
 import urllib
 
 from django.conf import settings
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 from poster.encode import multipart_encode
 from poster.streaminghttp import StreamingHTTPHandler, StreamingHTTPRedirectHandler, \
@@ -51,4 +52,20 @@ def send_message(url, param=None):
     # Create request
     request = urllib2.Request(url, data, headers)
     return opener.open(request).read()
+
+def paginate(queryset, total, page):
+    try:
+        page = int(page)
+        if page < 0: page = 1
+    except ValueError:
+        page = 1
+
+    paginator = Paginator(queryset, total)
+
+    try:
+        items = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        items = paginator.page(paginator.num_pages)
+
+    return items
 
