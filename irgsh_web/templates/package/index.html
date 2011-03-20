@@ -1,0 +1,35 @@
+{% extends "package/base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="block" id="package-page">
+<h1>{% trans "Latest Built Packages" %}</h1>
+
+{% if builds %}
+<table id="builds">
+<tr><th>{% trans "ID" %}</th>
+    <th>{% trans "Date" %}</th>
+    <th>{% trans "Distribution" %}</th>
+    <th>{% trans "Package" %}</th>
+    <th>{% trans "Version" %}</th>
+    <th>{% trans "Submitter" %}</th>
+</tr>
+{% for build in builds.object_list %}
+<tr><td><a href="{{ build.get_absolute_url }}">{{ build.id }}</a></td>
+    <td>{{ build.created|date:"d/m/y H:i" }}</td>
+    <td>{{ build.distribution }}</td>
+    <td>{{ build.package.name }}</td>
+    <td>{{ build.version }}</td>
+    <td><a href="{{ build.submitter.get_absolute_url }}">{{ build.submitter }}</a></td>
+</tr>
+{% endfor %}
+</table>
+{% with builds as items %}
+{% include "paginator.html" %}
+{% endwith %}
+{% else %}
+<p>{% trans "No packages ever built." %}</p>
+{% endif %}
+</div>
+{% endblock %}
+

@@ -207,3 +207,10 @@ div.paginator a.nav {
     display: inline;
 }
 
+#package-page #builds td {
+    white-space: nowrap;
+}
+#package-page #builds td:nth-child(5) {
+    width: 100%;
+}
+

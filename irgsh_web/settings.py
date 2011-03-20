@@ -90,6 +90,7 @@ INSTALLED_APPS = (
     'irgsh_web.account',
     'irgsh_web.repo',
     'irgsh_web.build',
+    'irgsh_web.package',
     'djcelery',
     'debug_toolbar',
 )
