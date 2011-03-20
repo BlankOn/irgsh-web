@@ -165,6 +165,6 @@ function init_submit_page() {
 
 
 $(document).ready(function() {
-    if ($('#submit-page')) { init_submit_page(); }
+    if ($('#submit-page').length > 0) { init_submit_page(); }
 });
 
