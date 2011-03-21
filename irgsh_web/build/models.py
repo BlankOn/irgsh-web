@@ -123,7 +123,7 @@ class WorkerBase(models.Model):
         status_list = {'unknown': _('Unknown'),
                        'dormant': _('Dormant'),
                        'unreachable': _('Unreachable'),
-                       'unresponsive': _('Active (but almost unresponsive)'),
+                       'unresponsive': _('Not responsive'),
                        'active': _('Active')}
         code = self.status_code()
         return status_list.get(code, _('Unknown'))
