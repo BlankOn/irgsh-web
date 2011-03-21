@@ -79,10 +79,14 @@ def datetime_or_age(value):
     elif value.date() == now.date():
         return _('%(hour)02d:%(minute)02d') % \
                {'hour': value.hour, 'minute': value.minute}
+    elif delta.days < 2:
+        return _('1 day ago')
+    elif delta.days < 8:
+        return _('%(days)d days ago') % {'days': delta.days }
     elif value.year == now.year:
-        return value.strftime(_('%d/%m %h:%m'))
+        return value.strftime(_('%d/%m %H:%M'))
     else:
-        return value.strftime(_('%d/%m/%y %h:%m'))
+        return value.strftime(_('%d/%m/%y %H:%M'))
 
 def full_datetime_or_age(value):
     if not isinstance(value, datetime):
@@ -97,10 +101,14 @@ def full_datetime_or_age(value):
     elif value.date() == now.date():
         return _('today at %(hour)02d:%(minute)02d') % \
                {'hour': value.hour, 'minute': value.minute}
+    elif delta.days < 2:
+        return _('1 day ago')
+    elif delta.days < 8:
+        return _('%(days)d days ago') % {'days': delta.days }
     elif value.year == now.year:
         return value.strftime(_('%a, %d/%m %H:%M'))
     else:
-        return value.strftime(_('%d/%m/%y %H:%M'))
+        return value.strftime(_('%a, %d/%m/%y %H:%M'))
 
 def datetime_relative(value, target):
     if value.date() == target.date():
