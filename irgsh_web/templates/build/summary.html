@@ -13,13 +13,13 @@
 <tr><th>{% trans "Name" %}</th>
     <th>{% trans "Arch" %}</th>
     <th>{% trans "Status" %}</th>
-    <th>{% trans "Location" %}</th>
+    <th>{% trans "Last Update" %}</th>
 </tr>
 {% for builder in builders %}
 <tr><td><a href="{{ builder.get_absolute_url }}">{{ builder.name }}</a></td>
     <td>{{ builder.architecture }}</td>
     <td>{{ builder.status }}</td>
-    <td>{{ builder.location }}</td>
+    <td>{{ builder.last_activity|datetime_or_age }}</td>
 </tr>
 {% endfor %}
 </table>
