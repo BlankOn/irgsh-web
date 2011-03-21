@@ -6,7 +6,7 @@
 <div id="summary-page">
 <h1>{% trans "Summary" %}</h1>
 
-<div class="block">
+<div class="block span-10">
 <h2>{% trans "Builders" %}</h2>
 {% if builders %}
 <table id="builders">
@@ -28,7 +28,29 @@
 {% endif %}
 </div>
 
-<div class="block">
+<div class="block span-9">
+<h2>{% trans "Workers" %}</h2>
+{% if workers %}
+<table id="workers">
+<tr><th>{% trans "Name" %}</th>
+    <th>{% trans "Type" %}</th>
+    <th>{% trans "Status" %}</th>
+    <th>{% trans "Last Update" %}</th>
+</tr>
+{% for worker in workers %}
+<tr><td>{{ worker.name }}</td>
+    <td>{{ worker.get_type_display }}</td>
+    <td>{{ worker.status }}</td>
+    <td>{{ worker.last_activity|datetime_or_age }}</td>
+</tr>
+{% endfor %}
+</table>
+{% else %}
+<p>{% trans "No builders" %}</p>
+{% endif %}
+</div>
+
+<div class="block clear">
 <h2>{% trans "Latest Builds" %}</h2>
 {% if builds %}
 <table id="builds">

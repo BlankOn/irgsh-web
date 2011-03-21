@@ -704,12 +704,14 @@ def summary(request):
     Show summary
     '''
     builders = Builder.objects.all().select_related()
+    workers = Worker.objects.all().select_related()
 
     spec_limit = 15
     all_specs = Specification.objects.all()
     specs = all_specs.select_related()[:spec_limit]
 
     context = {'builders': builders,
+               'workers': workers,
                'builds': specs,
                'more_builds': len(all_specs) > spec_limit}
     return render_to_response('build/summary.html', context,

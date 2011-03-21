@@ -134,12 +134,13 @@ th {
     padding-left: 2em;
 }
 
-#summary-page #builders td:nth-child(3) {
+#summary-page #builders td {
     white-space: nowrap;
 }
-#summary-page #builders td:nth-child(4) {
-    width: 100%;
+#summary-page #workers td {
+    white-space: nowrap;
 }
+
 #summary-page #builds td {
     white-space: nowrap;
 }
