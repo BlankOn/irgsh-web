@@ -23,6 +23,7 @@ class Distribution(models.Model):
     active = models.BooleanField(default=True)
 
     architectures = models.ManyToManyField(Architecture)
+    components = models.ManyToManyField('Component')
 
     class Meta:
         ordering = ('name',)
@@ -34,15 +35,13 @@ class Component(models.Model):
     '''
     List of components
     '''
-    name = models.CharField(max_length=50)
-    distribution = models.ForeignKey(Distribution)
+    name = models.CharField(max_length=50, unique=True)
 
     class Meta:
-        unique_together = ('name', 'distribution',)
-        ordering = ('distribution', 'name',)
+        ordering = ('name',)
 
     def __unicode__(self):
-        return '%s/%s' % (self.distribution.name, self.name)
+        return self.name
 
 class Package(models.Model):
     '''
