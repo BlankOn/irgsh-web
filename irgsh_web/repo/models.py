@@ -15,6 +15,18 @@ class Architecture(models.Model):
     def __unicode__(self):
         return self.name
 
+class Component(models.Model):
+    '''
+    List of components
+    '''
+    name = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        ordering = ('name',)
+
+    def __unicode__(self):
+        return self.name
+
 class Distribution(models.Model):
     '''
     List of distributions
@@ -23,19 +35,7 @@ class Distribution(models.Model):
     active = models.BooleanField(default=True)
 
     architectures = models.ManyToManyField(Architecture)
-    components = models.ManyToManyField('Component')
-
-    class Meta:
-        ordering = ('name',)
-
-    def __unicode__(self):
-        return self.name
-
-class Component(models.Model):
-    '''
-    List of components
-    '''
-    name = models.CharField(max_length=50, unique=True)
+    components = models.ManyToManyField(Component)
 
     class Meta:
         ordering = ('name',)
