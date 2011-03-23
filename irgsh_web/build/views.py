@@ -36,6 +36,7 @@ from .models import BuildTask, Distribution, Specification, BuildTaskLog, \
 from .forms import SpecificationForm
 from irgsh_web.utils import paginate
 from irgsh_web.repo.models import Package as RepoPackage
+from irgsh_web.repo.models import PackageDistribution
 
 JSON_MIME = 'application/json'
 JSON_MIME = 'text/plain'
@@ -182,12 +183,21 @@ def _set_description(spec, fcontrol, fchangelog):
 
     # Check if this package is registered
     try:
-        pkg = RepoPackage.objects.get(name=name,
-                                      distribution=spec.distribution.repo)
+        pkg = RepoPackage.objects.get(name=name)
     except RepoPackage.DoesNotExist:
         _set_spec_status(spec.id, -2)
         spec.add_log(_('Package rejected (unregistered package: %(name)s)') % \
                      {'name': name})
+        return {'status': 'fail', 'code': 406,
+                'msg': _('Unregistered package: %(name)s') % {'name': name}}
+
+    # Check if this package is registered for selected distribution
+    try:
+        pkgdist = pkg.packagedistribution_set.get(distribution=spec.distribution.repo)
+    except PackageDistribution.DoesNotExist:
+        _set_spec_status(spec.id, -2)
+        spec.add_log(_('Package rejected (not available in %(name)s distribution') % \
+                     {'name': spec.distribution.repo.name})
         return {'status': 'fail', 'code': 406,
                 'msg': _('Unregistered package: %(name)s') % {'name': name}}
 
