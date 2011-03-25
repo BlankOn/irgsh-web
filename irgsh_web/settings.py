@@ -85,6 +85,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django_openid_auth',
     'django_xmlrpc',
+    'south',
     'irgsh_web',
     'irgsh_web.account',
     'irgsh_web.repo',
