@@ -90,8 +90,8 @@ class UploadSource(Task):
         p = Popen(cmd.split(), stdout=PIPE, stderr=PIPE)
         p.communicate()
 
-        assert p.returncode == 0, \
-               'Upload failed, return code: %s' % p.returncode
+        if p.returncode != 0:
+            raise ValueError, 'Upload failed, return code: %s' % p.returncode
 
     def on_failure(self, exc, task_id, args, kwargs, einfo=None):
         spec_id = args[0]

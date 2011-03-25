@@ -113,20 +113,22 @@ def _json_result(func):
 def _verify_builder(func):
     def _func(request, *args, **kwargs):
         try:
-            assert request.META.get('SSL', None) == 'on'
-            assert request.META.has_key('SSL_CLIENT_S_DN')
+            if request.META.get('SSL', None) != 'on' or \
+               not request.META.has_key('SSL_CLIENT_S_DN'):
+                raise ValueError, 'No client certificate found'
 
             cert_subject = utils.make_canonical(request.META['SSL_CLIENT_S_DN'])
 
             builders = Builder.objects.filter(active=True,
                                               cert_subject=cert_subject)
-            assert len(builders) == 1
+            if len(builders) != 1:
+                raise ValueError, 'No builder found'
             builder = builders[0]
 
             request.META['IRGSH_BUILDER_ID'] = builder.id
             request.META['IRGSH_BUILDER_NAME'] = builder.name
 
-        except AssertionError:
+        except StandardError:
             return HttpResponse(status=403)
         return func(request, *args, **kwargs)
     return _func
@@ -147,16 +149,16 @@ def _serve_static(request, fullpath):
 def _client_cert_required(func):
     def _func(request, *args, **kwargs):
         try:
-            assert request.META.get('SSL', None) == 'on', \
-                   'Not in secure connection'
-            assert request.META.has_key('SSL_CLIENT_S_DN'), \
-                   'Certificate subject is unknown'
+            if request.META.get('SSL', None) != 'on' or \
+               not request.META.has_key('SSL_CLIENT_S_DN'):
+                raise ValueError, 'No client certificate found'
+
             cert_subject = request.META['SSL_CLIENT_S_DN']
 
-            assert utils.verify_certificate(cert_subject), \
-                   'Certificate not found'
+            if not utils.verify_certificate(cert_subject):
+                raise ValueError, 'Certificate not found'
 
-        except AssertionError, e:
+        except StandardError, e:
             return HttpResponse(status=403)
         return func(request, *args, **kwargs)
     return _func
@@ -536,14 +538,15 @@ def spec_status(request, spec):
             status = int(request.POST['status'])
 
             status_list = dict(models.SPECIFICATION_STATUS)
-            assert status in status_list
+            if not status in status_list:
+                raise ValueError, 'Invalid status'
 
             _set_spec_status(spec.id, status)
             spec.add_log(status_list[status])
 
             if status == 104:
                 _rebuild_repo(spec)
-        except (ValueError, AssertionError):
+        except ValueError:
             return HttpResponse(status=400)
 
     else:

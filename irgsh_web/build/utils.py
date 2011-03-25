@@ -174,8 +174,7 @@ class SpecInit(object):
             files = self.download()
             self.distribute()
             self.upload(files)
-        except (ValueError, AssertionError, TypeError, IOError, \
-                SourcePackageBuilderException), e:
+        except StandardError, e:
             self.log.error('[%s] Error! %s' % (self.spec_id, e))
             self.spec.add_log('Specification initialization failed: %s' % str(e))
             current_status = Specification.objects.get(pk=self.spec_id).status
@@ -349,7 +348,8 @@ class SpecInit(object):
         subtasks = []
         archs = self.get_archs(spec)
 
-        assert len(archs) > 0, _('No suitable builders found.')
+        if len(archs) == 0:
+            raise ValueError, _('No suitable builders found.')
 
         for arch in archs:
             # store task info
