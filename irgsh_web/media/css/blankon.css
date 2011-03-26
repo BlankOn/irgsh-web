@@ -212,3 +212,19 @@ div.paginator a.nav {
     width: 100%;
 }
 
+.published td {
+    white-space: nowrap;
+}
+.published td:nth-child(4) {
+    width: 100%;
+}
+.pbuilds td {
+    white-space: nowrap;
+}
+.pbuilds td:nth-child(4) {
+    text-align: right;
+}
+.pbuilds td:nth-child(6) {
+    width: 100%;
+}
+
