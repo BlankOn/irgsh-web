@@ -397,6 +397,10 @@ def rebuild_repo(spec):
     from .models import BuildTask
     from irgsh_repo.tasks import RebuildRepo
 
+    package = spec.package
+    dist = spec.distribution.repo
+    pkgdist = package.packagedistribution_set.get(distribution=dist)
+
     tasks = BuildTask.objects.filter(specification=spec) \
                              .filter(status=999) \
                              .select_related()
@@ -404,9 +408,9 @@ def rebuild_repo(spec):
                       for task in tasks]
 
     task_name = RebuildRepo.name
-    args = [spec.id, spec.package.name, spec.version,
-            spec.package.distribution.name,
-            spec.package.component.name,
+    args = [spec.id, package.name, spec.version,
+            dist.name,
+            pkgdist.component.name,
             task_arch_list]
     kwargs = None
     opts = {'exchange': 'repo',
