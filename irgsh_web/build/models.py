@@ -228,27 +228,6 @@ class Specification(models.Model):
                     for pkg in Package.objects.filter(specification=self,
                                                       type=BINARY)])
 
-class SpecificationResource(models.Model):
-    '''
-    List of files needed by a specification
-    '''
-    specification = models.ForeignKey(Specification, unique=True)
-
-    source_name = models.CharField(max_length=1024, null=True, default=None)
-    source_started = models.DateTimeField(null=True, default=None)
-    source_finished = models.DateTimeField(null=True, default=None)
-
-    orig_name = models.CharField(max_length=1024, null=True, default=None)
-    orig_started = models.DateTimeField(null=True, default=None)
-    orig_finished = models.DateTimeField(null=True, default=None)
-
-class Installation(models.Model):
-    package = models.ForeignKey(RepoPackage, unique=True)
-    specification = models.ForeignKey(Specification)
-
-    created = models.DateTimeField(default=datetime.now)
-    updated = models.DateTimeField(auto_now=True)
-
 class Package(models.Model):
     '''
     List of packages described in debian/control file
