@@ -19,9 +19,18 @@
 <tr><th>{% trans "Submission date" %}</th>
     <td>{{ build.created|datetime_and_age }}</td>
 </tr>
-<tr><th>{% trans "Last Update" %}</th>
-    <td>{{ build.updated|datetime_and_since:build.created }}</td>
+{% if build.finished %}
+<tr><th>{% trans "Finished" %}</th>
+    <td>{{ build.finished|datetime }}</td>
 </tr>
+<tr><th>{% trans "Duration" %}</th>
+    <td>{{ build.finished|since:build.created }}</td>
+</tr>
+{% else %}
+<tr><th>{% trans "Last Update" %}</th>
+    <td>{{ build.updated|datetime }} (+{{ build.updated|since:build.created }})</td>
+</tr>
+{% endif %}
 </table>
 
 <h2>{% trans "Specification" %}</h2>
