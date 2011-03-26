@@ -30,28 +30,9 @@
 
 {% if tasks %}
 <h2>Handled build tasks</h2>
-<table id="builder-tasks">
-<tr><th>{% trans "Build" %}</th>
-    <th>{% trans "Task" %}</th>
-    <th>{% trans "Assigned" %}</th>
-    <th>{% trans "Submitter" %}</th>
-    <th>{% trans "Package" %}</th>
-    <th>{% trans "Version" %}</th>
-    <th>{% trans "Task Status" %}</th>
-    <th>{% trans "Build Status" %}</th>
-</tr>
-{% for task in tasks.object_list %}
-<tr><td><a href="{{ task.specification.get_absolute_url }}">{{ task.specification.id }}</a></td>
-    <td class="code"><a href="{{ task.get_absolute_url }}">{{ task.task_id }}</a></td>
-    <td>{{ task.assigned|date:"d/m/y H:i" }}</td>
-    <td><a href="{{ task.specification.submitter.get_absolute_url }}">{{ task.specification.submitter }}</a></td>
-    <td><a href="{{ task.specification.package.get_absolute_url }}">{{ task.specification.package.name }}</a></td>
-    <td>{{ task.specification.version }}</td>
-    <td>{{ task.get_status_display }}</td>
-    <td>{{ task.specification.get_status_display }}</td>
-</tr>
-{% endfor %}
-</table>
+{% with tasks.object_list as tasks %}
+{% include "build/tasks.html" %}
+{% endwith %}
 {% with tasks as items %}
 {% include "paginator.html" %}
 {% endwith %}

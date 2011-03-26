@@ -148,15 +148,14 @@ th {
     width: 100%;
 }
 
-#builder-page #builder-tasks td {
+.tasks td {
     white-space: nowrap;
 }
-#builder-page #builder-tasks td:nth-child(6),
-#builder-page #builder-tasks td:nth-child(7),
-#builder-page #builder-tasks td:nth-child(8) {
-    width: 33%;
-    white-space: normal;
-    font-size: .8em;
+.tasks td:nth-child(4) {
+    text-align: right;
+}
+.tasks td:nth-child(5) {
+    width: 100%;
 }
 
 div.paginator {

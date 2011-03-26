@@ -1,0 +1,23 @@
+{% load i18n %}
+{% load irgsh_tags %}
+
+<table class="tasks">
+<tr><th>{% trans "Build" %}</th>
+    <th>{% trans "Task" %}</th>
+    <th>{% trans "Assigned" %}</th>
+    <th>{% trans "Duration" %}</th>
+    <th>{% trans "Package" %}</th>
+    <th>{% trans "Task Status" %}</th>
+    <th>{% trans "Build Status" %}</th>
+</tr>
+{% for task in tasks %}
+<tr><td><a href="{{ task.specification.get_absolute_url }}">{{ task.specification.id }}</a></td>
+    <td><a href="{{ task.get_absolute_url }}">{{ task.task_id }}</a></td>
+    <td>{{ task.assigned|date:"d/m/y H:i" }}</td>
+    <td>{{ task.finished|since:task.assigned }}</td>
+    <td><a href="{{ task.specification.package.get_absolute_url }}">{{ task.specification.package.name }}</a></td>
+    <td>{{ task.get_status_display }}</td>
+    <td>{{ task.specification.get_status_display }}</td>
+</tr>
+{% endfor %}
+</table>
