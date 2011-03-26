@@ -382,8 +382,11 @@ class SpecInit(object):
 
     def set_status(self, status):
         from .models import Specification
-        Specification.objects.filter(pk=self.spec.id).update(status=status,
-                                                             updated=datetime.now())
+        updates = {'status': status,
+                   'updated': datetime.now()}
+        if status < 0:
+            updates['finished'] = updates['updated']
+        Specification.objects.filter(pk=self.spec.id).update(**updates)
 
     def upload(self, files):
         self.log.debug('[%s] Scheduling source package upload' % self.spec_id)
@@ -455,10 +458,12 @@ def cancel_other_tasks(spec, exception):
     tasks = BuildTask.objects.filter(specification=spec) \
                              .exclude(pk=exception.id)
     for task in tasks:
+        now = datetime.now()
         total = BuildTask.objects.filter(pk=task.id) \
                                  .filter(status__gte=0) \
                                  .update(status=-2,
-                                         updated=datetime.now())
+                                         updated=now,
+                                         finished=now)
 
         if total > 0:
             spec.add_log(_('Task %(cancelled_task_id)s ' \

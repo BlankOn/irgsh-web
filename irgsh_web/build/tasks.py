@@ -98,11 +98,16 @@ class UploadSource(Task):
         self.set_status(spec_id, -1)
 
     def set_status(self, spec_id, status):
-        Specification.objects.filter(pk=spec_id).update(status=status)
+        updates = {'status': status,
+                   'updated': datetime.now()}
+        if status < 0 or status == 999:
+            updates['finished'] = updates['updated']
+        Specification.objects.filter(pk=spec_id).update(**updates)
 
     def set_source_uploaded(self, spec_id):
         Specification.objects.filter(pk=spec_id) \
-                             .update(source_uploaded=datetime.now())
+                             .update(source_uploaded=datetime.now(),
+                                     updated=datetime.now())
 
 class PingWorkers(PeriodicTask):
     '''Periodically send ping message to all workers

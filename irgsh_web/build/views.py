@@ -42,8 +42,11 @@ JSON_MIME = 'application/json'
 JSON_MIME = 'text/plain'
 
 def _set_spec_status(spec_id, status):
-    Specification.objects.filter(pk=spec_id).update(status=status,
-                                                    updated=datetime.now())
+    updates = {'status': status,
+               'updated': datetime.now()}
+    if status < 0 or status == 999:
+        updates['finished'] = updates['updated']
+    Specification.objects.filter(pk=spec_id).update(**updates)
 
 def _rebuild_repo(spec):
     # Start rebuilding repo if
@@ -354,9 +357,12 @@ def task_status(request, task):
     rule = Q(status__gte=0)
     if status >= 0:
         rule = rule & Q(status__lt=status)
+    updates = {'status': status,
+               'updated': datetime.now()}
+    if status < 0 or status == 999:
+        updates['finished'] = updates['updated']
     BuildTask.objects.filter(pk=task.id) \
-                     .filter(rule).update(status=status,
-                                          updated=datetime.now())
+                     .filter(rule).update(**updates)
 
     task.add_log(status_list[status])
 
