@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ValidationError
 
@@ -53,6 +54,9 @@ class Package(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('package_show', args=[self.name])
 
 class PackageDistribution(models.Model):
     package = models.ForeignKey(Package)
