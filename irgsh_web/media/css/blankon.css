@@ -141,13 +141,13 @@ th {
     white-space: nowrap;
 }
 
-#summary-page #builds td {
+.builds td {
     white-space: nowrap;
 }
-#summary-page #builds td:nth-child(6) {
+.builds td:nth-child(6) {
     width: 100%;
-    white-space: normal;
 }
+
 #builder-page #builder-tasks td {
     white-space: nowrap;
 }

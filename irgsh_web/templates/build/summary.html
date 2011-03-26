@@ -53,24 +53,7 @@
 <div class="block clear">
 <h2>{% trans "Latest Builds" %}</h2>
 {% if builds %}
-<table id="builds">
-<tr><th>{% trans "ID" %}</th>
-    <th>{% trans "Submitter" %}</th>
-    <th>{% trans "Date" %}</th>
-    <th>{% trans "Package" %}</th>
-    <th>{% trans "Version" %}</th>
-    <th>{% trans "Status" %}</th>
-</tr>
-{% for build in builds %}
-<tr><td><a href="{{ build.get_absolute_url }}">{{ build.id }}</a></td>
-    <td><a href="{{ build.submitter.get_absolute_url }}">{{ build.submitter }}</a></td>
-    <td>{{ build.created|date:"d/m/y H:i" }}</td>
-    <td>{% if build.package %}<a href="{{ build.package.get_absolute_url }}">{{ build.package.name }}</a>{% endif %}</td>
-    <td>{% if build.version %}{{ build.version }}{% endif %}</td>
-    <td>{{ build.get_status_display }}</td>
-</tr>
-{% endfor %}
-</table>
+{% include "build/builds.html" %}
 {% if more_builds %}
 <p><a href="{% url build_spec_list %}">{% trans "show all builds" %}</a></p>
 {% endif %}
