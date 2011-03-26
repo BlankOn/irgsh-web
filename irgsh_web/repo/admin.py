@@ -1,31 +1,33 @@
 from django.contrib import admin
 from django.utils.translation import ugettext as _
 
-from .models import Architecture, Distribution, Component, Package
+from .models import Architecture, Distribution, Component, Package, \
+                    PackageDistribution
 
 class DistributionAdmin(admin.ModelAdmin):
     def architectures(obj):
         archs = obj.architectures.all().values_list('name', flat=True)
         return ', '.join(archs)
 
-    list_display = ('name', 'active', architectures,)
+    def components(obj):
+        archs = obj.components.all().values_list('name', flat=True)
+        return ', '.join(archs)
 
-class ComponentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'distribution',)
+    list_display = ('name', 'active', architectures, components)
+
+class PackageDistributionInline(admin.TabularInline):
+    model = PackageDistribution
+    extra = 1
 
 class PackageAdmin(admin.ModelAdmin):
-    def component(obj):
-        return obj.component.name
-    component.admin_order_field = 'component__name'
+    def distributions(obj):
+        return ' '.join(map(str, PackageDistribution.objects.filter(package=obj)))
 
-    def distribution(obj):
-        return obj.component.distribution.name
-    distribution.admin_order_field = 'component__distribution__name'
-
-    list_display = ('name', component, distribution,)
+    list_display = ('name', distributions,)
+    inlines = [PackageDistributionInline]
 
 admin.site.register(Architecture)
 admin.site.register(Distribution, DistributionAdmin)
-admin.site.register(Component, ComponentAdmin)
+admin.site.register(Component)
 admin.site.register(Package, PackageAdmin)
 
