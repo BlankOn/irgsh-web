@@ -813,7 +813,7 @@ def builder_ping(request, builder):
 
 @_username_required
 def user_show(request, user):
-    builds = Specification.objects.filter(submitter=user)
+    builds = Specification.objects.filter(submitter=user).select_related()
 
     # Last build
     last_build = None

@@ -167,12 +167,11 @@ div.paginator a.nav {
     padding: 0 5px;
 }
 
-#user-page #builds td {
+.ubuilds td {
     white-space: nowrap;
 }
-#user-page #builds td:nth-child(5) {
+.ubuilds td:nth-child(5) {
     width: 100%;
-    white-space: normal;
 }
 
 #submit-page label {
