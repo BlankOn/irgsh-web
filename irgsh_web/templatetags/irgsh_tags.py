@@ -6,6 +6,11 @@ from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.html import conditional_escape
 
+def show_datetime(value):
+    if not isinstance(value, datetime):
+        return value
+    return value.strftime(_('%A, %d %B %Y %H:%M:%S'))
+
 def datetime_and_age(value):
     if not isinstance(value, datetime):
         return value
@@ -192,6 +197,7 @@ def filter_email(text):
     return mark_safe(''.join(_interleave(tt, te)))
 
 register = template.Library()
+register.filter('datetime', show_datetime)
 register.filter('datetime_or_age', datetime_or_age)
 register.filter('full_datetime_or_age', full_datetime_or_age)
 register.filter('datetime_and_age', datetime_and_age)
