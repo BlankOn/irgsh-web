@@ -11,6 +11,36 @@ def show_datetime(value):
         return value
     return value.strftime(_('%A, %d %B %Y %H:%M:%S'))
 
+def duration(value):
+    if not isinstance(value, timedelta):
+        return value
+
+    hours = value.seconds // 3600
+    minutes = (value.seconds % 3600) // 60
+
+    if value.days > 0:
+        res = '%02d:%02d' % (hours, minutes)
+
+        if value.days > 1:
+            res = '%s, %s' % (_('%(days)s days') % {'days': value.days}, res)
+        elif value.days > 0:
+            res = '%s, %s' % (_('1 day') % {'days': value.days}, res)
+
+    else:
+        res = []
+        if hours > 1:
+            res.append(_('%(hours)s hours') % {'hours': hours})
+        elif hours > 0:
+            res.append(_('1 hour'))
+        if minutes > 1:
+            res.append(_('%(minutes)s minutes') % {'minutes': minutes})
+        elif minutes > 0:
+            res.append(_('1 minute'))
+
+        res = ' '.join(res)
+
+    return res
+
 def datetime_and_age(value):
     if not isinstance(value, datetime):
         return value
@@ -198,6 +228,7 @@ def filter_email(text):
 
 register = template.Library()
 register.filter('datetime', show_datetime)
+register.filter('duration', duration)
 register.filter('datetime_or_age', datetime_or_age)
 register.filter('full_datetime_or_age', full_datetime_or_age)
 register.filter('datetime_and_age', datetime_and_age)

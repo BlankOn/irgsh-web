@@ -20,6 +20,12 @@
 <tr><th>{% trans "Status" %}</th>
     <td>{{ builder.status }}</td>
 </tr>
+<tr><th>{% trans "Total tasks" %}</th>
+    <td>{{ total }}</td>
+</tr>
+<tr><th>{% trans "Total duration" %}</th>
+    <td>{{ total_duration|duration }}</td>
+</tr>
 <tr><th>{% trans "Active" %}</th>
     <td>{{ builder.active }}</td>
 </tr>

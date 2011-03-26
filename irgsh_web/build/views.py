@@ -2,7 +2,7 @@ import tempfile
 import os
 import gzip
 import shutil
-from datetime import datetime
+from datetime import datetime, timedelta
 import mimetypes
 import stat
 try:
@@ -778,6 +778,26 @@ def worker_ping(request):
 def builder_list(request):
     pass
 
+def _get_builder_duration(builder):
+    if settings.DATABASES['default']['ENGINE'].endswith('sqlite3'):
+        items = BuildTask.objects.filter(builder=builder) \
+                                 .exclude(finished=None) \
+                                 .values_list('assigned', 'finished')
+        duration = timedelta(0)
+        for assigned, finished in items:
+            duration += finished - assigned
+        return duration
+
+    else:
+        from django.db import connection, transaction
+        cursor = connection.cursor()
+
+        cursor.execute('''SELECT SUM(finished-assigned) FROM build_buildtask
+                          WHERE finished IS NOT NULL
+                            AND builder_id=%s''', (builder.id,))
+        row = cursor.fetchone()
+        return row[0]
+
 @_builder_name_required
 def builder_show(request, builder):
     limit = 10
@@ -785,17 +805,22 @@ def builder_show(request, builder):
     tasks = all_tasks.select_related(depth=2)[:limit]
     context = {'builder': builder,
                'tasks': tasks,
-               'more_tasks': len(all_tasks) > limit}
+               'more_tasks': len(all_tasks) > limit,
+               'total': len(all_tasks),
+               'total_duration': _get_builder_duration(builder)}
     return render_to_response('build/builder_show.html', context,
                               context_instance=RequestContext(request))
 
 @_builder_name_required
 def builder_task(request, builder):
-    task_list = BuildTask.objects.filter(builder=builder)
+    task_list = BuildTask.objects.filter(builder=builder) \
+                                 .select_related(depth=2)
     tasks = paginate(task_list, 50, request.GET.get('page', 1))
 
     context = {'builder': builder,
-               'tasks': tasks}
+               'tasks': tasks,
+               'total': len(task_list),
+               'total_duration': _get_builder_duration(builder)}
     return render_to_response('build/builder_task.html', context,
                               context_instance=RequestContext(request))
 
