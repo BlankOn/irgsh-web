@@ -45,7 +45,7 @@
     <td class="code"><a href="{{ task.get_absolute_url }}">{{ task.task_id }}</a></td>
     <td>{{ task.assigned|date:"d/m/y H:i" }}</td>
     <td><a href="{{ task.specification.submitter.get_absolute_url }}">{{ task.specification.submitter }}</a></td>
-    <td>{{ task.specification.package.name }}</td>
+    <td><a href="{{ task.specification.package.get_absolute_url }}">{{ task.specification.package.name }}</a></td>
     <td>{{ task.specification.version }}</td>
     <td>{{ task.get_status_display }}</td>
     <td>{{ task.specification.get_status_display }}</td>

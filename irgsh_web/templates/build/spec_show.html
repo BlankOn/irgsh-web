@@ -79,7 +79,7 @@
 {% if build.package %}
 <table class="vertical" id="spec-pkg">
 <tr><th>{% trans "Source Package" %}</th>
-    <td>{{ build.package.name }}</td>
+    <td><a href="{{ build.package.get_absolute_url }}">{{ build.package.name }}</a></td>
 </tr>
 <tr><th>{% trans "Version" %}</th>
     <td>{{ build.version }}</td>

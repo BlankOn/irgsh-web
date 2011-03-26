@@ -18,7 +18,7 @@
 <tr><td><a href="{{ build.get_absolute_url }}">{{ build.id }}</a></td>
     <td>{{ build.created|date:"d/m/y H:i" }}</td>
     <td>{{ build.distribution }}</td>
-    <td>{{ build.package.name }}</td>
+    <td><a href="{{ build.package.get_absolute_url }}">{{ build.package.name }}</a></td>
     <td>{{ build.version }}</td>
     <td><a href="{{ build.submitter.get_absolute_url }}">{{ build.submitter }}</a></td>
 </tr>
