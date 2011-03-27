@@ -48,9 +48,17 @@
 <tr><th>{% trans "Source options" %}</th>
     <td>{% if build.source_opts_raw %}{{ build.source_opts_raw }}{% endif %}</td>
 </tr>
-<tr><th>{% trans "Orig" %}</th>
+<tr><th>{% trans "Original" %}</th>
     <td>{% if build.orig %}<a href="{{ build.orig }}">{{ build.orig }}</a>{% endif %}</td>
 </tr>
+{% if build.extraorig_set.all %}
+<tr><th>{% trans "Additional Originals" %}</th>
+    <td><ul>
+{% for extra in build.extraorig_set.all %}
+        <li><a href="{{ extra.orig }}">{{ extra.orig }}</a></li>
+{% endfor %}
+    </ul></td>
+{% endif %}
 </table>
 
 <p><a href="{% url build_submit %}?copy={{ build.id }}">{% trans "Resubmit Build Job" %}</a></p>
