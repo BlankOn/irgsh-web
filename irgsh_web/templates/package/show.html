@@ -39,7 +39,7 @@
 <tr><td><a href="{{ build.get_absolute_url }}">{{ build.id }}</a></td>
     <td><a href="{{ build.submitter.get_absolute_url }}">{{ build.submitter }}</a></td>
     <td>{{ build.created|date:"d/m/y H:i" }}</td>
-    <td>{{ build.finished|since:build.created }}</td>
+    <td>{% if build.finished %}{{ build.finished|since:build.created }}{% endif %}</td>
     <td>{{ build.distribution }}</td>
     <td>{% if build.version %}{{ build.version }}{% endif %}</td>
     <td>{{ build.get_status_display }}</td>

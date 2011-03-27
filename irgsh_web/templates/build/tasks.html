@@ -14,7 +14,7 @@
 <tr><td><a href="{{ task.specification.get_absolute_url }}">{{ task.specification.id }}</a></td>
     <td><a href="{{ task.get_absolute_url }}">{{ task.task_id }}</a></td>
     <td>{{ task.assigned|date:"d/m/y H:i" }}</td>
-    <td>{{ task.finished|since:task.assigned }}</td>
+    <td>{% if task.finished %}{{ task.finished|since:task.assigned }}{% endif %}</td>
     <td><a href="{{ task.specification.package.get_absolute_url }}">{{ task.specification.package.name }}</a></td>
     <td>{{ task.get_status_display }}</td>
     <td>{{ task.specification.get_status_display }}</td>
