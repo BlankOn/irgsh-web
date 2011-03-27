@@ -694,7 +694,6 @@ def submit(request):
 
             for orig in [orig.strip() for orig in request.POST.getlist('extra')
                                       if orig.strip() != '']:
-                print '> extra orig:', orig
                 extra = ExtraOrig()
                 extra.specification = spec
                 extra.orig = orig
@@ -703,8 +702,6 @@ def submit(request):
             spec.add_log('Build specification created')
 
             tasks.InitSpecification.apply_async(args=(spec.id,))
-            print 'task init:', data
-            print '- spec:', spec
 
             url = reverse('build_spec_show', args=[spec.id])
             return HttpResponseRedirect(url)
