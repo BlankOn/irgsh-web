@@ -8,9 +8,19 @@
 <form method="post" action="">
 {{ form.as_p }}
 <p class="extra"><label for="id_extra">{% trans "Additional Original URLs:" %}</label>
+{% if extra %}
+{% for orig in extra %}
+{% if forloop.first %}
+    <input id="id_extra" type="text" name="extra" value="{{ orig }}"/>
+{% else %}
+    <input type="text" name="extra" value="{{ orig }}"/>
+{% endif %}
+{% endfor %}
+{% else %}
     <input id="id_extra" type="text" name="extra"/>
     <input type="text" name="extra"/>
     <input type="text" name="extra"/>
+{% endif %}
 </p>
 <p><input type="submit"/></p>
 </form>

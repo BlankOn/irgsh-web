@@ -675,6 +675,7 @@ def repo_log(request, spec):
 
 @login_required
 def submit(request):
+    additional = []
     if request.method == 'POST':
         form = SpecificationForm(request.POST)
         if form.is_valid():
@@ -699,6 +700,8 @@ def submit(request):
                 extra.orig = orig
                 extra.save()
 
+                additional.append(orig)
+
             spec.add_log('Build specification created')
 
             tasks.InitSpecification.apply_async(args=(spec.id,))
@@ -716,11 +719,13 @@ def submit(request):
                            'source_opts': spec.source_opts_raw,
                            'source_type': spec.source_type,
                            'orig': spec.orig}
+                additional = spec.extraorig_set.all().values_list('orig', flat=True)
             except (ValueError, Specification.DoesNotExist):
                 return HttpResponseRedirect(reverse(submit))
         form = SpecificationForm(initial=initial)
 
-    context = {'form': form}
+    context = {'form': form,
+               'extra': additional}
     return render_to_response('build/submit.html', context,
                               context_instance=RequestContext(request))
 
