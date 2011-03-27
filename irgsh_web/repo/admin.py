@@ -21,7 +21,7 @@ class PackageDistributionInline(admin.TabularInline):
 
 class PackageAdmin(admin.ModelAdmin):
     def distributions(obj):
-        return ' '.join(map(str, PackageDistribution.objects.filter(package=obj)))
+        return ', '.join(map(str, PackageDistribution.objects.filter(package=obj)))
 
     list_display = ('name', distributions,)
     inlines = [PackageDistributionInline]
