@@ -203,8 +203,8 @@ class SpecInit(object):
 
         try:
             # Download source and build source package
-            build_dir = tempfile.mkdtemp()
-            source_dir = tempfile.mkdtemp()
+            build_dir = tempfile.mkdtemp('-irgsh-build')
+            source_dir = tempfile.mkdtemp('-irgsh-build-source')
 
             # Build source package
             spec.add_log(_('Downloading source code'))
