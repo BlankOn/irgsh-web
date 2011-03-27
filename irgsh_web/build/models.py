@@ -1,11 +1,13 @@
-from datetime import datetime
+import re
 import os
+from datetime import datetime
 
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from picklefield.fields import PickledObjectField
 
@@ -64,6 +66,10 @@ WORKER_TYPES = (
     (2, _('Repository Builder')),
     (3, _('Upload Handler')),
 )
+
+# TODO ORIG_FORMATS = '(gz|bz2|lzma|xz)'
+ORIG_FORMATS = '(gz)'
+re_orig = re.compile(r'.+\.orig\.tar\.%s$' % ORIG_FORMATS)
 
 class Distribution(models.Model):
     '''
@@ -195,6 +201,11 @@ class Specification(models.Model):
            (self.status < 0 or self.status == 999):
             self.finished = datetime.now()
         super(Specification, self).save()
+
+    def clean(self):
+        if self.orig is not None:
+            if not re_orig.match(self.orig):
+                raise ValidationError(_('Invalid original tarball filename'))
 
     def dsc(self):
         if self.package is None:
