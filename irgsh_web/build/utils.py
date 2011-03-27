@@ -30,7 +30,8 @@ def create_build_task_param(spec):
 
     spec_id = spec.id
     build_spec = BuildSpecification(spec.source, spec.source_type,
-                                    spec.source_opts, spec.orig)
+                                    spec.source_opts, spec.orig,
+                                    spec.extraorig_set.all().values_list('orig', flat=True))
 
     dist = spec.distribution
     build_dist = BuildDistribution(dist.name, dist.mirror, dist.dist,
@@ -195,7 +196,8 @@ class SpecInit(object):
 
         spec = self.spec
         srcpkg = SourcePackageBuilder(spec.source, spec.source_type,
-                                      spec.source_opts, spec.orig)
+                                      spec.source_opts, spec.orig,
+                                      spec.extraorig_set.all().values_list('orig', flat=True))
 
         orig_path = None
 
@@ -330,7 +332,8 @@ class SpecInit(object):
         args = create_build_task_param(spec)
 
         # build_spec = BuildSpecification(spec.source, spec.source_type,
-        #                                 spec.source_opts, spec.orig)
+        #                                 spec.source_opts, spec.orig,
+        #                                 spec.extraorig_set.all().values_list('orig', flat=True))
         path = reverse('build_spec_source', args=[self.spec_id, self.dsc])
         url_dsc = 'http://%s%s' % (Site.objects.get_current().domain, path)
         build_spec = BuildSpecification(url_dsc, 'dsc')
