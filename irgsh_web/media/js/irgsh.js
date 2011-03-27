@@ -157,10 +157,28 @@ SourceOptionsHandler.prototype = {
 
 }
 
-var soh = undefined;
+var ExtraOrigHandler = function(container) {
+    this.container = container;
+}
+ExtraOrigHandler.prototype = {
+    init: function() {
+        var span = $('<span><img src="/media/images/add.png"/> add more</span>');
+        this.container.append(span);
+        span.click(function() {
+            var p = span.prev();
+            for (var i=0; i<3; i++) {
+                p.after($('<input type="text" name="extra"/>'));
+            }
+        });
+    }
+}
+
 function init_submit_page() {
-    soh = new SourceOptionsHandler($('#submit-page form'));
+    var soh = new SourceOptionsHandler($('#submit-page form'));
     soh.init();
+
+    var eoh = new ExtraOrigHandler($('#submit-page #id_extra').parent());
+    eoh.init();
 }
 
 

@@ -204,6 +204,16 @@ div.paginator a.nav {
 #submit-page #id_source_opts_bzr li label {
     display: inline;
 }
+#submit-page p.extra input {
+    margin-bottom: 5px;
+}
+#submit-page p.extra span img {
+    vertical-align: middle;
+}
+#submit-page p.extra span:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
 
 #package-page #builds td {
     white-space: nowrap;

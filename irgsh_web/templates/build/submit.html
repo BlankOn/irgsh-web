@@ -7,9 +7,15 @@
 
 <form method="post" action="">
 {{ form.as_p }}
+<p class="extra"><label for="id_extra">{% trans "Additional Original URLs:" %}</label>
+    <input id="id_extra" type="text" name="extra"/>
+    <input type="text" name="extra"/>
+    <input type="text" name="extra"/>
+</p>
 <p><input type="submit"/></p>
 </form>
 
 </div>
 {% endblock %}
+
 

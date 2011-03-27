@@ -32,7 +32,7 @@ except ImportError:
 
 from . import utils, models, tasks
 from .models import BuildTask, Distribution, Specification, BuildTaskLog, \
-                    Builder, Package, SpecificationLog, Worker
+                    Builder, Package, SpecificationLog, Worker, ExtraOrig
 from .forms import SpecificationForm
 from irgsh_web.utils import paginate
 from irgsh_web.repo.models import Package as RepoPackage
@@ -691,6 +691,15 @@ def submit(request):
             spec.source_opts = utils.build_source_opts(data['source_type'],
                                                        data['source_opts'])
             spec.save()
+
+            for orig in [orig.strip() for orig in request.POST.getlist('extra')
+                                      if orig.strip() != '']:
+                print '> extra orig:', orig
+                extra = ExtraOrig()
+                extra.specification = spec
+                extra.orig = orig
+                extra.save()
+
             spec.add_log('Build specification created')
 
             tasks.InitSpecification.apply_async(args=(spec.id,))
