@@ -67,7 +67,7 @@ def datetime_and_age(value):
 
 def since(now, start):
     if not isinstance(now, datetime) or not isinstance(start, datetime):
-        return value
+        return start
 
     delta = now - start
     if delta.days < 0 or delta.seconds < 0:
