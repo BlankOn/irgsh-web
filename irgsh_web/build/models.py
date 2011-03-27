@@ -70,6 +70,7 @@ WORKER_TYPES = (
 # TODO ORIG_FORMATS = '(gz|bz2|lzma|xz)'
 ORIG_FORMATS = '(gz)'
 re_orig = re.compile(r'.+\.orig\.tar\.%s$' % ORIG_FORMATS)
+re_orig_extra = re.compile(r'.+\.orig-[a-z0-9-]+\.tar\.%s$' % ORIG_FORMATS)
 
 class Distribution(models.Model):
     '''
@@ -238,6 +239,14 @@ class Specification(models.Model):
         return all([pkg.architecture == 'all'
                     for pkg in Package.objects.filter(specification=self,
                                                       type=BINARY)])
+
+class ExtraOrig(models.Model):
+    specification = models.ForeignKey(Specification)
+    orig = models.CharField(max_length=1024)
+
+    def clean(self):
+        if not re_orig_extra.match(self.orig):
+            raise ValidationError(_('Invalid additional original tarball filename'))
 
 class Package(models.Model):
     '''
