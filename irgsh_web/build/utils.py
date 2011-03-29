@@ -8,7 +8,7 @@ import tarfile
 import logging
 import random
 import time
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 from datetime import datetime
 
 from django.db import IntegrityError
@@ -200,18 +200,26 @@ class SpecInit(object):
                                       spec.extraorig_set.all().values_list('orig', flat=True))
 
         orig_path = None
+        logger = None
 
         try:
             # Download source and build source package
             build_dir = tempfile.mkdtemp('-irgsh-build')
             source_dir = tempfile.mkdtemp('-irgsh-build-source')
 
+            # Prepare logger
+            logdir = os.path.dirname(self.spec.source_log_path())
+            if not os.path.exists(logdir):
+                os.makedirs(logdir)
+            logname = os.path.join(logdir, 'source.log')
+            logger = open(logname, 'wb')
+
             # Build source package
             spec.add_log(_('Downloading source code'))
             self.log.debug('[%s] Downloading source code' % (self.spec_id,))
 
             self.set_status(101)
-            self.dsc = srcpkg.build(build_dir)
+            self.dsc = srcpkg.build(build_dir, logger)
 
             spec.add_log(_('Source code downloaded'))
             self.log.debug('[%s] Source code downloaded' % (self.spec_id,))
@@ -221,17 +229,23 @@ class SpecInit(object):
             source = os.path.join(source_dir, 'source')
 
             cmd = 'dpkg-source -x %s %s' % (dsc_file, source)
-            p = Popen(cmd.split(), stdout=PIPE, stderr=PIPE)
+            logger.write('# Extracting source package\n')
+            logger.write('# Command: %s\n' % cmd)
+            logger.flush()
+            p = Popen(cmd.split(), stdout=logger, stderr=STDOUT)
             p.communicate()
+            logger.write('\n')
 
             changelog = os.path.join(source, 'debian', 'changelog')
             control = os.path.join(source, 'debian', 'control')
             self.send_description(changelog, control)
 
             # Copy source packages
+            logger.write('# Copying source files:\n')
             src = Sources(open(dsc_file))
             files = [self.dsc] + [info['name'] for info in src['Files']]
             for fname in files:
+                logger.write('# - %s\n' % os.path.basename(fname))
                 target = os.path.join(self.target, fname)
                 if os.path.exists(target):
                     os.unlink(target)
@@ -240,9 +254,25 @@ class SpecInit(object):
 
             return files
 
+        except StandardError, e:
+            logger.write('# Exception happened: %s: %s' % (type(e), str(e)))
+            raise
+
         finally:
             shutil.rmtree(build_dir)
             shutil.rmtree(source_dir)
+
+            if logger is not None:
+                logger.close()
+
+                logger = open(logname, 'rb')
+                gzlogname = os.path.join(logdir, 'source.log.gz')
+                gz = gzip.open(gzlogname, 'wb')
+                gz.write(logger.read())
+                gz.close()
+                logger.close()
+
+                os.unlink(logname)
 
     def send_description(self, changelog, control):
         '''
