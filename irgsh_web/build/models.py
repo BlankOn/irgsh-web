@@ -235,6 +235,19 @@ class Specification(models.Model):
     def repo_log_name(self):
         return 'repo.log.gz'
 
+    def source_log_path(self):
+        return os.path.join(settings.LOG_PATH, 'build',
+                            str(self.id), 'source.log.gz')
+
+    def has_source_log(self):
+        return os.path.exists(self.source_log_path())
+
+    def source_log_url(self):
+        return reverse('build_source_log', args=[self.id])
+
+    def source_log_name(self):
+        return 'source.log.gz'
+
     def is_arch_independent(self):
         return all([pkg.architecture == 'all'
                     for pkg in Package.objects.filter(specification=self,

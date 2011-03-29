@@ -600,6 +600,14 @@ def spec_source(request, spec, path):
 
     return _serve_static(request, fullpath)
 
+@_spec_id_required
+def source_log(request, spec):
+    path = spec.repo_log_path()
+    if not os.path.exists(path):
+        raise Http404()
+
+    return _serve_static(request, path)
+
 @_client_cert_required
 @_spec_id_required
 @_json_result
