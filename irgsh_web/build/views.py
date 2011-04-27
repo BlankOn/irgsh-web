@@ -533,14 +533,22 @@ def spec_description(request, spec):
         tmpdir = tempfile.mkdtemp()
 
         for fname in files:
+            # Save
             fin = request.FILES[fname]
             f = open(os.path.join(tmpdir, '%s.gz' % fname), 'wb')
             f.write(fin.read())
             f.close()
 
-        gz = [gzip.open(os.path.join(tmpdir, '%s.gz' % fname))
-              for fname in files]
-        return _set_description(spec, gz[0], gz[1])
+            # Extract
+            fgz = gzip.open(os.path.join(tmpdir, '%s.gz' % fname))
+            f = open(os.path.join(tmpdir, fname), 'wb')
+            f.write(fgz.read())
+            f.close()
+            fgz.close()
+
+        items = [open(os.path.join(tmpdir, fname))
+                 for fname in files]
+        return _set_description(spec, items[0], items[1])
 
     finally:
         shutil.rmtree(tmpdir)
