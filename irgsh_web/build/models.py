@@ -180,6 +180,9 @@ class Specification(models.Model):
     version = models.CharField(max_length=255, null=True, default=None)
     changelog = models.TextField(null=True, default=None)
 
+    priority = models.CharField(max_length=255, null=True, default=None)
+    section = models.CharField(max_length=255, null=True, default=None)
+
     source_uploaded = models.DateTimeField(null=True, default=None)
 
     created = models.DateTimeField(default=datetime.now)
