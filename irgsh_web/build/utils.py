@@ -459,7 +459,7 @@ def rebuild_repo(spec):
             dist.name,
             pkgdist.component.name,
             task_arch_list,
-            spec.priority, spec.section]
+            spec.section, spec.priority]
     kwargs = None
     opts = {'exchange': 'repo',
             'exchange_type': 'direct',
