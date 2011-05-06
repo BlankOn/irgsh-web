@@ -177,6 +177,8 @@ def _set_description(spec, fcontrol, fchangelog):
         return {'status': 'fail', 'code': 406, 'msg': _('Incomplete package')}
 
     name = info['name']
+    priority = info['priority']
+    section = info['section']
 
     # The package must have a name
     if name is None:
@@ -226,6 +228,8 @@ def _set_description(spec, fcontrol, fchangelog):
     spec.package = pkg
     spec.version = version
     spec.changelog = last_changelog
+    spec.priority = priority
+    spec.section = section
     spec.save()
 
     utils.store_package_info(spec, info)

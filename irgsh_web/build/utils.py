@@ -63,17 +63,26 @@ def get_package_info(packages):
 
     items = []
     name = None
+    priority = None
+    section = None
     for info in packages:
         try:
             pkg = {}
             if info.has_key('Source'):
                 pkg['name'] = info['Source']
                 pkg['type'] = SOURCE
+
                 name = info['Source']
-            else:
+                priority = info.get('Priority', None)
+                section = info.get('Section', None)
+
+            elif info.has_key('Package'):
                 pkg['name'] = info['Package']
                 pkg['type'] = BINARY
                 pkg['architecture'] = info['Architecture']
+
+            else:
+                continue
 
             desc, long_desc = None, None
             if info.has_key('Description'):
@@ -87,6 +96,8 @@ def get_package_info(packages):
             pass
 
     result = {'name': name,
+              'priority': priority,
+              'section': section,
               'packages': items}
 
     return result
