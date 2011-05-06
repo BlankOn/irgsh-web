@@ -73,7 +73,7 @@ class SpecificationAdmin(admin.ModelAdmin):
     specification_id.admin_order_field = 'id'
 
     list_display = (specification_id, 'distribution', 'submitter', 'status',
-                    'package', 'version',
+                    'package', 'version', 'section', 'priority',
                     'created',)
 
     fieldsets = (
@@ -84,7 +84,7 @@ class SpecificationAdmin(admin.ModelAdmin):
             'fields': ('source', 'source_type', 'orig',),
         }),
         ('Package', {
-            'fields': ('package', 'version',)
+            'fields': ('package', 'version', 'section', 'priority',)
         }),
     )
 

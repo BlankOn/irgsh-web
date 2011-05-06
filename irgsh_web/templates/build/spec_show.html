@@ -101,6 +101,16 @@
 <tr><th>{% trans "Version" %}</th>
     <td>{{ build.version }}</td>
 </tr>
+{% if build.section %}
+<tr><th>{% trans "Section" %}</th>
+    <td>{{ build.section }}</td>
+</tr>
+{% endif %}
+{% if build.priority %}
+<tr><th>{% trans "Priority" %}</th>
+    <td>{{ build.priority }}</td>
+</tr>
+{% endif %}
 <tr><th>{% trans "Changelog" %}</th>
     <td id="spec-changelog"><pre>{{ build.changelog|filter_email }}</pre></td>
 </tr>
