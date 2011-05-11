@@ -1,4 +1,7 @@
-import json
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 from django.conf import settings
 from django.core.urlresolvers import reverse

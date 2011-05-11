@@ -17,6 +17,6 @@ setup(
     install_requires = ['setuptools', 'django-openid-auth', 'django-xmlrpc',
                         'python-openid', 'celery>=2.2', 'django-celery>=2.2',
                         'django-picklefield', 'poster', 'python-debian',
-                        'django-debug-toolbar', 'South']
+                        'django-debug-toolbar', 'South', 'simplejson']
 )
 
