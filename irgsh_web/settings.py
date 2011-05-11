@@ -84,7 +84,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django_openid_auth',
-    'django_xmlrpc',
     'south',
     'irgsh_web',
     'irgsh_web.account',
@@ -118,8 +117,6 @@ LOG_PATH = 'run/logs'
 
 
 ROOT_URLCONF = 'irgsh_web.urls'
-
-XMLRPC_METHODS = ()
 
 import djcelery
 djcelery.setup_loader()
