@@ -14,7 +14,7 @@ setup(
     description = 'Ir. Robot Gedek, SH',
     author = 'BlankOn Developers',
     packages = packages,
-    install_requires = ['setuptools', 'django-openid-auth', 'django-xmlrpc',
+    install_requires = ['setuptools', 'django-openid-auth',
                         'python-openid', 'celery>=2.2', 'django-celery>=2.2',
                         'django-picklefield', 'poster', 'python-debian',
                         'django-debug-toolbar', 'South', 'simplejson']
