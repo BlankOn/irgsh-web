@@ -67,33 +67,3 @@ urlpatterns += patterns('irgsh_web.build.views',
     url(r'^$', 'summary', name='build_summary'),
 )
 
-
-# from irgsh_web.jobs.views import *
-# 
-# urlpatterns = patterns('',
-#     # Example:
-#     # (r'^web_builder/', include('web_builder.foo.urls')),
-# 
-#     # Uncomment the admin/doc line below and add 'djantgo.contrib.admindocs' 
-#     # to INSTALLED_APPS to enable admin documentation:
-#     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-# 
-#     # Uncomment the next line to enable the admin:
-#     (r'^admin/', include(admin.site.urls)),
-#     (r'^build/', include('irgsh_web.build.urls')),
-# 
-#     (r'^o/', include('django_openid_auth.urls')),
-#     (r'^logout/', site_logout),
-#     ('^new-job/', new_job),
-#     ('^builder/(?P<builder_id>.*)$', builder),
-#     ('^task/(?P<task_id>.*)$', task),
-#     ('^tasks/$', tasks),
-#     (r'xmlrpc/$', 'django_xmlrpc.views.handle_xmlrpc',),
-#     ('^$', site_index),
-# )
-# 
-# urlpatterns += patterns('',
-#     (r'^site-media/(?P<path>.*)$', 'django.views.static.serve',
-#     {'document_root': settings.MEDIA_ROOT}),
-# )
-
