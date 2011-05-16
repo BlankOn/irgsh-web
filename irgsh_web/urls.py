@@ -11,7 +11,7 @@ urlpatterns = patterns('',
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': settings.MEDIA_ROOT}),
     (r'^account/', include('irgsh_web.account.urls')),
-    (r'package/', include('irgsh_web.package.urls')),
+    (r'^package/', include('irgsh_web.package.urls')),
 )
 
 TASK_ID = r'(?P<task_id>\d+\.\d+\.\d+)'
