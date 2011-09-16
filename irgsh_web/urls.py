@@ -55,7 +55,7 @@ urlpatterns += patterns('irgsh_web.build.views',
     url(r'^data/authorized_keys.json$', 'authorized_keys', name='build_authorized_keys'),
 
     # users
-    url(r'^user/(?P<name>[a-z0-9_-]+)/$', 'user_show', name='build_user_show'),
+    url(r'^user/(?P<name>[A-Za-z0-9_-]+)/$', 'user_show', name='build_user_show'),
 
     # shortcuts
     (r'^(?P<spec_id>\d+)/$', redirect_to, {'url': '/build/%(spec_id)s/',
