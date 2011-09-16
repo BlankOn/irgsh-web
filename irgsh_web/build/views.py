@@ -167,6 +167,18 @@ def _client_cert_required(func):
         return func(request, *args, **kwargs)
     return _func
 
+def _permission_required(perm):
+    def _outer_func(f):
+        def _func(request, *args, **kwargs):
+            if not request.user.has_perm(perm):
+                res = render_to_response('build/no_permission.html',
+                                         context_instance=RequestContext(request))
+                res.status_code = 403
+                return res
+            return f(request, *args, **kwargs)
+        return _func
+    return _outer_func
+
 def _set_description(spec, fcontrol, fchangelog):
     # Get packages info
     packages = Packages.iter_paragraphs(fcontrol)
@@ -694,6 +706,7 @@ def repo_log(request, spec):
     return _serve_static(request, path)
 
 @login_required
+@_permission_required('build.specification_submit')
 def submit(request):
     additional = []
     if request.method == 'POST':

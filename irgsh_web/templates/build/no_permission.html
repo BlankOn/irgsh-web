@@ -1,0 +1,9 @@
+{% extends "build/base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{% trans "Access Denied" %}</h1>
+
+<p>{% trans "Sorry, you have no permission to submit a new build job." %}</p>
+{% endblock %}
+
