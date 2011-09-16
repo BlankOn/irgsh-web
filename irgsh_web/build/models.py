@@ -191,6 +191,9 @@ class Specification(models.Model):
 
     class Meta:
         ordering = ('-created',)
+        permissions = (
+            ('submit', _('Can submit a new job')),
+        )
 
     def __unicode__(self):
         param = {'dist': self.distribution}
