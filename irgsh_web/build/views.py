@@ -457,6 +457,10 @@ def task_claim(request, task):
 
     return {'status': 'ok', 'code': 200}
 
+@_spec_id_required
+def task_build(request, spec):
+    return HttpResponseRedirect(spec.get_absolute_url())
+
 @_task_id_required
 def task_show(request, task):
     '''

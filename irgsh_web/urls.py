@@ -37,6 +37,7 @@ urlpatterns += patterns('irgsh_web.build.views',
     url(r'^task/%s/status/$' % TASK_ID, 'task_status', name='build_task_status'),
     url(r'^task/%s/info/$' % TASK_ID, 'task_info', name='build_task_info'),
     url(r'^task/%s/claim/$' % TASK_ID, 'task_claim', name='build_task_claim'),
+    url(r'^task/(?P<spec_id>\d+)/$', 'task_build', name='build_task_build'),
     url(r'^task/%s/$' % TASK_ID, 'task_show', name='build_task_show'),
 
     # submit
