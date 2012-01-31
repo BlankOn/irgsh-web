@@ -1,9 +1,12 @@
 from django.conf.urls.defaults import *
-from django.views.generic.simple import redirect_to
 from django.conf import settings
 
 from django.contrib import admin
 admin.autodiscover()
+
+from .views import redirect_spec, redirect_task, redirect_user
+
+TASK_ID = r'(?P<task_id>\d+\.\d+\.\d+)'
 
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
@@ -12,9 +15,12 @@ urlpatterns = patterns('',
         {'document_root': settings.MEDIA_ROOT}),
     (r'^account/', include('irgsh_web.account.urls')),
     (r'^package/', include('irgsh_web.package.urls')),
-)
 
-TASK_ID = r'(?P<task_id>\d+\.\d+\.\d+)'
+    # shortcuts
+    (r'^(?P<spec_id>\d+)/$', redirect_spec),
+    (r'^%s/$' % TASK_ID, redirect_task),
+    (r'^~(?P<name>[A-Za-z0-9_-]+)/$', redirect_user),
+)
 
 urlpatterns += patterns('irgsh_web.build.views',
     # build spec
@@ -57,12 +63,6 @@ urlpatterns += patterns('irgsh_web.build.views',
 
     # users
     url(r'^user/(?P<name>[A-Za-z0-9_-]+)/$', 'user_show', name='build_user_show'),
-
-    # shortcuts
-    (r'^(?P<spec_id>\d+)/$', redirect_to, {'url': '/build/%(spec_id)s/',
-                                           'permanent': True}),
-    (r'^%s/$' % TASK_ID, redirect_to, {'url': '/task/%(task_id)s/',
-                                       'permanent': True}),
 
     # summary
     url(r'^$', 'summary', name='build_summary'),
