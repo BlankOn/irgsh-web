@@ -202,6 +202,8 @@ class SpecInit(object):
         self.log.debug('[%s] Resource directory: %s' % (self.spec_id, self.target))
 
     def download(self):
+        from .tasks import tweet_status
+
         # Prepare source package builder
         from irgsh.source import SourcePackageBuilder
 
@@ -267,6 +269,8 @@ class SpecInit(object):
 
         except StandardError, e:
             logger.write('# Exception happened: %s: %s' % (type(e), str(e)))
+            tweet_status.delay('[irgsh] Build #%d failed to initialize - %s ' % \
+                               (self.spec_id, self.spec.get_short_url()))
             raise
 
         finally:
@@ -293,6 +297,7 @@ class SpecInit(object):
         this specification is allowed to proceed or not.
         '''
         from . import manager
+        from .tasks import tweet_status
 
         if self.description_sent:
             return
@@ -317,12 +322,19 @@ class SpecInit(object):
             if res['status'] != 'ok':
                 self.log.debug('[%s] Package is rejected: %s' % (self.spec_id, res))
 
+                tweet_status.delay('[irgsh] Build #%d rejected - %s' % \
+                                   (self.spec_id, self.spec.get_short_url()))
+
                 # Package is rejected
                 raise ValueError(_('Package rejected: %(msg)s') % \
                                  {'msg': res['msg']})
 
             self.log.debug('[%s] Package is accepted: %s' % \
                            (self.spec_id, res['package']))
+
+            tweet_status.delay('[irgsh] Build #%d accepted: %s %s - %s' % \
+                               (self.spec_id, res['package'], res['version'],
+                                self.spec.get_short_url()))
 
         finally:
             self.description_sent = True
