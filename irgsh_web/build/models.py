@@ -14,6 +14,7 @@ from picklefield.fields import PickledObjectField
 from irgsh_web.repo.models import Distribution as RepoDistribution
 from irgsh_web.repo.models import Package as RepoPackage
 from irgsh_web.repo.models import Architecture
+from irgsh_web.utils import build_short_url
 
 SOURCE = 0
 BINARY = 1
@@ -228,6 +229,9 @@ class Specification(models.Model):
     def get_absolute_url(self):
         return reverse('build_spec_show', args=[self.id])
 
+    def get_short_url(self):
+        return build_short_url(reverse('short_build', args=[self.id]))
+
     def repo_log_path(self):
         return os.path.join(settings.LOG_PATH, 'build',
                             str(self.id), 'repo.log.gz')
@@ -369,6 +373,9 @@ class BuildTask(models.Model):
 
     def get_absolute_url(self):
         return reverse('build_task_show', args=[self.task_id])
+
+    def get_short_url(self):
+        return build_short_url(reverse('short_task', args=[self.task_id]))
 
     def build_log_path(self):
         return os.path.join(settings.LOG_PATH, 'task',
