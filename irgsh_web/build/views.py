@@ -396,9 +396,9 @@ def task_status(request, task):
                        {'builder': task.builder})
         _set_spec_status(spec.id, -1)
 
-        tasks.tweet_status.delay('[irgsh] Build #%d (%s %s) task %s (%s) failed - %s' % \
-                                 (spec.id, spec.package.name, spec.version,
-                                  task.task_id, task.architecture.name,
+        tasks.tweet_status.delay('[irgsh] Build #%d task %s (%s) failed: %s %s - %s' % \
+                                 (spec.id, task.task_id, task.architecture.name,
+                                  spec.package.name, spec.version,
                                   task.get_short_url()))
 
         # Cancel other tasks
@@ -671,7 +671,7 @@ def repo_status(request, spec):
         else:
             spec.add_log('Rebuilding repository for %s failed' % arch)
 
-        tasks.tweet_status.delay('[irgsh] Build #%d (%s %s) failed to rebuild repository - %s' % \
+        tasks.tweet_status.delay('[irgsh] Build #%d failed to rebuild repository: %s %s - %s' % \
                                  (spec.id, spec.package.name, spec.version,
                                   spec.get_short_url()))
 
@@ -685,7 +685,7 @@ def repo_status(request, spec):
 
         spec.add_log('Repository rebuilt, all done.')
 
-        tasks.tweet_status.delay('[irgsh] Build #%d (%s %s) finished - %s' % \
+        tasks.tweet_status.delay('[irgsh] Build #%d finished: %s %s - %s' % \
                                  (spec.id, spec.package.name, spec.version,
                                   spec.get_short_url()))
 
