@@ -17,9 +17,9 @@ urlpatterns = patterns('',
     (r'^package/', include('irgsh_web.package.urls')),
 
     # shortcuts
-    (r'^(?P<spec_id>\d+)/$', redirect_spec),
-    (r'^%s/$' % TASK_ID, redirect_task),
-    (r'^~(?P<name>[A-Za-z0-9_-]+)/$', redirect_user),
+    url(r'^(?P<spec_id>\d+)/$', redirect_spec, name='short_build'),
+    url(r'^%s/$' % TASK_ID, redirect_task, name='short_task'),
+    url(r'^~(?P<name>[A-Za-z0-9_-]+)/$', redirect_user, name='short_user'),
 )
 
 urlpatterns += patterns('irgsh_web.build.views',
