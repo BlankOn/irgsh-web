@@ -6,11 +6,12 @@ from subprocess import Popen, PIPE
 
 from django.conf import settings
 
-from celery.task import Task, PeriodicTask
+from celery.task import task, Task, PeriodicTask
 from celery.worker.control import Panel
 
 from . import utils, manager
 from .models import Specification
+from irgsh_web.utils import tweet
 
 class InitSpecification(Task):
     '''Initialize specification.
@@ -132,4 +133,8 @@ def report_alive(panel):
         manager.ping()
 
     return {'status': 'ok'}
+
+@task()
+def tweet_status(message):
+    tweet(message)
 
