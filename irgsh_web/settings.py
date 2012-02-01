@@ -158,6 +158,8 @@ TWITTER_CONFIG = dict(CONSUMER_KEY=None,
                       ACCESS_TOKEN_SECRET=None)
 SHORT_URL = 'http://p.blankon.in/'
 
+AUTH_PROFILE_MODULE = 'account.UserProfile'
+
 LOCAL_SETTINGS = os.path.join(PROJECT_PATH, 'localsettings.py')
 if os.path.exists(LOCAL_SETTINGS):
     execfile(LOCAL_SETTINGS)
