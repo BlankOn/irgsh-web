@@ -152,6 +152,11 @@ DOWNLOAD_TARGET = 'static/source/'
 SERVER = 'https://irgsh.dahsy.at:9443/'
 REPO_UPLOAD_SERVE = 'irgsh-upload-serve'
 
+TWITTER_CONFIG = dict(CONSUMER_KEY=None,
+                      CONSUMER_SECRET=None,
+                      ACCESS_TOKEN_KEY=None,
+                      ACCESS_TOKEN_SECRET=None)
+
 LOCAL_SETTINGS = os.path.join(PROJECT_PATH, 'localsettings.py')
 if os.path.exists(LOCAL_SETTINGS):
     execfile(LOCAL_SETTINGS)

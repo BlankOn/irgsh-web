@@ -69,3 +69,28 @@ def paginate(queryset, total, page):
 
     return items
 
+def tweet(message):
+    try:
+        import twitter
+        conf = settings.TWITTER_CONFIG
+        consumer_key = conf['CONSUMER_KEY']
+        consumer_secret = conf['CONSUMER_SECRET']
+        access_token_key = conf['ACCESS_TOKEN_KEY']
+        access_token_secret = conf['ACCESS_TOKEN_SECRET']
+    except (ImportError, TypeError, KeyError):
+        return False
+
+    if None in (consumer_key, consumer_secret,
+                access_token_key, access_token_secret):
+        return False
+
+    try:
+        api = twitter.Api(consumer_key=consumer_key,
+                          consumer_secret=consumer_secret,
+                          access_token_key=access_token_key,
+                          access_token_secret=access_token_secret)
+        api.PostUpdate(message)
+        return True
+    except (twitter.TwitterError, TypeError):
+        return False
+
