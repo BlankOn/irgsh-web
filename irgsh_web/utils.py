@@ -97,3 +97,11 @@ def tweet(message):
 def build_short_url(path):
     return '%s/%s' % (settings.SHORT_URL.rstrip('/'), path.lstrip('/'))
 
+def get_twitter_or_username(specification):
+    user = specification.submitter
+    profile = user.get_profile()
+
+    if profile and profile.twitter:
+        return '@%s' % profile.twitter
+    return user.username
+
