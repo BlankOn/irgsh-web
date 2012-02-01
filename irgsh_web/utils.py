@@ -94,3 +94,6 @@ def tweet(message):
     except (twitter.TwitterError, TypeError):
         return False
 
+def build_short_url(path):
+    return '%s/%s' % (settings.SHORT_URL.rstrip('/'), path.lstrip('/'))
+

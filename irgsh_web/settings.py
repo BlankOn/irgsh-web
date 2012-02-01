@@ -156,6 +156,7 @@ TWITTER_CONFIG = dict(CONSUMER_KEY=None,
                       CONSUMER_SECRET=None,
                       ACCESS_TOKEN_KEY=None,
                       ACCESS_TOKEN_SECRET=None)
+SHORT_URL = 'http://p.blankon.in/'
 
 LOCAL_SETTINGS = os.path.join(PROJECT_PATH, 'localsettings.py')
 if os.path.exists(LOCAL_SETTINGS):
