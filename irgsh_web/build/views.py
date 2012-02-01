@@ -246,7 +246,7 @@ def _set_description(spec, fcontrol, fchangelog):
 
     utils.store_package_info(spec, info)
 
-    return {'status': 'ok', 'package': name}
+    return {'status': 'ok', 'package': name, 'version': version}
 
 @_task_id_required
 def task_build_log(request, task):
