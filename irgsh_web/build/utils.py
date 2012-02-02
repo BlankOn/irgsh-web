@@ -534,3 +534,36 @@ def cancel_other_tasks(spec, exception):
                           'task_id': exception.task_id})
             revoke(task.task_id)
 
+def send_tweet(spec_or_task, message, package=None, version=None):
+    from .tasks import tweet_status
+    from .models import Specification
+    from irgsh_web.utils import get_twitter_or_username
+
+    url = spec_or_task.get_short_url()
+    if isinstance(spec_or_task, Specification):
+        spec = spec_or_task
+        task = None
+    else:
+        spec = spec_or_task.specification
+        task = spec_or_task
+
+    submitter = get_twitter_or_username(spec.submitter)
+
+    msg = ['[irgsh] %(url)s %(submitter)s - Build #%(spec_id)d' % \
+           dict(url=url, submitter=submitter, spec_id=spec.id)]
+
+    if spec.package is not None:
+        package = spec.package.name
+        version = spec.version
+
+    if package is not None and version is not None:
+        msg.append(' %(package)s %(version)s' % dict(package=package,
+                                                     version=version))
+
+    if task is not None:
+        msg.append(' - Task %(task_id)s (%(arch)s)' % dict(task_id=task.task_id,
+                                                           arch=task.architecture.name))
+
+    msg.append(' | %s' % message)
+    tweet_status.delay(''.join(msg))
+
