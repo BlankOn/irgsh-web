@@ -34,7 +34,7 @@ from . import utils, models, tasks
 from .models import BuildTask, Distribution, Specification, BuildTaskLog, \
                     Builder, Package, SpecificationLog, Worker, ExtraOrig
 from .forms import SpecificationForm
-from irgsh_web.utils import paginate, get_twitter_or_username
+from irgsh_web.utils import paginate
 from irgsh_web.repo.models import Package as RepoPackage
 from irgsh_web.repo.models import PackageDistribution
 
@@ -396,11 +396,7 @@ def task_status(request, task):
                        {'builder': task.builder})
         _set_spec_status(spec.id, -1)
 
-        tasks.tweet_status.delay('[irgsh] Build #%d task %s (%s) failed: %s %s - %s %s' % \
-                                 (spec.id, task.task_id, task.architecture.name,
-                                  spec.package.name, spec.version,
-                                  get_twitter_or_username(spec),
-                                  task.get_short_url()))
+        utils.send_tweet(task, 'Failed')
 
         # Cancel other tasks
         utils.cancel_other_tasks(spec, task)
@@ -672,10 +668,7 @@ def repo_status(request, spec):
         else:
             spec.add_log('Rebuilding repository for %s failed' % arch)
 
-        tasks.tweet_status.delay('[irgsh] Build #%d failed to rebuild repository: %s %s - %s %s' % \
-                                 (spec.id, spec.package.name, spec.version,
-                                  get_twitter_or_username(spec),
-                                  spec.get_short_url()))
+        utils.send_tweet(spec, 'Failed to rebuild repository')
 
     elif status == 0:
         # SUCCESS
@@ -687,10 +680,7 @@ def repo_status(request, spec):
 
         spec.add_log('Repository rebuilt, all done.')
 
-        tasks.tweet_status.delay('[irgsh] Build #%d finished: %s %s - %s %s' % \
-                                 (spec.id, spec.package.name, spec.version,
-                                  get_twitter_or_username(spec),
-                                  spec.get_short_url()))
+        utils.send_tweet(spec, 'Finished')
 
     return {'status': 'ok', 'code': status}
 

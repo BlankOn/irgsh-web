@@ -202,9 +202,6 @@ class SpecInit(object):
         self.log.debug('[%s] Resource directory: %s' % (self.spec_id, self.target))
 
     def download(self):
-        from .tasks import tweet_status
-        from irgsh_web.utils import get_twitter_or_username
-
         # Prepare source package builder
         from irgsh.source import SourcePackageBuilder
 
@@ -270,9 +267,7 @@ class SpecInit(object):
 
         except StandardError, e:
             logger.write('# Exception happened: %s: %s' % (type(e), str(e)))
-            tweet_status.delay('[irgsh] Build #%d failed to initialize - %s %s' % \
-                               (self.spec_id, get_twitter_or_username(spec),
-                                self.spec.get_short_url()))
+            send_tweet(self.spec, 'Failed to initialize')
             raise
 
         finally:
@@ -299,8 +294,6 @@ class SpecInit(object):
         this specification is allowed to proceed or not.
         '''
         from . import manager
-        from .tasks import tweet_status
-        from irgsh_web.utils import get_twitter_or_username
 
         if self.description_sent:
             return
@@ -324,10 +317,7 @@ class SpecInit(object):
                                                 gzchangelog, gzcontrol)
             if res['status'] != 'ok':
                 self.log.debug('[%s] Package is rejected: %s' % (self.spec_id, res))
-
-                tweet_status.delay('[irgsh] Build #%d rejected - %s %s' % \
-                                   (self.spec_id, get_twitter_or_username(self.spec),
-                                    self.spec.get_short_url()))
+                send_tweet(self.spec, 'Rejected')
 
                 # Package is rejected
                 raise ValueError(_('Package rejected: %(msg)s') % \
@@ -336,10 +326,8 @@ class SpecInit(object):
             self.log.debug('[%s] Package is accepted: %s' % \
                            (self.spec_id, res['package']))
 
-            tweet_status.delay('[irgsh] Build #%d accepted: %s %s - %s %s' % \
-                               (self.spec_id, res['package'], res['version'],
-                                get_twitter_or_username(self.spec),
-                                self.spec.get_short_url()))
+            send_tweet(self.spec, 'Accepted', package=res['package'],
+                       version=res['version'])
 
         finally:
             self.description_sent = True
