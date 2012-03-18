@@ -7,7 +7,7 @@ header {
     padding: 5px;
     color: #eeeeec;
     text-align: right;
-    border-bottom: 3px solid #4e9a06;
+    border-bottom: 3px solid #545453;
     margin: 0 0 10px 0;
 }
 
@@ -20,12 +20,12 @@ header menu li {
 }
 
 header menu li a:hover {
-    background-color: #4e9a06;
+    background-color: #000000;
     color: #e2e3db;
 }
 
 header menu li a {
-    color: black;
+    color: ffffff;
     text-decoration: none;
     padding: 7px 5px 5px 5px;
     margin: 0x;
@@ -38,7 +38,7 @@ header img#logo {
 }
 
 a.submenu {
-    color: black;
+    color: ffffff;
     padding: 0 10px 0 0;
 }
 
