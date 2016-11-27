@@ -131,7 +131,7 @@ CELERY_DEFAULT_QUEUE = 'celery'
 CELERY_DEFAULT_EXCHANGE = 'celery'
 CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
 
-BROKER_HOST = 'irgsh.dahsy.at'
+BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
 BROKER_USER = 'irgsh'
 BROKER_PASSWORD = 'irgsh'
@@ -174,4 +174,3 @@ if EXTRA_SETTINGS_DIR is not None:
     mods = sorted(glob(os.path.join(EXTRA_SETTINGS_DIR, '*.py')))
     for mod in mods:
         execfile(mod)
-
