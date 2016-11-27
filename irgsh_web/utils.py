@@ -50,11 +50,8 @@ def send_message(url, param=None):
             data = urllib.urlencode(param)
 
     # Create request
-    print '[send message] url: %s, param: %s' % (url, param)
     request = urllib2.Request(url, data, headers)
-    response = opener.open(request).read()
-    print '[send message] response: %s' % response
-    return response
+    return opener.open(request).read()
 
 def paginate(queryset, total, page):
     try:

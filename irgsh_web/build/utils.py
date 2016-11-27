@@ -266,9 +266,6 @@ class SpecInit(object):
             return files
 
         except StandardError, e:
-            import traceback
-            traceback.print_stack()
-
             logger.write('# Exception happened: %s: %s' % (type(e), str(e)))
             send_tweet(self.spec, 'Failed to initialize')
             raise
