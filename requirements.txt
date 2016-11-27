@@ -1,0 +1,15 @@
+setuptools
+django-openid-auth==0.2
+python-openid
+celery>=2.2.7,<2.3
+django-celery>=2.2.7,<2.3
+django-picklefield==0.1.7
+poster
+python-debian
+django-debug-toolbar==0.9.4
+South
+simplejson
+Django==1.2.5
+psycopg2
+flup
+chardet
