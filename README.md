@@ -37,10 +37,10 @@ Instalasi
 
 ### Unduh kode sumber
 
-    $ git clone git://github.com/fajran/python-irgsh.git
-    $ git clone git://github.com/fajran/web-interfaces.git
-    $ git clone git://github.com/fajran/irgsh-node.git
-    $ git clone git://github.com/fajran/irgsh-repo.git
+    $ git clone git://github.com/BlankOn/python-irgsh.git
+    $ git clone git://github.com/BlankOn/web-interfaces.git
+    $ git clone git://github.com/BlankOn/irgsh-node.git
+    $ git clone git://github.com/BlankOn/irgsh-repo.git
     $ cd web-interfaces
     $ ln -s ../python-irgsh/irgsh
     $ ln -s ../irgsh-node/irgsh_node
@@ -121,7 +121,7 @@ berikut.
     SOURCE_UPLOAD_KEY = 'local/taskinit-ssh.key'
     
     # Lokasi Irgsh
-    SERVER = 'https://192.168.56.1:8443/'
+    SERVER = 'https://192.168.1.1:8443/'
     
     # Lokasi penyimpanan log
     LOG_PATH = 'run/logs'
