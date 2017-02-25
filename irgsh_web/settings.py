@@ -44,7 +44,7 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = unicode(os.path.join(PROJECT_PATH, 'media')) 
+MEDIA_ROOT = unicode(os.path.join(PROJECT_PATH, 'media'))
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -103,14 +103,17 @@ ABSOLUTE_URL_OVERRIDES = {
     'auth.user': lambda o: '/user/%s/' % o.username
 }
 
-INTERNAL_IPS = ('127.0.0.1', '192.168.56.1',)
+INTERNAL_IPS = ('127.0.0.1')
 
+
+# SSO
+## Set aku.boi host here
 OPENID_CREATE_USERS = True
 OPENID_UPDATE_DETAILS_FROM_SREG = True
 LOGIN_URL = '/account/login'
 LOGIN_REDIRECT_URL = '/'
-OPENID_SSO_SERVER_URL = "http://82.181.46.34:8081/o/"
-FULL_LOGOUT_URL = "http://82.181.46.34:8081/logout"
+OPENID_SSO_SERVER_URL = "http://localhost:3000/o/"
+FULL_LOGOUT_URL = "http://localhost:3000/logout"
 OPENID_USE_AS_ADMIN_LOGIN = True
 
 LOG_PATH = 'run/logs'
