@@ -29,8 +29,8 @@ Kebutuhan
 Pengguna sistem operasi berbasis Debian dapat menjalankan perintah berikut
 untuk memasang semua kebutuhan.
 
-    $ sudo apt-get install python dpkg-dev rabbitmq-server git-core nginx
-
+		$ apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils sudoers python python-pip python-dev python-debian dpkg-dev rabbitmq-server git-core nginx libpq-dev git vim
 
 Instalasi
 ---------
