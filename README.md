@@ -81,6 +81,10 @@ Konfigurasi koneksi dengan SSL
        ]}
     ].
 
+Restart RabbitMQ.
+
+    $ sudo /etc/init.d/rabbitmq-server restart
+
 Tutup koneksi tanpa SSL dari luar menuju RabbitMQ.
 
     $ sudo iptables -A INPUT -p tcp --dport 5672 -j REJECT
@@ -88,15 +92,13 @@ Tutup koneksi tanpa SSL dari luar menuju RabbitMQ.
 Simpan konfigurasi iptables dengan `iptables-save` dan pastikan konfigurasi
 dipasang kembali setiap mesin dihidupkan.
 
+
 Verifikasi koneksi SSL dengan perintah berikut. Jika berhasil, maka
 informasi sertifikat akan ditampilkan.
 
     $ openssl s_client -cert taskinit.pem -key taskinit.key \
-                       -connect localhost:5671 
+                       -connect localhost:5671
 
-Restart RabbitMQ.
-
-    $ sudo /etc/init.d/rabbitmq-server restart
 
 ### Konfigurasi Irgsh
 
@@ -106,7 +108,7 @@ berikut.
     # Sertifikat pekerja penyiap tugas
     SSL_KEY = 'local/taskinit.key'
     SSL_CERT = 'local/taskinit.pem'
-    
+
     # Konfigurasi antrian
     BROKER_HOST = '127.0.0.1'
     BROKER_PORT = 5671
@@ -119,10 +121,10 @@ berikut.
     SOURCE_UPLOAD_USER = 'upload'
     SOURCE_UPLOAD_PORT = 22
     SOURCE_UPLOAD_KEY = 'local/taskinit-ssh.key'
-    
+
     # Lokasi Irgsh
     SERVER = 'https://192.168.1.1:8443/'
-    
+
     # Lokasi penyimpanan log
     LOG_PATH = 'run/logs'
 
@@ -155,7 +157,7 @@ sesuaikan hal-hal berikut.
    Sesuaikan dengan nilai konfigurasi `LOG_PATH`
 4. Nama server pada `server_name`.
 5. Lokasi sertifikat pada `ssl_client_certificate, `ssl_certificate`, dan
-   `ssl_certificate_key`. 
+   `ssl_certificate_key`.
 6. Koneksi FastCGI dengan Django. Sesuaikan dengan cara menjalankan Django.
    Konfigurasi default mengharapkan Django menjalankan FastCGI melalui
    TCP socket pada `localhost` port `18000`.
