@@ -48,9 +48,7 @@ Instalasi
 
 ### Persiapkan kode sumber
 
-    $ python bootstrap.py
-    $ ./bin/buildout
-
+    $ pip install -r requirements.txt
 
 Konfigurasi
 -----------
@@ -170,8 +168,8 @@ Ada dua hal yang harus dijalankan:
 
 1. Django server
 
-        $ ./bin/django runfcgi method=prefork host=127.0.0.1 port=18000
+        $ python manage.py runfcgi method=prefork host=127.0.0.1 port=18000
 
 2. TaskInit worker
 
-        $ ./bin/django celeryd -n taskinit
+        $ python manage.py celeryd -n taskinit
