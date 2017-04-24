@@ -1,15 +1,58 @@
-FROM debian:stable-slim
-MAINTAINER Herpiko Dwi Aguno <herpiko@gmail.com>
-ENV DOCKYARD_SRC="."
-ENV DOCKYARD_SRVHOME=/opt
-ENV DOCKYARD_SRVPROJ=/opt/irgsh-web
-COPY $DOCKYARD_SRC $DOCKYARD_SRVPROJ
-EXPOSE 8000
-RUN apt-get -y update && apt-get -y install make build-essential libssl-dev zlib1g-dev libbz2-dev \
+FROM debian:jessie-slim
+
+MAINTAINER BlankOn Developer <blankon-dev@googlegroups.com>
+
+# Environment for PyEnv purpose
+ENV HOME /root
+ENV PYENV_ROOT $HOME/.pyenv
+ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
+
+# Debian Deps
+RUN apt-get update -qq && apt-get install -y -qqq make build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils sudo \
-python python-pip python-dev python-debian dpkg-dev rabbitmq-server git-core nginx libpq-dev git vim
-WORKDIR $DOCKYARD_SRVPROJ
-RUN curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
-RUN ~/.pyenv/bin/pyenv install 2.6.6
-RUN export PATH=$PATH:/root/.pyenv/versions/2.6.6/bin
-RUN /bin/bash -c "pip install -r requirements.txt"
+python python-pip python-dev python-debian dpkg-dev rabbitmq-server git-core nginx libpq-dev git vim net-tools
+
+# Configure PyEnv for python 2.6.6 support
+RUN curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash &&\
+	/bin/bash -c "echo 'export PATH=\"$HOME/.pyenv/bin:${PATH}\"' >> ${HOME}/.bashrc" &&\
+	/bin/bash -c "echo 'eval \"\$(pyenv init -)\"' >> ${HOME}/.bashrc" &&\
+	/bin/bash -c "echo 'eval \"\$(pyenv virtualenv-init -)\"' >> ${HOME}/.bashrc" &&\
+	/bin/bash -c "source ${HOME}/.bashrc" &&\ 
+	pyenv install 2.6.6 &&\
+	pyenv global 2.6.6 &&\
+	mkdir ~/src/
+
+WORKDIR ~/src/
+
+# Clone the repo
+RUN git clone git://github.com/BlankOn/python-irgsh.git &&\
+	git clone git://github.com/BlankOn/irgsh-web.git && \
+	git clone git://github.com/BlankOn/irgsh-node.git && \
+	git clone git://github.com/BlankOn/irgsh-repo.git
+
+WORKDIR irgsh-web/
+
+RUN ln -s ../python-irgsh/irgsh && \
+	ln -s ../irgsh-node/irgsh_node && \
+	ln -s ../irgsh-repo/irgsh_repo
+
+# Bootstrap
+RUN python bootstrap.py
+
+# Small Hack for pyparsing and pip deps
+RUN sed -i 's/(MARKER_EXPR())/(MARKER_EXPR)/' $HOME/.pyenv/versions/2.6.6/lib/python2.6/site-packages/packaging/requirements.py &&\
+	rm -rf eggs/pyparsing* &&\
+	pip uninstall pyparsing -y &&\
+	pip install pyparsing &&\
+	pip install pyparsing==1.5.7 || echo "Pyparsing Try 1 fails" &&\
+	pip install pyparsing==1.5.7 || echo "Pyparsing Try 2 fails" &&\
+	pip install -r requirements.txt &&\
+	./bin/buildout
+
+# Expose Port
+EXPOSE 8080
+
+ENTRYPOINT ["./bin/django"]
+CMD ["runfcgi", "method=prefork", "host=0.0.0.0", "port=8080", "daemonize=false"]
+
+
