@@ -46,7 +46,7 @@ RUN sed -i 's/(MARKER_EXPR())/(MARKER_EXPR)/' $HOME/.pyenv/versions/2.6.6/lib/py
 	pip install pyparsing &&\
 	pip install pyparsing==1.5.7 || echo "Pyparsing Try 1 fails" &&\
 	pip install pyparsing==1.5.7 || echo "Pyparsing Try 2 fails" &&\
-	pip install -r requirements.txt &&\
+  python bootstrap.py &&\
 	./bin/buildout
 
 # Expose Port
