@@ -127,7 +127,7 @@ def store_package_info(spec, info):
             pass
 
 def build_source_opts(source_type, source_opts):
-    from .models import TARBALL, BZR
+    from .models import TARBALL, BZR, GIT
 
     if source_opts is None:
         source_opts = ''
@@ -136,7 +136,7 @@ def build_source_opts(source_type, source_opts):
     if source_type == TARBALL:
         return None
 
-    elif source_type == BZR:
+    elif source_type == BZR :
         '''
         valid opts:
         - tag=a-tag
@@ -156,6 +156,8 @@ def build_source_opts(source_type, source_opts):
             pass
 
         raise ValueError(_('Invalid source options for Bazaar'))
+    elif source_type == GIT :
+        return None
 
 class SpecInit(object):
     '''
@@ -217,7 +219,6 @@ class SpecInit(object):
             # Download source and build source package
             build_dir = tempfile.mkdtemp('-irgsh-build')
             source_dir = tempfile.mkdtemp('-irgsh-build-source')
-
             # Prepare logger
             logdir = os.path.dirname(self.spec.source_log_path())
             if not os.path.exists(logdir):

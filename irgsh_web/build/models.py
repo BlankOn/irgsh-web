@@ -21,6 +21,7 @@ BINARY = 1
 
 TARBALL = 'tarball'
 BZR = 'bzr'
+GIT = 'git'
 PATCH = 'patch'
 
 SPECIFICATION_STATUS = (
@@ -59,6 +60,7 @@ PACKAGE_CONTENT_TYPE = (
 SOURCE_TYPE = (
     (TARBALL, _('Tarball')),
     (BZR, _('Bazaar Repository')),
+    (GIT, _('Git Repository')),
     (PATCH, _('Diff/Patch')),
 )
 
